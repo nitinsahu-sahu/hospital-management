@@ -1,0 +1,47 @@
+{
+  "name": "hopital-server",
+  "version": "1.0.0",
+  "description": "Hospital, medicare, medicine",
+  "keywords": [
+    "hospital",
+    "medicate",
+    "doctor"
+  ],
+  "license": "ISC",
+  "author": "Nitin Sahu",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "debug": "node --inspect server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.9.0",
+    "compression": "^1.8.1",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "crypto": "^1.0.1",
+    "csv-writer": "^1.6.0",
+    "dotenv": "^17.3.1",
+    "exceljs": "^4.4.0",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.3.1",
+    "helmet": "^8.1.0",
+    "joi": "^18.1.2",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.5.0",
+    "morgan": "^1.10.1",
+    "multer": "^2.1.1",
+    "nanoid": "^5.1.7",
+    "node-cron": "^4.2.1",
+    "nodemailer": "^8.0.5",
+    "nodemon": "^3.1.14",
+    "pdfkit": "^0.18.0",
+    "razorpay": "^2.9.6",
+    "sanitize-html": "^2.17.3",
+    "slugify": "^1.6.8",
+    "streamifier": "^0.1.1"
+  }
+}
