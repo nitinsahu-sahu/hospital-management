@@ -59,6 +59,7 @@ app.use(cookieParser());
 // Routes
 app.use('/api/patient', require('../routes/patient.routes'));
 app.use('/api/prescription', require('../routes/prescription.routes'));
+app.use('/api/auth', require('../routes/user.route'));
 
 // Health check endpoint
 app.get('/health', (req, res) => {
