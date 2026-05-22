@@ -9,7 +9,7 @@ import Input from "../form/input/InputField";
 import Button from "../ui/button/Button";
 
 import { RootState } from "../../redux/store/store";
-import { login } from "../../redux/actions";
+import { login } from "../../redux/actions/auth.actions";
 
 
 export default function SignInForm() {
@@ -47,7 +47,6 @@ export default function SignInForm() {
     e.preventDefault();
 
     const response = await dispatch(login(formData));
-        console.log(response);
 
     if (response?.type === "LOGIN_SUCCESS") {
       navigate("/");

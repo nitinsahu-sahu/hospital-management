@@ -6,8 +6,11 @@ export interface PatientFormData {
   dateOfBirth: string;
   maritalStatus: string;
   bloodGroup: string;
-  mobile: string;
+  mobileNumber: string;
+  address: string;
+  durationOfMarriage:string;
   city: string;
+  sex: string;
   department: string;
   doctor: string;
   type: "OPD" | "IPD";
@@ -16,6 +19,7 @@ export interface PatientFormData {
   emergencyMobile: string;
   symptoms: string;
   fee: number | string;
+  age: number | string;
   paymentMode: "Cash" | "UPI" | "Card";
   paymentStatus: "Paid" | "Pending";
 }

@@ -49,8 +49,8 @@ const userSchema = new mongoose.Schema(
         UH_ID: {
             type: String,
             unique: true,
+            sparse: true,
         },
-
         age: {
             type: Number,
         },
@@ -62,7 +62,7 @@ const userSchema = new mongoose.Schema(
 
         maritalStatus: {
             type: String,
-            enum: ["single", "married", "divorced", "widowed"],
+            enum: ["single", "married", "divorced", "widowed","other"],
         },
 
         durationOfMarriage: {
@@ -162,7 +162,7 @@ const userSchema = new mongoose.Schema(
 
 // Password Hash
 userSchema.pre("save", async function () {
-    if (!this.isModified("password")) return next();
+    if (!this.isModified("password")) return;
 
     this.password = await bcrypt.hash(this.password, 10);
 });

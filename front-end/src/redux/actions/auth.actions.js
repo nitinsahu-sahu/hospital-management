@@ -1,5 +1,5 @@
-import { authConstants } from "./constants";
 import APIs from "../helper/api";
+import { authConstants } from "./constants";
 
 export const login = (data) => async (dispatch) => {
     const { email, password } = data;
@@ -8,7 +8,7 @@ export const login = (data) => async (dispatch) => {
 
     try {
         const response = await APIs.post("/auth/login", { email, password });
-        
+
         const { token, user, message, expiresIn } = response.data.data;
 
         // Calculate expiration time (current time + expiresIn)
@@ -21,7 +21,7 @@ export const login = (data) => async (dispatch) => {
 
         // Set a timer to log the user out when the token expires
         const timeout = setTimeout(() => {
-            dispatch(logout()); 
+            dispatch(logout());
         }, expiresIn);
 
         localStorage.setItem("logoutTimer", timeout);
@@ -38,9 +38,6 @@ export const login = (data) => async (dispatch) => {
         };
 
     } catch (error) {
-        console.log("error",error);
-        
-        // Dispatch failure
         dispatch({
             type: authConstants.LOGIN_FAILURE,
             payload: { message: error?.response?.data?.message || "Server error", error: error.status },
@@ -58,24 +55,42 @@ export const logout = () => async (dispatch) => {
     dispatch({ type: authConstants.LOGOUT_REQUEST });
 
     try {
-        await APIs.post("/auth/logout");
+        const response = await APIs.post("/auth/logout");
+
+        // Clear authentication data
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        localStorage.removeItem("expiresAt");
+
+        // Clear the logout timer
+        const timeout = localStorage.getItem("logoutTimer");
+        if (timeout) {
+            clearTimeout(Number(timeout));
+            localStorage.removeItem("logoutTimer");
+        }
+
+        dispatch({ type: authConstants.LOGOUT_SUCCESS });
+
+        return {
+            type: authConstants.LOGOUT_SUCCESS,
+            status: response.status,
+            message: response?.data?.message
+        };
     } catch (error) {
-        console.error("Logout error:", error);
+        dispatch({
+            type: authConstants.LOGOUT_FAILURE,
+            payload: {
+                message: "logout failed",
+                error: error.status
+            },
+        });
+
+        return {
+            type: authConstants.LOGOUT_FAILURE,
+            message: error?.response?.data?.message || "Server error",
+            status: error.status
+        };
     }
-
-    // Clear authentication data
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    localStorage.removeItem("expiresAt");
-
-    // Clear the logout timer
-    const timeout = localStorage.getItem("logoutTimer");
-    if (timeout) {
-        clearTimeout(Number(timeout));
-        localStorage.removeItem("logoutTimer");
-    }
-
-    dispatch({ type: authConstants.LOGOUT_SUCCESS });
 };
 
 export const isUserLoggedIn = () => async (dispatch) => {
