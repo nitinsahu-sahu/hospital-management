@@ -1,4 +1,6 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router";
+import { BrowserRouter as Router, Routes, Route,  redirect } from "react-router";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
 
 import SignIn from "./pages/AuthPages/SignIn";
 import SignUp from "./pages/AuthPages/SignUp";
@@ -33,10 +35,23 @@ import Prescription from "./pages/Prescription/Prescription";
 import PrescriptionView from "./pages/Prescription/Prescription-listing";
 
 import Protected from "./redux/helper/HOC";
-
+import { RootState } from "./redux/store/store";
+import { isUserLoggedIn } from "./redux/actions/auth.actions";
 
 export default function App() {
- 
+  
+  // let navigate = useNavigate();
+  const { authenticate } = useSelector(
+      (state: RootState) => state.auth
+    );
+  const dispatch = useDispatch()
+  
+  useEffect(() => {
+    if (!authenticate) {
+      dispatch(isUserLoggedIn());
+      redirect('/')
+    }
+  }, [])
 
   return (
     <Router>

@@ -9,6 +9,7 @@ const {
   loginUser,
   getAllPatients,
   logout,
+  createRelative
 } = require("../controllers/user.controller");
 
 const router = express.Router();
@@ -21,6 +22,7 @@ router.post("/logout", logout);
 // ================= PATIENT =================
 
 router.post("/patient/create", createPatient);
+router.post("/relative/create", createRelative);
 
 router.get("/patients", getAllPatients);
 

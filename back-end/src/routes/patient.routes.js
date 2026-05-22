@@ -6,7 +6,8 @@ const {
     getPatientById,
     updatePatient,
     deletePatient,
-    getRoleWise
+    getRoleWise,
+    createRelative
 } = require('../controllers/patient.controller');
 
 

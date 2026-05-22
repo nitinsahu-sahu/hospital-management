@@ -1,13 +1,63 @@
 
 const User = require("../models/User");
+const Relative = require("../models/Relative");
 const generateUHID = require("../utils/generateUHID");
 const jwt = require("jsonwebtoken");
 const { sendResponse } = require("../utils/response");
-const { calculateDuration,addDurations } = require("../utils/duration");
+const { calculateDuration, addDurations } = require("../utils/duration");
+
+// ================= CREATE RELATIVE=================
+
+exports.createRelative = async (req, res) => {
+    try {
+        const {
+            name,
+            age,
+            sex,
+            mobileNumber,
+            address,
+            email,
+            maritalStatus,
+            idProofType,
+            idProofNumber,
+            profilePic,
+            role,
+            UH_ID
+        } = req.body;
+
+        const existingPatient = await Relative.findOne({ mobileNumber });
+
+        if (existingPatient) {
+            return sendResponse(res, false, "Patient already exists", null, 400);
+        }
+
+        const patient = await Relative.create({
+            role,
+            name,
+            age,
+            email,
+            sex,
+            mobileNumber,
+            address,
+            maritalStatus,
+            idProofType,
+            idProofNumber,
+            profilePic,
+            UH_ID
+        });
+
+        return sendResponse(res, true, "Relative created successfully", patient, 201);
+
+    } catch (error) {
+        return sendResponse(res, false, error.message, null, 500);
+    }
+};
 
 // ================= CREATE PATIENT =================
 
 exports.createPatient = async (req, res) => {
+    console.log(req.body);
+    
     try {
         const {
             name,
@@ -28,10 +78,7 @@ exports.createPatient = async (req, res) => {
         const existingPatient = await User.findOne({ mobileNumber });
 
         if (existingPatient) {
-            return res.status(400).json({
-                success: false,
-                message: "Patient already exists",
-            });
+            return sendResponse(res, false, "Patient already exists", null, 400);
         }
 
         const patient = await User.create({
@@ -49,15 +96,14 @@ exports.createPatient = async (req, res) => {
             idProofType,
             idProofNumber,
             profilePic,
-            UH_ID: generateUHID(),
+            UH_ID: await generateUHID(),
         });
 
-        res.status(201).json({
-            success: true,
-            message: "Patient created successfully",
-            data: patient,
-        });
+        return sendResponse(res, true, "Patient created successfully", patient, 201);
+
     } catch (error) {
+        console.log(error);
+        
         return sendResponse(res, false, error.message, null, 500);
     }
 };
@@ -100,7 +146,7 @@ exports.createEmployee = async (req, res) => {
         });
 
         if (existingEmployee) {
-        return sendResponse(res, false, "Employee already exists", null, 400);
+            return sendResponse(res, false, "Employee already exists", null, 400);
         }
 
         const employee = await User.create({
@@ -109,7 +155,7 @@ exports.createEmployee = async (req, res) => {
         });
 
         return sendResponse(res, true, "Employee created successfully", employee, 201);
-       
+
     } catch (error) {
         return sendResponse(res, false, error.message, null, 500);
 
@@ -149,7 +195,18 @@ exports.loginUser = async (req, res) => {
             }
         );
 
-        return sendResponse(res, true, "Login successfully", { token, user,expiresIn:process.env.JWT_EXPIRE }, 200);
+        const cookieExpiry = 2 * 60 * 60 * 1000; //2 hours
+        res.cookie('token', token, {
+            sameSite: process.env.PRODUCTION ? "none" : 'Lax',
+            maxAge: cookieExpiry,
+            httpOnly: true,
+            secure: process.env.PRODUCTION ? true : false
+        });
+        return sendResponse(res, true, "Login successfully", {
+            token,
+            user,
+            expiresIn: cookieExpiry
+        }, 200);
 
     } catch (error) {
         return sendResponse(res, false, error.message, null, 500);
@@ -164,7 +221,7 @@ exports.getAllPatients = async (req, res) => {
             role: "patient",
         }).sort({ createdAt: -1 });
 
-        return sendResponse(res, true, "Get patient successfully.", {patients,count: patients.length}, 200);
+        return sendResponse(res, true, "Get patient successfully.", { patients, count: patients.length }, 200);
 
     } catch (error) {
         return sendResponse(res, false, error.message, null, 500);
@@ -227,9 +284,8 @@ exports.logout = async (req, res) => {
             secure: process.env.PRODUCTION === 'true' ? true : false
         });
 
-        return res.status(200).json({ message: "Logout successful" });
+        return sendResponse(res, true, "Logout successfully", null, 200);
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Error while logging out, please try again later" });
+        return sendResponse(res, false, error.message, null, 500);
     }
 };
