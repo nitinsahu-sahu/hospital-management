@@ -5,7 +5,7 @@ import PageMeta from "../../components/common/PageMeta";
 import Input from "../../components/form/input/InputField";
 import Select from "../../components/form/Select";
 import DatePicker from "../../components/form/date-picker";
-import { getRoleWise } from "../../services/patientService";
+// import { getRoleWise } from "../../services/patientService";
 import { createPrescription } from "../../services/prescriptionService";
 import { Patient } from "../../types/patient";
 import { useNavigate } from "react-router";
@@ -91,21 +91,21 @@ export default function Prescription() {
 
   const fetchPatientsAndDoctors = async () => {
     try {
-      const response = await getRoleWise();
+      // const response = await getRoleWise();
       
-      let patientData = response.data?.patient || response.patient || [];
-      let doctorData = response.data?.doctor || response.doctor || [];
+      // let patientData = response.data?.patient || response.patient || [];
+      // let doctorData = response.data?.doctor || response.doctor || [];
       
-      // Agar single object hai toh array mein convert karo
-      if (patientData && !Array.isArray(patientData)) {
-        patientData = [patientData];
-      }
-      if (doctorData && !Array.isArray(doctorData)) {
-        doctorData = [doctorData];
-      }
+      // // Agar single object hai toh array mein convert karo
+      // if (patientData && !Array.isArray(patientData)) {
+      //   patientData = [patientData];
+      // }
+      // if (doctorData && !Array.isArray(doctorData)) {
+      //   doctorData = [doctorData];
+      // }
       
-      setPatients(patientData);
-      setDoctors(doctorData);
+      // setPatients(patientData);
+      // setDoctors(doctorData);
     } catch (err) {
       console.error("Failed to fetch patients/doctors:", err);
       setError("Failed to load patients and doctors data");
@@ -188,7 +188,7 @@ export default function Prescription() {
 
   const doctorOptions = doctors.map((d) => ({
     value: d._id,
-    label: `${d.name} - ${d.patientId || d._id} (${d.specialization || 'Doctor'})`,
+    // label: `${d.name} - ${d.patientId || d._id} (${d.specialization || 'Doctor'})`,
   }));
 
   return (
@@ -228,12 +228,12 @@ export default function Prescription() {
               />
               
               {/* Doctor Select - Changed from Input to Select */}
-              <Select
+              {/* <Select
                 options={doctorOptions}
                 placeholder="Select Doctor *"
                 value={formData.doctorId}
                 onChange={(val) => handleSelectChange("doctorId", val)}
-              />
+              /> */}
             </div>
           </div>
 
@@ -356,7 +356,7 @@ export default function Prescription() {
               Additional Information
             </h4>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div>
+              {/* <div>
                 <DatePicker
                   id="follow-up"
                   placeholder="Select follow-up date"
@@ -364,7 +364,7 @@ export default function Prescription() {
                     setFormData({ ...formData, followUpDate: date })
                   }
                 />
-              </div>
+              </div> */}
               <Input
                 type="text"
                 name="notes"

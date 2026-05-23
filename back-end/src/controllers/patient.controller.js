@@ -1,47 +1,113 @@
+const Relative = require("../models/Relative");
+const User = require("../models/User.js");
+const generateUHID = require("../utils/generateUHID.js");
+const { sendResponse } = require("../utils/response.js");
 
-const Patient = require('../models/Patient.js');
+// ================= CREATE RELATIVE=================
 
-// 🔥 Generate Patient ID
-const generatePatientId = async () => {
-  const count = await Patient.countDocuments();
-  const id = `PAT${new Date().getFullYear()}${(count + 1)
-    .toString()
-    .padStart(4, "0")}`;
-  return id;
+exports.createRelative = async (req, res) => {
+  try {
+    const {
+      name,
+      age,
+      sex,
+      mobileNumber,
+      address,
+      email,
+      maritalStatus,
+      idProofType,
+      idProofNumber,
+      profilePic,
+      role,
+      UH_ID
+    } = req.body;
+
+    const existingPatient = await Relative.findOne({ mobileNumber });
+
+    if (existingPatient) {
+      return sendResponse(res, false, "Patient already exists", null, 400);
+    }
+
+    const patient = await Relative.create({
+      role,
+      name,
+      age,
+      email,
+      sex,
+      mobileNumber,
+      address,
+      maritalStatus,
+      idProofType,
+      idProofNumber,
+      profilePic,
+      UH_ID
+    });
+
+    return sendResponse(res, true, "Registration successfully", patient, 201);
+
+  } catch (error) {
+    return sendResponse(res, false, error.message, null, 500);
+  }
 };
 
-// ✅ Create Patient
+// ================= CREATE PATIENT =================
+
 exports.createPatient = async (req, res) => {
   try {
-    const patientId = await generatePatientId();
+    const {
+      name,
+      age,
+      sex,
+      mobileNumber,
+      address,
+      maritalStatus,
+      durationOfMarriage,
+      howToFindClinic,
+      referredByDoctorName,
+      idProofType,
+      idProofNumber,
+      profilePic,
+      infertiliyType
+    } = req.body;
 
-    // Convert dateOfBirth to Date object if it's a string
-    const patientData = {
-      ...req.body,
-      patientId,
-      dateOfBirth: new Date(req.body.dateOfBirth),
-    };
+    // const existingPatient = await User.findOne({ mobileNumber,email });
+    const existingPatient = await User.findOne({ mobileNumber });
+    if (existingPatient) {
+      return sendResponse(res, false, "Patient already exists", null, 400);
+    }
 
-    const patient = new Patient(patientData);
-    await patient.save();
-
-    res.status(201).json({
-      success: true,
-      message: "Patient registered successfully",
-      data: patient,
+    if (howToFindClinic && howToFindClinic.trim() !== "") {
+      patientData.howToFindClinic = howToFindClinic;
+    }
+    const patient = await User.create({
+      role: "patient",
+      name,
+      age,
+      infertiliyType,
+      sex,
+      mobileNumber,
+      address,
+      maritalStatus,
+      durationOfMarriage,
+      // howToFindClinic,
+      referredByDoctorName,
+      idProofType,
+      idProofNumber,
+      profilePic,
+      createdBy: req.user.id,
+      UH_ID: await generateUHID(),
     });
+
+    return sendResponse(res, true, "Patient created successfully", patient, 201);
+
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    return sendResponse(res, false, error.message, null, 500);
   }
 };
 
 // ✅ Get All Patients
 exports.getPatients = async (req, res) => {
   try {
-    // 📌 Query params
     let { page = 1, limit = 10 } = req.query;
 
     page = parseInt(page);
@@ -50,17 +116,16 @@ exports.getPatients = async (req, res) => {
     const skip = (page - 1) * limit;
 
     // 📊 Total documents
-    const total = await Patient.countDocuments();
+    const total = await User.countDocuments();
 
     // 📄 Paginated data
-    const patients = await Patient.find()
+    const patients = await User.find({role:"patient"})
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 
-    res.json({
-      success: true,
-      data: patients,
+    return sendResponse(res, true, "Get patient successfully", {
+      patients,
       pagination: {
         totalRecords: total,
         currentPage: page,
@@ -69,12 +134,9 @@ exports.getPatients = async (req, res) => {
         hasNextPage: page < Math.ceil(total / limit),
         hasPrevPage: page > 1,
       },
-    });
+    }, 200);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    return sendResponse(res, false, error.message, null, 500);
   }
 };
 
@@ -147,18 +209,16 @@ exports.getRoleWise = async (req, res) => {
   try {
     // Ek hi ID se patient role wala data lo
     const patient = await Patient.find({ role: "patient" });
-    
+
     // Usi ID se doctor role wala data lo
     const doctor = await Patient.find({ role: "doctor" });
 
     // Agar dono hi nahi mile
     if (!patient && !doctor) {
-      return res.status(404).json({ 
-        message: "No user found with this ID as patient or doctor" 
+      return res.status(404).json({
+        message: "No user found with this ID as patient or doctor"
       });
     }
-console.log(patient);
-console.log(doctor);
 
     // Dono objects alag-alag bhejo
     res.json({
@@ -168,7 +228,7 @@ console.log(doctor);
     });
 
   } catch (error) {
-console.log(error.message);
+    console.log(error.message);
 
     res.status(500).json({ message: error.message });
   }

@@ -1,4 +1,41 @@
 // types/patient.ts
+// types/patient.ts
+export interface Patient {
+  _id: string;
+  patientId: string;
+  UH_ID?: string;
+  name: string;
+  email?: string;
+  gender?: string;
+  sex?: string;
+  dateOfBirth?: string;
+  age?: number;
+  maritalStatus?: string;
+  bloodGroup?: string;
+  mobileNumber: string;
+  city?: string;
+  address?: string;
+  department?: string;
+  doctor?: string;
+  type: "OPD" | "IPD";
+  referredBy?: string;
+  emergencyName?: string;
+  emergencyMobile?: string;
+  symptoms?: string;
+  fee?: string;
+  paymentMode: "Cash" | "UPI" | "Card";
+  paymentStatus: "Paid" | "Pending";
+  idProofType?: string;
+  idProofNumber?: string;
+  infertiliyType?: string;
+  howToFindClinic?: string;
+  referredByDoctorName?: string;
+  durationOfMarriage?: string;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface PatientFormData {
   name: string;
   email: string;
@@ -7,10 +44,7 @@ export interface PatientFormData {
   maritalStatus: string;
   bloodGroup: string;
   mobileNumber: string;
-  address: string;
-  durationOfMarriage:string;
   city: string;
-  sex: string;
   department: string;
   doctor: string;
   type: "OPD" | "IPD";
@@ -18,18 +52,9 @@ export interface PatientFormData {
   emergencyName: string;
   emergencyMobile: string;
   symptoms: string;
-  fee: number | string;
-  age: number | string;
+  fee: string;
   paymentMode: "Cash" | "UPI" | "Card";
   paymentStatus: "Paid" | "Pending";
-}
-
-export interface Patient extends PatientFormData {
-  _id: string;
-  patientId: string;
-  doctorId: string;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface ApiResponse<T> {

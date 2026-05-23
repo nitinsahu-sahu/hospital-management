@@ -40,12 +40,11 @@ import { isUserLoggedIn } from "./redux/actions/auth.actions";
 
 export default function App() {
   
-  // let navigate = useNavigate();
   const { authenticate } = useSelector(
       (state: RootState) => state.auth
     );
   const dispatch = useDispatch()
-  
+
   useEffect(() => {
     if (!authenticate) {
       dispatch(isUserLoggedIn());

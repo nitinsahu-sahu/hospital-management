@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -10,11 +10,16 @@ import Button from "../ui/button/Button";
 
 import { RootState } from "../../redux/store/store";
 import { login } from "../../redux/actions/auth.actions";
+import ComponentCard from "../common/ComponentCard";
+import Alert from "../ui/alert/Alert";
 
 
 export default function SignInForm() {
   const dispatch = useDispatch<any>();
   const navigate = useNavigate();
+  const hasNavigated = useRef(false); // Track if navigation already happened
+  const [error, setError] = useState<string>("");
+  const [success, setSuccess] = useState<string>("");
 
   const { authenticate, loading } = useSelector(
     (state: RootState) => state.auth
@@ -27,11 +32,18 @@ export default function SignInForm() {
     password: "vinod@!232",
   });
 
-  // Redirect after login
+  // Redirect after login - only if user is authenticated and comes to signin page
   useEffect(() => {
-    if (authenticate) {
-      navigate("/");
+    if (authenticate && !hasNavigated.current) {
+      hasNavigated.current = true;
+      // Use replace to prevent going back to signin
+      navigate("/", { replace: true });
     }
+
+    // Reset the ref when component unmounts or auth state changes
+    return () => {
+      hasNavigated.current = false;
+    };
   }, [authenticate, navigate]);
 
   // Handle input
@@ -45,13 +57,19 @@ export default function SignInForm() {
   // Handle login
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    const response = await dispatch(login(formData));
-
-    if (response?.type === "LOGIN_SUCCESS") {
-      navigate("/");
-    } else {
-      alert(response?.message || "Login failed");
+    setError("");
+    setSuccess("");
+    try {
+      const response = await dispatch(login(formData));
+      if (response?.type === "LOGIN_SUCCESS") {
+        setSuccess(response.message);
+        hasNavigated.current = true;
+        navigate("/", { replace: true });
+      } else {
+        setError(response.message);
+      }
+    } catch (error) {
+      setError("Failed to login")
     }
   };
 
@@ -68,7 +86,38 @@ export default function SignInForm() {
               Enter your email and password to sign in!
             </p>
           </div>
-
+          {
+            success && (
+              <ComponentCard title="Success Alert">
+                <Alert
+                  variant="success"
+                  title="Success Message"
+                  message={success}
+                  showLink={false}
+                />
+              </ComponentCard>
+            )
+          }
+          {
+            success && (
+              <Alert
+                variant="success"
+                title="Success Message"
+                message={success}
+                showLink={false}
+              />
+            )
+          }
+          {
+            error && (
+              <Alert
+                variant="error"
+                title="Error Message"
+                message={error}
+                showLink={false}
+              />
+            )
+          }
           <div>
             <form onSubmit={handleSubmit}>
               <div className="space-y-6">
