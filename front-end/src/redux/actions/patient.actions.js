@@ -10,13 +10,13 @@ export const createPatient = (data) => async (dispatch) => {
 
         dispatch({
             type: patientConstants.CREATE_PATIENT_SUCCESS,
-            payload: { message:response?.data?.message, data:response?.data?.data },
+            payload: { message: response?.data?.message, data: response?.data?.data },
         });
         return {
             type: patientConstants.CREATE_PATIENT_SUCCESS,
             status: response.status,
             message: response?.data?.message,
-            UH_ID:response?.data?.data?.UH_ID
+            UH_ID: response?.data?.data?.UH_ID
         };
 
     } catch (error) {
@@ -42,12 +42,13 @@ export const createRelative = (data) => async (dispatch) => {
 
         dispatch({
             type: patientConstants.CREATE_RELATIVE_SUCCESS,
-            payload: { token, user, message },
+            payload: { message: response?.data?.message, data: response?.data?.data },
         });
         return {
             type: patientConstants.CREATE_RELATIVE_SUCCESS,
             status: response.status,
-            message: response?.data?.message
+            message: response?.data?.message,
+            UH_ID: response?.data?.data?.UH_ID
         };
 
     } catch (error) {

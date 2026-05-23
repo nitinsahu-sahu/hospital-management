@@ -21,7 +21,7 @@ export default function Patients() {
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
   const dispatch = useDispatch<any>();
-
+const navigate = useNavigate();
   // Options
   const genderOptions: Option[] = [
     { value: "male", label: "Male" },
@@ -54,7 +54,7 @@ export default function Patients() {
 
   const howToFindClinicOptions: Option[] = [
     { value: "google", label: "Google" },
-    { value: "justdial", label: "Just Dial"},
+    { value: "justdial", label: "Just Dial" },
     { value: "instagram", label: "Instagram" },
     { value: "facebook", label: "Facebook" },
     { value: "friend", label: "Friend" },
@@ -196,7 +196,7 @@ export default function Patients() {
 
   // Handle Patient Submit (Step 1)
   const handlePatientSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    
+
     e.preventDefault();
     setError("");
     setSuccess("");
@@ -210,10 +210,9 @@ export default function Patients() {
     try {
       const response = await dispatch(createPatient(patientFormData));
 
-      console.log(response, "patient");
       if (response?.type === "CREATE_PATIENT_SUCCESS") {
         setPatientUHID(response.UH_ID);
-        setRelativeFormData(prev => ({ ...prev, UH_ID: response.UH_ID }));
+        setRelativeFormData((prev:any) => ({ ...prev, UH_ID: response.UH_ID }));
 
         setSuccess("Patient registered successfully! Please fill relative details.");
         setCurrentStep(2);
@@ -250,18 +249,19 @@ export default function Patients() {
         ...relativeFormData,
         UH_ID: patientUHID || relativeFormData.UH_ID,
       }));
+      if (response?.type === "CREATE_RELATIVE_SUCCESS") {
 
-      setSuccess(response.message || "Relative registered successfully");
+        setSuccess(response.message || "Registration successfully");
 
-      // Clear session storage
-      sessionStorage.removeItem("currentPatientUHID");
-      sessionStorage.removeItem("registrationStep");
+        // Clear session storage
+        sessionStorage.removeItem("currentPatientUHID");
+        sessionStorage.removeItem("registrationStep");
 
-      // Reset all forms
-      setTimeout(() => {
+        // Reset all forms
+        setTimeout(() => {
         navigate("/patient/view");
       }, 3000);
-
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to register relative");
     } finally {
@@ -276,17 +276,10 @@ export default function Patients() {
 
     if (savedUHID && savedStep === "2") {
       setPatientUHID(savedUHID);
-      setRelativeFormData(prev => ({ ...prev, UH_ID: savedUHID }));
+      setRelativeFormData((prev:any) => ({ ...prev, UH_ID: savedUHID }));
       setCurrentStep(2);
     }
   });
-
-  // Handle Skip - Go to Step 2 manually (for page reload scenario)
-  const handleSkipToRelative = () => {
-    if (patientUHID) {
-      setCurrentStep(2);
-    }
-  };
 
   return (
     <>
@@ -300,8 +293,8 @@ export default function Patients() {
           <div className="flex items-center">
             <div
               className={`flex h-10 w-10 items-center justify-center rounded-full ${currentStep >= 1
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-200 text-gray-600"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200 text-gray-600"
                 }`}
             >
               1
@@ -319,8 +312,8 @@ export default function Patients() {
           <div className="flex items-center">
             <div
               className={`flex h-10 w-10 items-center justify-center rounded-full ${currentStep >= 2
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-200 text-gray-600"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200 text-gray-600"
                 }`}
             >
               2
