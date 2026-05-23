@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema(
     {
         role: {
             type: String,
-            enum: ["doctor", "patient", "employee", "cousin", "husband"],
+            enum: ["doctor", "patient", "employee"],
             required: true,
         },
 
@@ -62,7 +62,7 @@ const userSchema = new mongoose.Schema(
 
         maritalStatus: {
             type: String,
-            enum: ["single", "married", "divorced", "widowed","other"],
+            enum: ["single", "married", "divorced", "widowed", "other"],
         },
 
         durationOfMarriage: {
@@ -83,6 +83,7 @@ const userSchema = new mongoose.Schema(
                 "youtube",
                 "other",
             ],
+            default:""
         },
 
         referredByDoctorName: {
@@ -106,6 +107,7 @@ const userSchema = new mongoose.Schema(
                 "primary",
                 "secondary",
             ],
+            default:"primary"
         },
 
         idProofNumber: {
@@ -153,6 +155,10 @@ const userSchema = new mongoose.Schema(
         isActive: {
             type: Boolean,
             default: true,
+        },
+        createdBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User"
         },
     },
     {

@@ -46,7 +46,7 @@ exports.createRelative = async (req, res) => {
             UH_ID
         });
 
-        return sendResponse(res, true, "Relative created successfully", patient, 201);
+        return sendResponse(res, true, "Registration successfully", patient, 201);
 
     } catch (error) {
         return sendResponse(res, false, error.message, null, 500);
@@ -56,8 +56,7 @@ exports.createRelative = async (req, res) => {
 // ================= CREATE PATIENT =================
 
 exports.createPatient = async (req, res) => {
-    console.log(req.body);
-    
+
     try {
         const {
             name,
@@ -96,6 +95,7 @@ exports.createPatient = async (req, res) => {
             idProofType,
             idProofNumber,
             profilePic,
+            createdBy: req.user.id,
             UH_ID: await generateUHID(),
         });
 
@@ -103,7 +103,7 @@ exports.createPatient = async (req, res) => {
 
     } catch (error) {
         console.log(error);
-        
+
         return sendResponse(res, false, error.message, null, 500);
     }
 };
