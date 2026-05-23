@@ -6,7 +6,7 @@ export const createPatient = (data) => async (dispatch) => {
     dispatch({ type: patientConstants.CREATE_PATIENT_REQUEST });
 
     try {
-        const response = await APIs.post("/auth/patient/create", data);
+        const response = await APIs.post("/patient/create", data);
 
         dispatch({
             type: patientConstants.CREATE_PATIENT_SUCCESS,
@@ -38,7 +38,7 @@ export const createRelative = (data) => async (dispatch) => {
     dispatch({ type: patientConstants.CREATE_RELATIVE_REQUEST });
 
     try {
-        const response = await APIs.post("/auth/relative/create", data);
+        const response = await APIs.post("/patient/relative/create", data);
 
         dispatch({
             type: patientConstants.CREATE_RELATIVE_SUCCESS,
@@ -62,5 +62,28 @@ export const createRelative = (data) => async (dispatch) => {
             message: error?.response?.data?.message || "Server error",
             status: error.status
         };
+    }
+};
+
+export const patientsFetch = (page = 1, limit = 10) => async (dispatch) => {
+    dispatch({ type: patientConstants.GET_REQUEST });
+
+    try {
+        const response = await APIs.get(`/patient?page=${page}&limit=${limit}`);
+
+        dispatch({
+            type: patientConstants.GET_SUCCESS,
+            payload: {
+                pagination:response?.data?.data.pagination,
+                patients:response?.data?.data.patients,
+                message: response?.data?.message,
+            },
+
+        });
+    } catch (error) {
+        dispatch({
+            type: patientConstants.GET_FAILURE,
+            payload: { message: error?.response?.data?.message || "Server error", error: error.status },
+        });
     }
 };

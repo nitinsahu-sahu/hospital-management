@@ -50,16 +50,19 @@ const relativeSchema = new mongoose.Schema(
         maritalStatus: {
             type: String,
             enum: ["single", "married", "divorced", "widowed"],
+            default:"married"
         },
 
         idProofType: {
             type: String,
             enum: [
                 "aadhaar",
-                "pan_card",
+                "pancard",
                 "passport",
                 "driving_license",
+                "voter",
             ],
+            default:"aadhaar"
         },
 
         idProofNumber: {

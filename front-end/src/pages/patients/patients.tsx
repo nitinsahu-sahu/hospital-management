@@ -7,11 +7,9 @@ import Select from "../../components/form/Select";
 import { createPatient, createRelative } from "../../redux/actions/patient.actions.js";
 import { useNavigate } from "react-router";
 import { useDispatch } from "react-redux";
+import { genderOptions, howToFindClinicOptions, idProofTypeOptions, infertiliyTypeOptions, maritalStatusOptions, relativeRoleOptions, roleOptions } from "../../utils/patientSelection.js";
 
-interface Option {
-  value: string;
-  label: string;
-}
+
 
 export default function Patients() {
   // const navigate = useNavigate();
@@ -21,56 +19,7 @@ export default function Patients() {
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
   const dispatch = useDispatch<any>();
-const navigate = useNavigate();
-  // Options
-  const genderOptions: Option[] = [
-    { value: "male", label: "Male" },
-    { value: "female", label: "Female" },
-    { value: "other", label: "Other" },
-  ];
-
-  const maritalStatusOptions: Option[] = [
-    { value: "single", label: "Single" },
-    { value: "married", label: "Married" },
-    { value: "divorced", label: "Divorced" },
-    { value: "widowed", label: "Widowed" },
-    { value: "other", label: "Other" },
-  ];
-
-  const idProofTypeOptions: Option[] = [
-    { value: "aadhaar", label: "Aadhaar Card" },
-    { value: "pan", label: "PAN Card" },
-    { value: "voter", label: "Voter ID" },
-    { value: "driving", label: "Driving License" },
-    { value: "passport", label: "Passport" },
-  ];
-
-  const infertiliyTypeOptions: Option[] = [
-    { value: "primary", label: "Primary" },
-    { value: "secondary", label: "Secondary" },
-    { value: "unexplained", label: "Unexplained" },
-    { value: "other", label: "Other" },
-  ];
-
-  const howToFindClinicOptions: Option[] = [
-    { value: "google", label: "Google" },
-    { value: "justdial", label: "Just Dial" },
-    { value: "instagram", label: "Instagram" },
-    { value: "facebook", label: "Facebook" },
-    { value: "friend", label: "Friend" },
-    { value: "relative", label: "Relative" },
-    { value: "doctor", label: "Doctor" },
-    { value: "newspaper", label: "News Paper" },
-    { value: "youtube", label: "YouTube" },
-    { value: "other", label: "Other" },
-  ];
-
-  const roleOptions: Option[] = [
-    { value: "husband", label: "Husband" },
-    { value: "wife", label: "Wife" },
-    { value: "cousin", label: "Cousin" },
-    { value: "other", label: "Other" },
-  ];
+  const navigate = useNavigate();
 
   // Patient Form Data
   const [patientFormData, setPatientFormData] = useState<any>({
@@ -146,10 +95,6 @@ const navigate = useNavigate();
       setError("Address is required");
       return false;
     }
-    if (!patientFormData.maritalStatus) {
-      setError("Marital status is required");
-      return false;
-    }
     if (!patientFormData.idProofType) {
       setError("ID proof type is required");
       return false;
@@ -212,7 +157,7 @@ const navigate = useNavigate();
 
       if (response?.type === "CREATE_PATIENT_SUCCESS") {
         setPatientUHID(response.UH_ID);
-        setRelativeFormData((prev:any) => ({ ...prev, UH_ID: response.UH_ID }));
+        setRelativeFormData((prev: any) => ({ ...prev, UH_ID: response.UH_ID }));
 
         setSuccess("Patient registered successfully! Please fill relative details.");
         setCurrentStep(2);
@@ -221,7 +166,7 @@ const navigate = useNavigate();
         sessionStorage.setItem("currentPatientUHID", response.UH_ID);
         sessionStorage.setItem("registrationStep", "2");
       } else {
-        alert(response?.message || "Login failed");
+        alert(response?.message);
       }
 
 
@@ -259,8 +204,8 @@ const navigate = useNavigate();
 
         // Reset all forms
         setTimeout(() => {
-        navigate("/patient/view");
-      }, 3000);
+          navigate("/patient/view");
+        }, 3000);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to register relative");
@@ -276,7 +221,7 @@ const navigate = useNavigate();
 
     if (savedUHID && savedStep === "2") {
       setPatientUHID(savedUHID);
-      setRelativeFormData((prev:any) => ({ ...prev, UH_ID: savedUHID }));
+      setRelativeFormData((prev: any) => ({ ...prev, UH_ID: savedUHID }));
       setCurrentStep(2);
     }
   });
@@ -599,7 +544,7 @@ const navigate = useNavigate();
               </h4>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <Select
-                  options={roleOptions}
+                  options={relativeRoleOptions}
                   placeholder="Select Role *"
                   value={relativeFormData.role}
                   onChange={(val) => handleRelativeSelectChange("role", val)}

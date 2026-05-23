@@ -6,7 +6,7 @@ import Input from "../../components/form/input/InputField";
 import Select from "../../components/form/Select";
 import DatePicker from "../../components/form/date-picker";
 import { getPrescriptions, deletePrescription, updatePrescription, getPrescriptionById } from "../../services/prescriptionService";
-import { getPatients } from "../../services/patientService";
+// import { getPatients } from "../../services/patientService";
 
 interface Medication {
   drugName: string;
@@ -126,8 +126,8 @@ export default function PrescriptionView() {
 
   const fetchPatients = async () => {
     try {
-      const response = await getPatients(1, 100);
-      setPatients(response.data);
+      // const response = await getPatients(1, 100);
+      // setPatients(response.data);
     } catch (err) {
       console.error("Failed to fetch patients");
     }

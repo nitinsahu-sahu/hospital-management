@@ -27,7 +27,6 @@ const userSchema = new mongoose.Schema(
             public_id: String,
             alt: String,
         },
-
         address: {
             type: String,
             trim: true,
@@ -71,19 +70,19 @@ const userSchema = new mongoose.Schema(
 
         howToFindClinic: {
             type: String,
-            enum: [
-                "google",
-                "justdial",
-                "instagram",
-                "facebook",
-                "friend",
-                "relative",
-                "doctor",
-                "newspaper",
-                "youtube",
-                "other",
-            ],
-            default:""
+            // enum: [
+            //     "google",
+            //     "justdial",
+            //     "instagram",
+            //     "facebook",
+            //     "friend",
+            //     "relative",
+            //     "doctor",
+            //     "newspaper",
+            //     "youtube",
+            //     "other",
+            // ],
+            default:"google"
         },
 
         referredByDoctorName: {
@@ -95,10 +94,12 @@ const userSchema = new mongoose.Schema(
             type: String,
             enum: [
                 "aadhaar",
-                "pan_card",
+                "pancard",
                 "passport",
                 "driving_license",
+                "voter",
             ],
+            default:"aadhaar"
         },
 
         infertiliyType: {
