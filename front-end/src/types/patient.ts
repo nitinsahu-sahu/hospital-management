@@ -14,6 +14,10 @@ export interface Patient {
   bloodGroup?: string;
   mobileNumber: string;
   relatives: [];
+  pic: {
+    url: string;
+    alt: string;
+  };
   city?: string;
   address?: string;
   department?: string;

@@ -52,14 +52,15 @@ app.use(cors(corsOptions));
 app.use(compression());
 app.use(morgan('combined'));
 // Body parsing and sanitization
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Routes
 app.use('/api/patient', require('../routes/patient.routes'));
 app.use('/api/prescription', require('../routes/prescription.routes'));
 app.use('/api/auth', require('../routes/user.route'));
+app.use('/api/consultation', require('../routes/consultation.routes'));
 
 // Health check endpoint
 app.get('/health', (req, res) => {

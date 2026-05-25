@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema(
             unique: true,
         },
 
-        profilePic: {
+        pic: {
             url: String,
             public_id: String,
             alt: String,
