@@ -3,6 +3,73 @@ const User = require("../models/User.js");
 const generateUHID = require("../utils/generateUHID.js");
 const { sendResponse } = require("../utils/response.js");
 
+// ✅ Get All Patients with their Relatives
+exports.getPatients = async (req, res) => {
+  try {
+    let { page = 1, limit = 10, includeRelatives = true } = req.query;
+
+    page = parseInt(page);
+    limit = parseInt(limit);
+
+    const skip = (page - 1) * limit;
+
+    // 📊 Total documents (only patients)
+    const total = await User.countDocuments({ role: "patient" });
+
+    // 📄 Paginated patients
+    const patients = await User.find({ role: "patient" })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean(); // Convert to plain JavaScript object
+
+    // 👥 Fetch relatives for each patient
+    if (includeRelatives === 'true' || includeRelatives === true) {
+      const patientsWithRelatives = await Promise.all(
+        patients.map(async (patient) => {
+          const relatives = await Relative.find({ 
+            UH_ID: patient.UH_ID 
+          }).lean();
+          
+          return {
+            ...patient,
+            relatives: relatives,
+            relativesCount: relatives.length
+          };
+        })
+      );
+
+      return sendResponse(res, true, "Get patients with relatives successfully", {
+        patients: patientsWithRelatives,
+        pagination: {
+          totalRecords: total,
+          currentPage: page,
+          totalPages: Math.ceil(total / limit),
+          limit,
+          hasNextPage: page < Math.ceil(total / limit),
+          hasPrevPage: page > 1,
+        },
+      }, 200);
+    }
+
+    // If relatives not requested, return patients without relatives
+    return sendResponse(res, true, "Get patients successfully", {
+      patients,
+      pagination: {
+        totalRecords: total,
+        currentPage: page,
+        totalPages: Math.ceil(total / limit),
+        limit,
+        hasNextPage: page < Math.ceil(total / limit),
+        hasPrevPage: page > 1,
+      },
+    }, 200);
+
+  } catch (error) {
+    return sendResponse(res, false, error.message, null, 500);
+  }
+};
+
 // ================= CREATE RELATIVE=================
 
 exports.createRelative = async (req, res) => {
@@ -105,40 +172,6 @@ exports.createPatient = async (req, res) => {
   }
 };
 
-// ✅ Get All Patients
-exports.getPatients = async (req, res) => {
-  try {
-    let { page = 1, limit = 10 } = req.query;
-
-    page = parseInt(page);
-    limit = parseInt(limit);
-
-    const skip = (page - 1) * limit;
-
-    // 📊 Total documents
-    const total = await User.countDocuments();
-
-    // 📄 Paginated data
-    const patients = await User.find({role:"patient"})
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
-
-    return sendResponse(res, true, "Get patient successfully", {
-      patients,
-      pagination: {
-        totalRecords: total,
-        currentPage: page,
-        totalPages: Math.ceil(total / limit),
-        limit,
-        hasNextPage: page < Math.ceil(total / limit),
-        hasPrevPage: page > 1,
-      },
-    }, 200);
-  } catch (error) {
-    return sendResponse(res, false, error.message, null, 500);
-  }
-};
 
 // ✅ Get Single Patient
 exports.getPatientById = async (req, res) => {

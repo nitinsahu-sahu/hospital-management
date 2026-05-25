@@ -13,6 +13,7 @@ export interface Patient {
   maritalStatus?: string;
   bloodGroup?: string;
   mobileNumber: string;
+  relatives: [];
   city?: string;
   address?: string;
   department?: string;

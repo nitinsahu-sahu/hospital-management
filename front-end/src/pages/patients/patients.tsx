@@ -4,10 +4,11 @@ import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import PageMeta from "../../components/common/PageMeta";
 import Input from "../../components/form/input/InputField";
 import Select from "../../components/form/Select";
+//@ts-ignore
 import { createPatient, createRelative } from "../../redux/actions/patient.actions.js";
 import { useNavigate } from "react-router";
 import { useDispatch } from "react-redux";
-import { genderOptions, howToFindClinicOptions, idProofTypeOptions, infertiliyTypeOptions, maritalStatusOptions, relativeRoleOptions, roleOptions } from "../../utils/patientSelection.js";
+import { genderOptions, howToFindClinicOptions, idProofTypeOptions, infertiliyTypeOptions, maritalStatusOptions, relativeRoleOptions } from "../../utils/patientSelection.js";
 
 
 
@@ -244,7 +245,7 @@ export default function Patients() {
             >
               1
             </div>
-            <span className="ml-2 text-sm font-medium">Patient Details</span>
+            <span className="ml-2 text-sm font-medium dark:text-white">Patient Details</span>
           </div>
 
           {/* Connector */}
@@ -263,7 +264,7 @@ export default function Patients() {
             >
               2
             </div>
-            <span className="ml-2 text-sm font-medium">Relative Details</span>
+            <span className="ml-2 text-sm font-medium dark:text-white">Relative Details</span>
           </div>
         </div>
       </div>
