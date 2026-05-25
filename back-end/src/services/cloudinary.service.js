@@ -5,7 +5,7 @@ const path = require('path');
 
 class CloudinaryService {
   constructor() {
-    this.folderPrefix = 'ecommerce/products';
+    this.folderPrefix = 'hospital/';
   }
   async uploadImage(buffer, options = {}) {
     try {

@@ -19,5 +19,5 @@ const upload = multer({
 });
 
 module.exports = {
-  uploadImages: upload.array('logo', 10)
+  uploadImages: upload.array('pic', 10)
 };

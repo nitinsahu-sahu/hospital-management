@@ -6,7 +6,12 @@ export const createPatient = (data) => async (dispatch) => {
     dispatch({ type: patientConstants.CREATE_PATIENT_REQUEST });
 
     try {
-        const response = await APIs.post("/patient/create", data);
+        const config = {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    };
+        const response = await APIs.post("/patient/create", data,config);
 
         dispatch({
             type: patientConstants.CREATE_PATIENT_SUCCESS,
@@ -34,11 +39,17 @@ export const createPatient = (data) => async (dispatch) => {
 };
 
 export const createRelative = (data) => async (dispatch) => {
+console.log(data);
 
     dispatch({ type: patientConstants.CREATE_RELATIVE_REQUEST });
 
     try {
-        const response = await APIs.post("/patient/relative/create", data);
+        const config = {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    };
+        const response = await APIs.post("/patient/relative/create", data,config);
 
         dispatch({
             type: patientConstants.CREATE_RELATIVE_SUCCESS,
