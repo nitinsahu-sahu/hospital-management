@@ -9,6 +9,7 @@ import Input from "../form/input/InputField";
 import Button from "../ui/button/Button";
 
 import { RootState } from "../../redux/store/store";
+//@ts-ignore
 import { login } from "../../redux/actions/auth.actions";
 import ComponentCard from "../common/ComponentCard";
 import Alert from "../ui/alert/Alert";
@@ -86,18 +87,6 @@ export default function SignInForm() {
               Enter your email and password to sign in!
             </p>
           </div>
-          {
-            success && (
-              <ComponentCard title="Success Alert">
-                <Alert
-                  variant="success"
-                  title="Success Message"
-                  message={success}
-                  showLink={false}
-                />
-              </ComponentCard>
-            )
-          }
           {
             success && (
               <Alert

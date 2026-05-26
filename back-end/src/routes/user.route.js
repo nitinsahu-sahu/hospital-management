@@ -22,7 +22,7 @@ const router = express.Router();
 // ================= AUTH =================
 
 router.post("/login", loginValidation, validate, loginUser);
-router.post("/logout", isAuth, logout);
+router.post("/logout", logout);
 
 // ================= DOCTOR =================
 

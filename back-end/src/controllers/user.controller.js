@@ -64,7 +64,7 @@ exports.loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email })
 
         if (!user) {
             return sendResponse(res, false, "User not found", null, 404);

@@ -30,13 +30,17 @@ import Home from "./pages/Dashboard/Home";
 
 import Patients from "./pages/patients/patients";
 import PatientsListing from "./pages/patients/patients-listing";
+import DoctorConsultation from "./pages/Consultation/DoctorCunsultation";
 
 import Prescription from "./pages/Prescription/Prescription";
 import PrescriptionView from "./pages/Prescription/Prescription-listing";
 
 import Protected from "./redux/helper/HOC";
 import { RootState } from "./redux/store/store";
+//@ts-ignore
 import { isUserLoggedIn } from "./redux/actions/auth.actions";
+import ExaminationOfCouple from "./pages/ExaminationOfCouple/ExaminationOfCouple";
+import PatientHistory from "./pages/PatientHistory/PatientHistory";
 
 export default function App() {
   
@@ -74,6 +78,9 @@ export default function App() {
 
           {/* Others Page */}
           <Route path="/profile" element={<UserProfiles />} />
+          <Route path="/patient-history" element={<PatientHistory />} />
+          <Route path="/examination-of-couple" element={<ExaminationOfCouple />} />
+          <Route path="/consultation" element={<DoctorConsultation />} />
           <Route path="/patient/add" element={<Patients />} />
           <Route path="/patient/view" element={<PatientsListing />} />
           <Route path="/prescription/add" element={<Prescription />} />
