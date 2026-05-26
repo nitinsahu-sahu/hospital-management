@@ -27,7 +27,6 @@ export default function RelativeRegistration({
   patientUHID,
   loading,
   onSubmit,
-  onBack,
   error,
   success,
 }: RelativeFormProps) {
@@ -196,14 +195,7 @@ export default function RelativeRegistration({
         />
 
         {/* Submit */}
-        <div className="flex justify-between">
-          <button
-            type="button"
-            onClick={onBack}
-            className="rounded-lg bg-gray-200 px-6 py-2 text-gray-700 hover:bg-gray-300 transition-colors"
-          >
-            Back
-          </button>
+        <div className="flex justify-center">
           <button
             type="submit"
             disabled={loading}

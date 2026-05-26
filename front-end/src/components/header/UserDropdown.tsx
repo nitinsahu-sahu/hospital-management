@@ -4,6 +4,7 @@ import { Dropdown } from "../ui/dropdown/Dropdown";
 import { useNavigate } from "react-router";
 import { RootState } from "../../redux/store/store";
 import { useDispatch, useSelector } from "react-redux";
+//@ts-ignore
 import { logout } from "../../redux/actions/auth.actions";
 import Button from "../ui/button/Button";
 
@@ -126,7 +127,7 @@ export default function UserDropdown() {
               Account settings
             </DropdownItem>
           </li>
-          <li>
+          {/* <li>
             <DropdownItem
               onItemClick={closeDropdown}
               tag="a"
@@ -150,7 +151,7 @@ export default function UserDropdown() {
               </svg>
               Support
             </DropdownItem>
-          </li>
+          </li> */}
         </ul>
         <Button
           onClick={handleLogout}

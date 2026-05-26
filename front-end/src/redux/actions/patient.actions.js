@@ -39,7 +39,6 @@ export const createPatient = (data) => async (dispatch) => {
 };
 
 export const createRelative = (data) => async (dispatch) => {
-console.log(data);
 
     dispatch({ type: patientConstants.CREATE_RELATIVE_REQUEST });
 
@@ -76,11 +75,11 @@ console.log(data);
     }
 };
 
-export const patientsFetch = (page = 1, limit = 10) => async (dispatch) => {
+export const patientsFetch = (page = 1, limit = 10,search = "") => async (dispatch) => {
     dispatch({ type: patientConstants.GET_REQUEST });
 
     try {
-        const response = await APIs.get(`/patient?page=${page}&limit=${limit}`);
+        const response = await APIs.get(`/patient?page=${page}&limit=${limit}&search=${search}`);
 
         dispatch({
             type: patientConstants.GET_SUCCESS,
@@ -94,6 +93,28 @@ export const patientsFetch = (page = 1, limit = 10) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: patientConstants.GET_FAILURE,
+            payload: { message: error?.response?.data?.message || "Server error", error: error.status },
+        });
+    }
+};
+
+export const searchPatientsFetch = (page = 1, limit = 10,search = "") => async (dispatch) => {
+    dispatch({ type: patientConstants.GET_SEARCH_REQUEST });
+
+    try {
+        const response = await APIs.get(`/patient?page=${page}&limit=${limit}&search=${search}`);
+
+        dispatch({
+            type: patientConstants.GET_SEARCH_SUCCESS,
+            payload: {
+                searchPatients:response?.data?.data.patients,
+                message: response?.data?.message,
+            },
+
+        });
+    } catch (error) {
+        dispatch({
+            type: patientConstants.GET_SEARCH_FAILURE,
             payload: { message: error?.response?.data?.message || "Server error", error: error.status },
         });
     }
