@@ -14,7 +14,8 @@ import {
   TableIcon,
   UserCircleIcon,
   Patients,
-  Prescription
+  Prescription,
+  Consultation
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 
@@ -38,6 +39,11 @@ const navItems: NavItem[] = [
       { name: "Add", path: "/patient/add", pro: false },
       { name: "View", path: "/patient/view", pro: false },
     ],
+  },
+  {
+    icon: <Consultation />,
+    name: "Doctor Consultation",
+    path: "/consultation",
   },
   {
     icon: <Prescription />,

@@ -56,8 +56,11 @@ import { ReactComponent as AlertHexaIcon } from "./alert-hexa.svg?react";
 import { ReactComponent as ErrorHexaIcon } from "./info-hexa.svg?react";
 import { ReactComponent as Patients } from "./patients.svg?react";
 import { ReactComponent as Prescription } from "./prescription.svg?react";
+import { ReactComponent as Consultation } from "./consultation.svg?react";
+import { ReactComponent as Save } from "./save.svg?react";
 
 export {
+  Consultation,
   Prescription,
   Patients,
   ErrorHexaIcon,
@@ -66,6 +69,7 @@ export {
   DownloadIcon,
   FileIcon,
   GridIcon,
+  Save,
   AudioIcon,
   VideoIcon,
   BoltIcon,

@@ -24,7 +24,7 @@ exports.createPatient = async (req, res) => {
       infertiliyType
     } = req.body;
 
-    
+
     const existingPatient = await User.findOne({ mobileNumber });
     if (existingPatient) {
       return sendResponse(res, false, "Patient already exists", null, 400);
@@ -96,7 +96,6 @@ exports.createRelative = async (req, res) => {
       role,
       UH_ID
     } = req.body;
-console.log(req.body);
 
     const existingPatient = await Relative.findOne({ mobileNumber });
 
@@ -142,7 +141,7 @@ console.log(req.body);
 
   } catch (error) {
     console.log(error);
-    
+
     return sendResponse(res, false, error.message, null, 500);
   }
 };
@@ -150,41 +149,102 @@ console.log(req.body);
 // ✅ Get All Patients with their Relatives
 exports.getPatients = async (req, res) => {
   try {
-    let { page = 1, limit = 10, includeRelatives = true } = req.query;
+    let {
+      page = 1,
+      limit = 10,
+      includeRelatives = true,
+      search = "",
+      gender,
+      age,
+      fromDate,
+      toDate,
+    } = req.query;
 
     page = parseInt(page);
     limit = parseInt(limit);
-
     const skip = (page - 1) * limit;
 
-    // 📊 Total documents (only patients)
-    const total = await User.countDocuments({ role: "patient" });
+    // 🧠 Dynamic filter object
+    let filter = { role: "patient" };
 
-    // 📄 Paginated patients
-    const patients = await User.find({ role: "patient" })
+    // 🔎 SEARCH (name, phone, UH_ID, email etc.)
+    if (search) {
+      filter.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { mobileNumber: { $regex: search, $options: "i" } },
+        { UH_ID: { $regex: search, $options: "i" } }
+      ];
+    }
+
+    // 🚻 Gender filter
+    if (gender) {
+      filter.gender = gender;
+    }
+
+    // 🎂 Age filter (if stored in DB)
+    if (age) {
+      filter.age = parseInt(age);
+    }
+
+    // 📅 Date range filter (createdAt)
+    if (fromDate || toDate) {
+      filter.createdAt = {};
+      if (fromDate) filter.createdAt.$gte = new Date(fromDate);
+      if (toDate) filter.createdAt.$lte = new Date(toDate);
+    }
+
+    // 📊 Total count
+    const total = await User.countDocuments(filter);
+
+    // 📄 Patients query
+    const patients = await User.find(filter)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .lean(); // Convert to plain JavaScript object
+      .lean();
 
-    // 👥 Fetch relatives for each patient
-    if (includeRelatives === 'true' || includeRelatives === true) {
+    // 👥 Relatives optional
+    if (includeRelatives === "true" || includeRelatives === true) {
       const patientsWithRelatives = await Promise.all(
         patients.map(async (patient) => {
-          const relatives = await Relative.find({ 
-            UH_ID: patient.UH_ID 
+          const relatives = await Relative.find({
+            UH_ID: patient.UH_ID,
           }).lean();
-          
+
           return {
             ...patient,
-            relatives: relatives,
-            relativesCount: relatives.length
+            relatives,
+            relativesCount: relatives.length,
           };
         })
       );
 
-      return sendResponse(res, true, "Get patients with relatives successfully", {
-        patients: patientsWithRelatives,
+      return sendResponse(
+        res,
+        true,
+        "Get patients with filters successfully",
+        {
+          patients: patientsWithRelatives,
+          pagination: {
+            totalRecords: total,
+            currentPage: page,
+            totalPages: Math.ceil(total / limit),
+            limit,
+            hasNextPage: page < Math.ceil(total / limit),
+            hasPrevPage: page > 1,
+          },
+        },
+        200
+      );
+    }
+
+    // without relatives
+    return sendResponse(
+      res,
+      true,
+      "Get patients successfully",
+      {
+        patients,
         pagination: {
           totalRecords: total,
           currentPage: page,
@@ -193,22 +253,9 @@ exports.getPatients = async (req, res) => {
           hasNextPage: page < Math.ceil(total / limit),
           hasPrevPage: page > 1,
         },
-      }, 200);
-    }
-
-    // If relatives not requested, return patients without relatives
-    return sendResponse(res, true, "Get patients successfully", {
-      patients,
-      pagination: {
-        totalRecords: total,
-        currentPage: page,
-        totalPages: Math.ceil(total / limit),
-        limit,
-        hasNextPage: page < Math.ceil(total / limit),
-        hasPrevPage: page > 1,
       },
-    }, 200);
-
+      200
+    );
   } catch (error) {
     return sendResponse(res, false, error.message, null, 500);
   }

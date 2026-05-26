@@ -4,7 +4,7 @@ import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import PageMeta from "../../components/common/PageMeta";
 import Input from "../../components/form/input/InputField";
 import Select from "../../components/form/Select";
-import DatePicker from "../../components/form/date-picker";
+// import DatePicker from "../../components/form/date-picker";
 // import { getRoleWise } from "../../services/patientService";
 import { createPrescription } from "../../services/prescriptionService";
 import { Patient } from "../../types/patient";
@@ -60,7 +60,7 @@ const routeOptions = [
 export default function Prescription() {
   const navigate = useNavigate();
   const [patients, setPatients] = useState<Patient[]>([]);
-  const [doctors, setDoctors] = useState<Patient[]>([]);
+  // const [doctors, setDoctors] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -184,11 +184,6 @@ export default function Prescription() {
   const patientOptions = patients.map((p) => ({
     value: p._id,
     label: `${p.name} - ${p.patientId || p._id}`,
-  }));
-
-  const doctorOptions = doctors.map((d) => ({
-    value: d._id,
-    // label: `${d.name} - ${d.patientId || d._id} (${d.specialization || 'Doctor'})`,
   }));
 
   return (
