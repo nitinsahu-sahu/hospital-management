@@ -58,8 +58,12 @@ import { ReactComponent as Patients } from "./patients.svg?react";
 import { ReactComponent as Prescription } from "./prescription.svg?react";
 import { ReactComponent as Consultation } from "./consultation.svg?react";
 import { ReactComponent as Save } from "./save.svg?react";
+import { ReactComponent as PatientHistory } from "./patient-history.svg?react";
+import { ReactComponent as Couple } from "./couple.svg?react";
 
 export {
+  PatientHistory,
+  Couple,
   Consultation,
   Prescription,
   Patients,

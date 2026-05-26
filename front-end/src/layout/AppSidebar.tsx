@@ -15,7 +15,9 @@ import {
   UserCircleIcon,
   Patients,
   Prescription,
-  Consultation
+  Consultation,
+  PatientHistory,
+  Couple
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 
@@ -44,6 +46,16 @@ const navItems: NavItem[] = [
     icon: <Consultation />,
     name: "Doctor Consultation",
     path: "/consultation",
+  },
+  {
+    icon: <PatientHistory />,
+    name: "Patient History",
+    path: "/patient-history",
+  },
+  {
+    icon: <Couple />,
+    name: "Examination of Couple",
+    path: "/examination-of-couple",
   },
   {
     icon: <Prescription />,

@@ -13,6 +13,9 @@ router.get('/all', consultationController.getAllConsultations);
 // Get single consultation
 router.get('/:id', consultationController.getConsultation);
 
+// Get single consultation
+router.get('/patient/:id', consultationController.getConsultationByPatientId);
+
 // Update consultation
 router.put('/:id', consultationController.updateConsultation);
 

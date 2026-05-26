@@ -48,8 +48,38 @@ exports.getAllConsultations = async (req, res) => {
   }
 };
 
+// Get consultation by patient id
+exports.getConsultationByPatientId = async (req, res) => {
+  try {
+    // Use findOne instead of findById to search by patientId
+    const consultation = await Consultation.findOne({ patientId: req.params.id })
+      .populate('patientId')
+      .populate('createdBy', 'name email')
+      .populate('updatedBy', 'name email');
+
+    if (!consultation) {
+      return res.status(404).json({
+        success: false,
+        message: 'Consultation not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: consultation
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching consultation',
+      error: error.message
+    });
+  }
+};
+
 // Get single consultation
 exports.getConsultation = async (req, res) => {
+  
   try {
     const consultation = await Consultation.findById(req.params.id).populate('patientId').populate('createdBy', 'name email')
       .populate('updatedBy', 'name email');
@@ -78,10 +108,11 @@ exports.getConsultation = async (req, res) => {
 exports.updateConsultation = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { fees } = req.body;
+    const { fees,totalAmount} = req.body;
 
     const updateData = {
-      updatedBy: userId
+      updatedBy: userId,
+      totalAmount
     };
 
     if (fees) {

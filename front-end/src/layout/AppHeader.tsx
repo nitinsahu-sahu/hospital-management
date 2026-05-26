@@ -16,7 +16,6 @@ const AppHeader: React.FC = () => {
   const [search, setSearch] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<any>(null);
-  console.log(selectedPatient);
 
   const handleToggle = () => {
     if (window.innerWidth >= 1024) {
@@ -54,6 +53,7 @@ const AppHeader: React.FC = () => {
 
     sessionStorage.setItem('selectedPatientId', patient._id);
     sessionStorage.setItem('selectedPatientUHID', patient.UH_ID);
+    sessionStorage.setItem('selectedPatient', JSON.stringify(patient));
   };
 
   useEffect(() => {
@@ -77,6 +77,7 @@ const AppHeader: React.FC = () => {
 
     sessionStorage.removeItem('selectedPatientId');
     sessionStorage.removeItem('selectedPatientUHID');
+    sessionStorage.removeItem('selectedPatient');
   };
 
   return (
