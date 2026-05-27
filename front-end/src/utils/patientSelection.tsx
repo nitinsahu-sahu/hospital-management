@@ -3,10 +3,15 @@ interface Option {
     label: string;
 }
 
+export const REGISTRATION_STEPS = [
+  { label: "Patient Details", step: 1 },
+  { label: "Relative Details", step: 2 },
+];
+
 export const genderOptions: Option[] = [
     { value: "male", label: "Male" },
     { value: "female", label: "Female" },
-    { value: "other", label: "Other" },
+    // { value: "other", label: "Other" },
 ];
 
 export const maritalStatusOptions: Option[] = [
@@ -39,7 +44,7 @@ export const howToFindClinicOptions: Option[] = [
     { value: "doctor", label: "Doctor" },
     { value: "newspaper", label: "News Paper" },
     { value: "youtube", label: "YouTube" },
-    { value: "other", label: "Other" },
+    // { value: "other", label: "Other" },
 ];
 
 export const roleOptions: Option[] = [

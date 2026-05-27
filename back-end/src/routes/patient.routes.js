@@ -6,7 +6,6 @@ const {
     getPatientById,
     updatePatient,
     deletePatient,
-    getRoleWise,
     createRelative
 } = require('../controllers/patient.controller');
 const isAuth = require('../middlewares/isAuth.middleware');
@@ -17,5 +16,9 @@ const { validate } = require('../middlewares/validate.middleware');
 router.post("/create", isAuth, uploadImages,createPatientValidation, validate,  createPatient);
 router.post("/relative/create", isAuth, uploadImages,createRelativeValidation, validate,  createRelative);
 router.get("/", getPatients);
+// updatePatientValidation, validate,
+router.get("/:id", getPatientById);
+router.put("/:id", isAuth, uploadImages,  updatePatient);
+router.delete("/:id", isAuth, deletePatient);
 
 module.exports = router;
