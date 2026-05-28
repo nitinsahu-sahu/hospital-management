@@ -17,6 +17,30 @@ const AppHeader: React.FC = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<any>(null);
 
+  // Load selected patient from sessionStorage on mount
+  useEffect(() => {
+    const loadSelectedPatient = () => {
+      const patientData = sessionStorage.getItem('selectedPatient');
+      const patientId = sessionStorage.getItem('selectedPatientId');
+      const patientUHID = sessionStorage.getItem('selectedPatientUHID');
+      
+      if (patientData && patientId && patientUHID) {
+        try {
+          const patient = JSON.parse(patientData);
+          setSelectedPatient(patient);
+        } catch (error) {
+          console.error('Error parsing patient data from session:', error);
+          // Clear invalid session data
+          sessionStorage.removeItem('selectedPatientId');
+          sessionStorage.removeItem('selectedPatientUHID');
+          sessionStorage.removeItem('selectedPatient');
+        }
+      }
+    };
+
+    loadSelectedPatient();
+  }, []);
+
   const handleToggle = () => {
     if (window.innerWidth >= 1024) {
       toggleSidebar();

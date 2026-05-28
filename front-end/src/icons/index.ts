@@ -60,8 +60,12 @@ import { ReactComponent as Consultation } from "./consultation.svg?react";
 import { ReactComponent as Save } from "./save.svg?react";
 import { ReactComponent as PatientHistory } from "./patient-history.svg?react";
 import { ReactComponent as Couple } from "./couple.svg?react";
+import { ReactComponent as EditIcon } from "./edit.svg?react";
+import { ReactComponent as ViewIcon } from "./view.svg?react";
 
 export {
+  ViewIcon,
+  EditIcon,
   PatientHistory,
   Couple,
   Consultation,

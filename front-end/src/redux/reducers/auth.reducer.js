@@ -1,3 +1,5 @@
+// redux/reducers/auth.reducer.js
+
 import { authConstants } from "../actions/constants";
 
 const initialState = {
@@ -9,23 +11,21 @@ const initialState = {
         mobileNumber: '',
         registrationNumber: '',
         department: '',
-        mobileNumber: '',
         email: '',
         address: "",
         experience: "",
         specialization: "",
         qualification: "",
+        pic: null,
     },
     authenticate: false,
     authenticating: false,
     error: null,
     message: '',
+    picUploading: false,
 };
 
-const authReducer = (state, action) => {
-    if (state === undefined) {
-        state = initialState;
-    }
+const authReducer = (state = initialState, action) => {
     switch (action.type) {
         case authConstants.LOGIN_REQUEST:
             return { ...state, authenticating: true };
@@ -50,19 +50,38 @@ const authReducer = (state, action) => {
             };
 
         case authConstants.LOGOUT_REQUEST:
-            return {
-                ...state,
-            };
+            return { ...state };
 
         case authConstants.LOGOUT_SUCCESS:
+            return { ...initialState };
+
+        // Profile Picture Update
+        case authConstants.UPDATE_PROFILE_PIC_REQUEST:
             return {
-                ...initialState,
+                ...state,
+                picUploading: true,
+                error: null,
+            };
+
+        case authConstants.UPDATE_PROFILE_PIC_SUCCESS:
+            return {
+                ...state,
+                user: action.payload.user,
+                picUploading: false,
+                message: action.payload.message,
+            };
+
+        case authConstants.UPDATE_PROFILE_PIC_FAILURE:
+            return {
+                ...state,
+                picUploading: false,
+                error: action.payload.error,
+                message: action.payload.message,
             };
 
         default:
             return state;
     }
 };
-
 
 export default authReducer;

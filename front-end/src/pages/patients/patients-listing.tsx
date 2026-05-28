@@ -6,10 +6,11 @@ import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import PageMeta from "../../components/common/PageMeta";
 import { Patient } from "../../types/patient";
 // @ts-ignore
-import { patientsFetch } from "../../redux/actions/patient.actions";
+import { patientsFetch,updatePatient,deletePatient } from "../../redux/actions/patient.actions";
 import { RootState } from "../../redux/store/store";
 import PatientTable from "../../components/tables/patientTable/PatientTable";
 import PatientViewModal from "../../components/models/PatientViewModal";
+import PatientEditModal from "../../components/models/PatientEditModal";
 import LoadingState from "../../components/common/LoadingState";
 import ErrorState from "../../components/common/ErrorState";
 import EmptyState from "../../components/common/EmptyState";
@@ -22,6 +23,10 @@ export default function PatientView() {
   // View Modal state
   const [viewModal, setViewModal] = useState<boolean>(false);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  
+  // Edit Modal state
+  const [editModal, setEditModal] = useState<boolean>(false);
+  const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
   
   // Get data directly from Redux store
   const { pagination, patients } = useSelector(
@@ -44,7 +49,6 @@ export default function PatientView() {
 
   useEffect(() => {
     fetchPatients(1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handlePageChange = (page: number): void => {
@@ -59,20 +63,70 @@ export default function PatientView() {
 
   // Handle Edit Patient
   const handleEdit = (patient: Patient): void => {
-    // Navigate to edit page or open edit modal
-    console.log("Edit patient:", patient._id);
+    setEditingPatient(patient);
+    setEditModal(true);
   };
 
-  // Handle Delete Patient
-  const handleDelete = (patient: Patient): void => {
-    // Implement delete functionality
-    console.log("Delete patient:", patient._id);
+  // Handle Edit Submit - NOW WITH API CALL
+  const handleEditSubmit = async (patientData: Partial<Patient>): Promise<void> => {
+    console.log("=== EDIT SUBMISSION ===");
+    console.log("Patient ID:", editingPatient?._id);
+    console.log("Updated Data:", patientData);
+    
+    try {
+      // Dispatch the update action
+      const result = await dispatch(updatePatient(editingPatient?._id, patientData));
+      
+      if (result?.type === "UPDATE_PATIENT_SUCCESS") {
+        // Success - refresh the list
+        console.log("Patient updated successfully:", result.message);
+        // Optional: Show success toast/notification
+      }
+    } catch (error) {
+      console.error("Failed to update patient:", error);
+      // Optional: Show error toast/notification
+    }
+    
+    // Close the modal
+    setEditModal(false);
+    setEditingPatient(null);
   };
+
+   // Handle Delete Patient - NOW WITH API CALL
+  const handleDelete = async (patient: Patient): Promise<void> => {
+    // Confirm before deleting
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete patient "${patient.name}" (UH ID: ${patient.UH_ID})?`
+    );
+    
+    if (!confirmDelete) return;
+    
+    console.log("Deleting patient:", patient._id);
+    
+    try {
+      const result = await dispatch(deletePatient(patient._id));
+      
+      if (result?.type === "DELETE_PATIENT_SUCCESS") {
+        console.log("Patient deleted successfully:", result.message);
+        // Optional: Show success toast/notification
+      }
+    } catch (error) {
+      console.error("Failed to delete patient:", error);
+      // Optional: Show error toast/notification
+    }
+  };
+
 
   // Close View Modal
   const closeViewModal = (): void => {
     setViewModal(false);
     setSelectedPatient(null);
+  };
+
+  // Close Edit Modal
+  const closeEditModal = (): void => {
+    setEditModal(false);
+    setEditingPatient(null);
   };
 
   return (
@@ -132,6 +186,15 @@ export default function PatientView() {
         <PatientViewModal
           patient={selectedPatient}
           onClose={closeViewModal}
+        />
+      )}
+
+      {/* Edit Patient Modal */}
+      {editModal && editingPatient && (
+        <PatientEditModal
+          patient={editingPatient}
+          onClose={closeEditModal}
+          onSubmit={handleEditSubmit}
         />
       )}
     </>
