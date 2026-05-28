@@ -603,21 +603,6 @@ export default function PatientEditModal({ patient, onClose, onSubmit }: Patient
               Cancel
             </button>
             <button
-              type="button"
-              onClick={() => {
-                console.log("=== DEBUG ===");
-                console.log("Current Form Data:", formData);
-                console.log("Current Relative:", hasRelative ? relative : null);
-                console.log("Complete Data:", { 
-                  ...formData, 
-                  relative: hasRelative ? relative : null 
-                });
-              }}
-              className="px-4 py-2 border border-blue-300 text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
-            >
-              Debug Console
-            </button>
-            <button
               type="submit"
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >

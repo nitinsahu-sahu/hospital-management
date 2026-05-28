@@ -12,18 +12,27 @@ export const getConsultationByPatientId = (patientId) => async (dispatch) => {
             type: consultationConstants.GET_CONSULTATION_BY_PATIENT_ID_SUCCESS,
             payload: data,
         });
-        return { payload: data };
+        return {
+            type: consultationConstants.GET_CONSULTATION_BY_PATIENT_ID_SUCCESS,
+            status: response.status,
+            message: response?.data?.message,
+            payload: data,
+        };
     } catch (error) {
         dispatch({
             type: consultationConstants.GET_CONSULTATION_BY_PATIENT_ID_FAILURE,
             payload: { message: error?.response?.data?.message || "Server error" },
         });
-        return { error: true };
+        return {
+            type: consultationConstants.GET_CONSULTATION_BY_PATIENT_ID_FAILURE,
+            message: error?.response?.data?.message || "Server error",
+            status: error.status,
+        };
     }
 };
 
 export const updateConsultation = (id, updateData) => async (dispatch) => {
-    
+
     dispatch({ type: consultationConstants.UPDATE_CONSULTATION_REQUEST });
 
     try {

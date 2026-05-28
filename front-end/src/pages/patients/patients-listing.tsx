@@ -6,7 +6,7 @@ import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import PageMeta from "../../components/common/PageMeta";
 import { Patient } from "../../types/patient";
 // @ts-ignore
-import { patientsFetch } from "../../redux/actions/patient.actions";
+import { patientsFetch,updatePatient,deletePatient } from "../../redux/actions/patient.actions";
 import { RootState } from "../../redux/store/store";
 import PatientTable from "../../components/tables/patientTable/PatientTable";
 import PatientViewModal from "../../components/models/PatientViewModal";
@@ -67,27 +67,55 @@ export default function PatientView() {
     setEditModal(true);
   };
 
-  // Handle Edit Submit
-  const handleEditSubmit = (patientData: Partial<Patient>): void => {
+  // Handle Edit Submit - NOW WITH API CALL
+  const handleEditSubmit = async (patientData: Partial<Patient>): Promise<void> => {
     console.log("=== EDIT SUBMISSION ===");
     console.log("Patient ID:", editingPatient?._id);
-    console.log("Patient Name:", editingPatient?.name);
     console.log("Updated Data:", patientData);
-    console.log("======================");
     
-    // TODO: Add API call here later
-    // dispatch(updatePatient(editingPatient._id, patientData));
+    try {
+      // Dispatch the update action
+      const result = await dispatch(updatePatient(editingPatient?._id, patientData));
+      
+      if (result?.type === "UPDATE_PATIENT_SUCCESS") {
+        // Success - refresh the list
+        console.log("Patient updated successfully:", result.message);
+        // Optional: Show success toast/notification
+      }
+    } catch (error) {
+      console.error("Failed to update patient:", error);
+      // Optional: Show error toast/notification
+    }
     
     // Close the modal
     setEditModal(false);
     setEditingPatient(null);
   };
 
-  // Handle Delete Patient
-  const handleDelete = (patient: Patient): void => {
-    // Implement delete functionality
-    console.log("Delete patient:", patient._id);
+   // Handle Delete Patient - NOW WITH API CALL
+  const handleDelete = async (patient: Patient): Promise<void> => {
+    // Confirm before deleting
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete patient "${patient.name}" (UH ID: ${patient.UH_ID})?`
+    );
+    
+    if (!confirmDelete) return;
+    
+    console.log("Deleting patient:", patient._id);
+    
+    try {
+      const result = await dispatch(deletePatient(patient._id));
+      
+      if (result?.type === "DELETE_PATIENT_SUCCESS") {
+        console.log("Patient deleted successfully:", result.message);
+        // Optional: Show success toast/notification
+      }
+    } catch (error) {
+      console.error("Failed to delete patient:", error);
+      // Optional: Show error toast/notification
+    }
   };
+
 
   // Close View Modal
   const closeViewModal = (): void => {

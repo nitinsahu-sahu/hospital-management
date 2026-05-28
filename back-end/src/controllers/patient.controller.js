@@ -1,5 +1,6 @@
 const Relative = require("../models/Relative");
 const User = require("../models/User.js");
+const mongoose = require("mongoose");
 const generateUHID = require("../utils/generateUHID.js");
 const { sendResponse } = require("../utils/response.js");
 const cloudinaryService = require("../services/cloudinary.service.js");
@@ -29,9 +30,9 @@ exports.createPatient = async (req, res) => {
       return sendResponse(res, false, "Patient already exists", null, 400);
     }
 
-    if (howToFindClinic && howToFindClinic.trim() !== "") {
-      patientData.howToFindClinic = howToFindClinic;
-    }
+    // if (howToFindClinic && howToFindClinic.trim() !== "") {
+    //   patientData.howToFindClinic = howToFindClinic;
+    // }
 
     let pic = {};
 
@@ -42,7 +43,6 @@ exports.createPatient = async (req, res) => {
         folder: "pic",
         public_id: `pic_${Date.now()}`,
         publicIdPrefix: `${Date.now()}`
-
       });
 
       pic = {
@@ -62,7 +62,7 @@ exports.createPatient = async (req, res) => {
       address,
       maritalStatus,
       durationOfMarriage,
-      // howToFindClinic,
+      howToFindClinic,
       referredByDoctorName,
       idProofType,
       idProofNumber,
@@ -74,6 +74,8 @@ exports.createPatient = async (req, res) => {
     return sendResponse(res, true, "Patient created successfully", patient, 201);
 
   } catch (error) {
+    console.log(error);
+    
     return sendResponse(res, false, error.message, null, 500);
   }
 };
@@ -300,6 +302,7 @@ exports.getPatientById = async (req, res) => {
 
 // ================= UPDATE PATIENT =================
 exports.updatePatient = async (req, res) => {
+
   try {
     const { id } = req.params;
     const {
@@ -315,7 +318,8 @@ exports.updatePatient = async (req, res) => {
       idProofType,
       idProofNumber,
       infertiliyType,
-      isActive
+      isActive,
+      relative  // Get relative data from request body
     } = req.body;
 
     // Find existing patient
@@ -339,7 +343,7 @@ exports.updatePatient = async (req, res) => {
       }
     }
 
-    // Prepare update data
+    // Prepare update data for patient
     const updateData = {
       updatedBy: req.user.id
     };
@@ -385,18 +389,78 @@ exports.updatePatient = async (req, res) => {
       id,
       { $set: updateData },
       { new: true, runValidators: true }
-    ).populate('createdBy', 'name email')
-      .populate('updatedBy', 'name email');
+    );
 
-    // Get relatives
-    const relatives = await Relative.find({
+    // Handle Relative Update/Create/Delete
+    if (relative !== undefined) {
+      // Check if relative exists for this patient
+      const existingRelative = await Relative.findOne({
+        UH_ID: existingPatient.UH_ID
+      });
+
+      if (relative === null || Object.keys(relative).length === 0) {
+        // If relative is null or empty, delete existing relative if any
+        if (existingRelative) {
+          await Relative.findByIdAndDelete(existingRelative._id);
+        }
+      } else {
+        // Prepare relative data
+        const relativeData = {
+          role: relative.role,
+          name: relative.name,
+          age: relative.age,
+          sex: relative.sex,
+          mobileNumber: relative.mobileNumber,
+          address: relative.address,
+          maritalStatus: relative.maritalStatus,
+          idProofType: relative.idProofType,
+          idProofNumber: relative.idProofNumber,
+          UH_ID: existingPatient.UH_ID,
+          isActive: relative.isActive !== undefined ? relative.isActive : true,
+        };
+
+        // Check if mobile number is being changed and if it's already taken by another relative
+        if (existingRelative && relative.mobileNumber !== existingRelative.mobileNumber) {
+          const mobileExists = await Relative.findOne({
+            mobileNumber: relative.mobileNumber,
+            _id: { $ne: existingRelative._id }
+          });
+          if (mobileExists) {
+            // Rollback patient update? Or just return error
+            return sendResponse(res, false, "Relative mobile number already exists", null, 400);
+          }
+        } else if (!existingRelative) {
+          const mobileExists = await Relative.findOne({
+            mobileNumber: relative.mobileNumber
+          });
+          if (mobileExists) {
+            return sendResponse(res, false, "Relative mobile number already exists", null, 400);
+          }
+        }
+
+        if (existingRelative) {
+          // Update existing relative
+          await Relative.findByIdAndUpdate(
+            existingRelative._id,
+            { $set: relativeData },
+            { new: true, runValidators: true }
+          );
+        } else {
+          // Create new relative
+          await Relative.create(relativeData);
+        }
+      }
+    }
+
+    // Get updated relatives (single relative)
+    const updatedRelatives = await Relative.find({
       UH_ID: updatedPatient.UH_ID
     }).lean();
 
     const patientWithRelatives = {
       ...updatedPatient.toObject(),
-      relatives,
-      relativesCount: relatives.length
+      relative: updatedRelatives.length > 0 ? updatedRelatives[0] : null,
+      hasRelative: updatedRelatives.length > 0,
     };
 
     return sendResponse(
@@ -415,35 +479,77 @@ exports.updatePatient = async (req, res) => {
 
 // ================= DELETE PATIENT =================
 exports.deletePatient = async (req, res) => {
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
     const { id } = req.params;
 
+    // Find the patient
     const patient = await User.findOne({
       _id: id,
       role: "patient"
-    });
+    }).session(session);
 
     if (!patient) {
+      await session.abortTransaction();
       return sendResponse(res, false, "Patient not found", null, 404);
     }
 
-    // Delete profile picture from cloudinary
+    // Find all relatives
+    const relatives = await Relative.find({
+      UH_ID: patient.UH_ID
+    }).session(session);
+
+    // Delete patient's profile picture from cloudinary
     if (patient.pic && patient.pic.public_id) {
       await cloudinaryService.deleteImage(patient.pic.public_id);
     }
 
-    // Delete all relatives associated with this patient
-    const relative = await Relative.deleteMany({ UH_ID: patient.UH_ID });
-    if (relative.pic && relative.pic.public_id) {
-      await cloudinaryService.deleteImage(relative.pic.public_id);
+    // Delete relatives' profile pictures from cloudinary
+    for (const relative of relatives) {
+      if (relative.pic && relative.pic.public_id) {
+        await cloudinaryService.deleteImage(relative.pic.public_id);
+      }
     }
-    // Delete patient
-    await User.findByIdAndDelete(id);
 
-    return sendResponse(res, true, "Patient and associated relatives deleted successfully", null, 200);
+    // Delete relatives from database
+    const deletedRelatives = await Relative.deleteMany(
+      { UH_ID: patient.UH_ID }
+    ).session(session);
+
+    // Delete patient from database
+    await User.findByIdAndDelete(id).session(session);
+
+    // Commit the transaction
+    await session.commitTransaction();
+
+    console.log(`Deleted patient ${patient.name} (${patient.UH_ID}) and ${deletedRelatives.deletedCount} relative(s)`);
+
+    return sendResponse(
+      res,
+      true,
+      `Patient and ${deletedRelatives.deletedCount} relative(s) deleted successfully`,
+      {
+        patient: {
+          _id: patient._id,
+          name: patient.name,
+          UH_ID: patient.UH_ID
+        },
+        deletedRelativesCount: deletedRelatives.deletedCount
+      },
+      200
+    );
 
   } catch (error) {
+    // Abort transaction on error
+    await session.abortTransaction();
+    console.error("Delete patient error:", error);
     return sendResponse(res, false, error.message, null, 500);
+  } finally {
+    // End session
+    session.endSession();
   }
 };
 

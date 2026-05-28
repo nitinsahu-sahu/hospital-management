@@ -61,7 +61,9 @@ export const logout = () => async (dispatch) => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         localStorage.removeItem("expiresAt");
-
+        sessionStorage.removeItem('selectedPatientId');
+        sessionStorage.removeItem('selectedPatientUHID');
+        sessionStorage.removeItem('selectedPatient');
         // Clear the logout timer
         const timeout = localStorage.getItem("logoutTimer");
         if (timeout) {
@@ -101,4 +103,51 @@ export const isUserLoggedIn = () => async (dispatch) => {
         type: token ? authConstants.LOGIN_SUCCESS : authConstants.LOGIN_FAILURE,
         payload: token ? { token, user } : { message: "Failed to login!!!" },
     });
+};
+
+export const updateProfilePic = (id, formData) => async (dispatch) => {
+    dispatch({ type: authConstants.UPDATE_PROFILE_PIC_REQUEST });
+
+    try {
+        const config = {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        };
+        const response = await APIs.put(`/auth/pic`, formData, config);
+
+        const { user } = response.data.data;
+
+        // Update localStorage
+        localStorage.setItem("user", JSON.stringify(user));
+
+        dispatch({
+            type: authConstants.UPDATE_PROFILE_PIC_SUCCESS,
+            payload: {
+                user,
+                message: response?.data?.message
+            },
+        });
+
+        return {
+            type: authConstants.UPDATE_PROFILE_PIC_SUCCESS,
+            status: response.status,
+            message: response?.data?.message,
+        };
+
+    } catch (error) {
+        dispatch({
+            type: authConstants.UPDATE_PROFILE_PIC_FAILURE,
+            payload: {
+                message: error?.response?.data?.message || "Server error",
+                error: error.status
+            },
+        });
+
+        return {
+            type: authConstants.UPDATE_PROFILE_PIC_FAILURE,
+            message: error?.response?.data?.message || "Server error",
+            status: error.status,
+        };
+    }
 };
