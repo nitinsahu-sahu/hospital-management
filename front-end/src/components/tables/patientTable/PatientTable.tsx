@@ -1,4 +1,5 @@
 // components/patient/PatientTable.tsx
+import { EditIcon,  TrashBinIcon, ViewIcon } from "../../../icons";
 import { Patient } from "../../../types/patient";
 import Pagination from "../../common/Pagination";
 
@@ -95,28 +96,38 @@ export default function PatientTable({
                   {patient.infertiliyType || "N/A"}
                 </span>
               </td>
-              <td className="px-4 py-3 text-sm">
-                <div className="flex gap-2">
+
+               <td className="px-4 py-3 text-sm">
+                <div className="flex justify-center gap-1">
                   <button
                     onClick={() => onView(patient)}
-                    className="px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                    className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors group relative"
                     title="View Details"
                   >
-                    View
+                    <ViewIcon />
+                    <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                      View
+                    </span>
                   </button>
                   <button
                     onClick={() => onEdit(patient)}
-                    className="px-3 py-1 text-xs bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors"
+                    className="p-2 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors group relative"
                     title="Edit Patient"
                   >
-                    Edit
+                    <EditIcon />
+                    <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                      Edit
+                    </span>
                   </button>
                   <button
                     onClick={() => onDelete(patient)}
-                    className="px-3 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                    className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors group relative"
                     title="Delete Patient"
                   >
-                    Delete
+                    <TrashBinIcon />
+                    <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                      Delete
+                    </span>
                   </button>
                 </div>
               </td>

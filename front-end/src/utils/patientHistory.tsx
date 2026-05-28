@@ -1,0 +1,67 @@
+interface Option {
+    value: string;
+    label: string;
+}
+
+export const complaintOptions:Option[]=[
+    { value: "decreased_fetal_movement", label: "Decreased fetal movement" },
+    { value: "loss_of_fetal_movement", label: "Loss of fetal movement" },
+    { value: "loose_motions", label: "Loose motions" },
+    { value: "lump_abdomen", label: "Lump abdomen" },
+    { value: "excessive_flow_during_periods", label: "Excessive flow during periods" },
+    { value: "irregular_bleeding_pv", label: "Irregular bleeding PV" },
+    { value: "delayed_menses", label: "Delayed menses" },
+    { value: "for_second_opinion", label: "For second opinion" },
+    { value: "for_expert_opinion", label: "For expert opinion" },
+    { value: "for_genetic_consultation", label: "For genetic consultation" },
+    { value: "referred_for_genetic_consultation", label: "Referred for genetic consultation" },
+    { value: "for_amniocentesis", label: "For amniocentesis" },
+    { value: "painful_periods", label: "Painful periods" },
+    { value: "foul_smell", label: "Foul smell" },
+    { value: "excessive_vaginal_discharge", label: "Excessive vaginal discharge" },
+    { value: "post_menopausal_bleeding", label: "Post menopausal bleeding" },
+    { value: "hot_flashes", label: "Hot flashes" },
+    { value: "vaginal_dryness", label: "Vaginal dryness" },
+
+]
+export const amenorrhoeaOptions:Option[]=[
+    { value: "half_month", label: "Half month" },
+    { value: "one_month", label: "One month" },
+    { value: "one_&_half_month", label: "One and half month" },
+    { value: "two_month", label: "Two month" },
+    { value: "two_&_half_month", label: "Two and half month" },
+    { value: "three_month", label: "Three month" },
+    { value: "three_&_half_month", label: "Three and half month" },
+    { value: "four_month", label: "Four month" },
+    { value: "four_&_half_month", label: "Four and half month" },
+    { value: "five_month", label: "Five month" },
+    { value: "five_&_half_month", label: "Five and half month" },
+    { value: "six_month", label: "Six month" },
+    { value: "six_&_half_month", label: "Six and half month" },
+    { value: "seven_month", label: "Seven month" },
+    { value: "seven_&_half_month", label: "Seven and half month" },
+    { value: "eight_month", label: "Eight month" },
+    { value: "eight_&_half_month", label: "Eight and half month" },
+    { value: "nine_month", label: "Nine month" },
+]
+export const chiefComplaintsOptions: Option[] = [
+    { value: "no_issue", label: "No issue" },
+    { value: "want_issue", label: "Want issue" },
+    { value: "unable_to_conceive", label: "Unable to conceive" },
+    { value: "pain_abdomen", label: "Pain abdomen" },
+    { value: "pain_lower_abdomen", label: "Pain lower abdomen" },
+    { value: "burning_urination", label: "Burning urination" },
+    { value: "increased_frequency_of_urination", label: "Increased frequency of urination" },
+    { value: "pain_during_passing_urine", label: "Pain during passing urine" },
+    { value: "nausea", label: "Nausea" },
+    { value: "vomiting", label: "Vomiting" },
+    { value: "giddiness_chakkar", label: "Giddiness / chakkar" },
+    { value: "no_menses", label: "No menses (Primary Amenorrhea)" },
+    { value: "itching_all_over_body", label: "Itching all over body" },
+    { value: "itching_lower_down", label: "Itching lower down" },
+    { value: "itching_vulva_vagina", label: "Itching vulva / vagina" },
+    { value: "discharge_per_vagina", label: "Discharge per vagina (PV)" },
+    { value: "bleeding_pv", label: "Bleeding PV" },
+    { value: "spotting_pv", label: "Spotting PV" },
+    { value: "other", label: "Other" },
+];

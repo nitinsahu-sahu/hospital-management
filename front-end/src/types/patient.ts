@@ -13,7 +13,8 @@ export interface Patient {
   maritalStatus?: string;
   bloodGroup?: string;
   mobileNumber: string;
-  relatives: [];
+  relative?:any;
+
   pic: {
     url: string;
     alt: string;

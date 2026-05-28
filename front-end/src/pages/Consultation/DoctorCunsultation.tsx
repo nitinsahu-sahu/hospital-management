@@ -47,33 +47,52 @@ export default function DoctorConsultation() {
     return total;
   }, [formData.fees]);
 
+  const resetForm = useCallback(() => {
+  setExistingConsultationId(null);
+  setIsExistingConsultation(false);
+  setFormData({
+    fees: {
+      freeOfCost: 0,
+      emergencyConsultationFee: '',
+      geneticConsultationFee: '',
+      opdConsultationFee: '',
+      additionalFees: []
+    },
+    totalAmount: 0
+  });
+}, []);
   // Fetch consultation for patient
-  const fetchConsultationForPatient = useCallback(async (patientId: string) => {
-    setIsLoadingConsultation(true);
-    try {
-      const result = await dispatch(getConsultationByPatientId(patientId) as any);
-      if (result?.payload) {
-        const consultationData = result.payload;
-        setExistingConsultationId(consultationData._id);
-        setIsExistingConsultation(true);
-        setFormData({
-          fees: {
-            freeOfCost: consultationData.fees?.freeOfCost || 0,
-            emergencyConsultationFee: consultationData.fees?.emergencyConsultationFee || '',
-            geneticConsultationFee: consultationData.fees?.geneticConsultationFee || '',
-            opdConsultationFee: consultationData.fees?.opdConsultationFee || '',
-            additionalFees: consultationData.fees?.additionalFees || []
-          },
-          totalAmount: consultationData.totalAmount || 0
-        });
-      } else {
-      }
-    } catch (error) {
-      console.error('Error fetching consultation:', error);
-    } finally {
-      setIsLoadingConsultation(false);
+ const fetchConsultationForPatient = useCallback(async (patientId: string) => {
+  setIsLoadingConsultation(true);
+  resetForm(); // Reset before fetching new patient data
+  
+  try {
+    const result = await dispatch(getConsultationByPatientId(patientId) as any);
+    console.log("getConsultationByPatientId", result);
+    
+    if (result?.type === "GET_CONSULTATION_BY_PATIENT_ID_SUCCESS" && result.payload) {
+      const consultationData = result.payload;
+      setExistingConsultationId(consultationData._id);
+      setIsExistingConsultation(true);
+      setFormData({
+        fees: {
+          freeOfCost: consultationData.fees?.freeOfCost || 0,
+          emergencyConsultationFee: consultationData.fees?.emergencyConsultationFee || '',
+          geneticConsultationFee: consultationData.fees?.geneticConsultationFee || '',
+          opdConsultationFee: consultationData.fees?.opdConsultationFee || '',
+          additionalFees: consultationData.fees?.additionalFees || []
+        },
+        totalAmount: consultationData.totalAmount || 0
+      });
     }
-  }, [dispatch]);
+    // If failure, form is already reset by resetForm()
+  } catch (error) {
+    console.error('Error fetching consultation:', error);
+    // resetForm already called, so no need to do anything
+  } finally {
+    setIsLoadingConsultation(false);
+  }
+}, [dispatch, resetForm]);
 
   // Handle patient selection
   useEffect(() => {

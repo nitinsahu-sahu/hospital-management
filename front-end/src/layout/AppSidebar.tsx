@@ -93,32 +93,6 @@ const navItems: NavItem[] = [
       { name: "404 Error", path: "/error-404", pro: false },
     ],
   },
-  {
-    name: "Amniocentesis",
-    icon: <PageIcon />,
-    path:"#"
-  },
-  {
-    name: "Consents",
-    icon: <PageIcon />,
-        path:"#"
-
-  },
-  {
-    name: "Billing",
-    icon: <PageIcon />,
-        path:"#"
-  },
-  {
-    name: "Documents",
-    icon: <PageIcon />,
-        path:"#"
-  },
-  {
-    name: "Setting",
-    icon: <PageIcon />,
-        path:"#"
-  },
 ];
 
 const othersItems: NavItem[] = [

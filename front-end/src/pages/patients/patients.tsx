@@ -10,11 +10,8 @@ import RelativeRegistration from "../../components/patients/RelativeRegistration
 import { createPatient, createRelative } from "../../redux/actions/patient.actions.js";
 
 import RegistrationStepper from "../../components/patients/RegistrationStepper.js";
+import { REGISTRATION_STEPS } from "../../utils/patientSelection.js";
 
-const REGISTRATION_STEPS = [
-  { label: "Patient Details", step: 1 },
-  { label: "Relative Details", step: 2 },
-];
 
 export default function Patients() {
   const [currentStep, setCurrentStep] = useState<number>(1);
@@ -38,8 +35,8 @@ export default function Patients() {
     referredByDoctorName: "",
     idProofType: "",
     idProofNumber: "",
-    pic: null, // For file
-    profilePicPreview: "", // For preview
+    pic: null, 
+    profilePicPreview: "", 
     infertiliyType: "",
   });
 

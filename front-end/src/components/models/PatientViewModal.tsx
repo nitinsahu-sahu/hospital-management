@@ -10,6 +10,7 @@ interface PatientViewModalProps {
 }
 
 export default function PatientViewModal({ patient, onClose }: PatientViewModalProps) {
+  
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
@@ -89,11 +90,9 @@ export default function PatientViewModal({ patient, onClose }: PatientViewModalP
 
           {/* Relatives Information */}
           <PatientInfoSection title="Relatives">
-            {patient.relatives && patient.relatives.length > 0 ? (
+            {patient.relative ? (
               <div className="space-y-4">
-                {patient.relatives.map((relative: any, index: number) => (
-                  <RelativeCard key={relative._id || index} relative={relative} />
-                ))}
+                  <RelativeCard relativedata={patient?.relative} />
               </div>
             ) : (
               <div className="text-center py-8 text-gray-500 dark:text-gray-400">

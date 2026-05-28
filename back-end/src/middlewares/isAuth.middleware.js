@@ -34,3 +34,15 @@ module.exports = async (req, res, next) => {
     return sendResponse(res, false, "Invalid or expired token", null, 401);
   }
 };
+
+exports.authorize = (...roles) => {
+    return (req, res, next) => {
+        if (!roles.includes(req.userRole)) {
+            return res.status(403).json({
+                success: false,
+                message: `User role ${req.userRole} is not authorized to access this route`
+            });
+        }
+        next();
+    };
+};
