@@ -13,6 +13,7 @@ exports.createPatient = async (req, res) => {
       name,
       age,
       sex,
+      sexDetails,
       mobileNumber,
       address,
       maritalStatus,
@@ -58,6 +59,7 @@ exports.createPatient = async (req, res) => {
       age,
       infertiliyType,
       sex,
+      sexDetails,
       mobileNumber,
       address,
       maritalStatus,
@@ -74,8 +76,6 @@ exports.createPatient = async (req, res) => {
     return sendResponse(res, true, "Patient created successfully", patient, 201);
 
   } catch (error) {
-    console.log(error);
-    
     return sendResponse(res, false, error.message, null, 500);
   }
 };
@@ -87,6 +87,7 @@ exports.createRelative = async (req, res) => {
       name,
       age,
       sex,
+      sexDetails,
       mobileNumber,
       address,
       email,
@@ -127,6 +128,7 @@ exports.createRelative = async (req, res) => {
       name,
       age,
       email,
+      sexDetails,
       sex,
       mobileNumber,
       address,

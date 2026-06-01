@@ -1,5 +1,5 @@
 // components/patient/PatientRegistration.tsx
-import { ChangeEvent, FormEvent } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 import Input from "../../components/form/input/InputField";
 import Select from "../../components/form/Select";
 import ImageUpload from "../../pages/Forms/ImageUpload";
@@ -30,6 +30,10 @@ export default function PatientRegistration({
   error,
   success,
 }: PatientFormProps) {
+  const [showOtherGenderInput, setShowOtherGenderInput] = useState(
+    patientFormData.sex === "other" || false
+  );
+
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setPatientFormData({ ...patientFormData, [name]: value });
@@ -37,13 +41,22 @@ export default function PatientRegistration({
 
   const handleSelectChange = (name: string, value: string) => {
     setPatientFormData({ ...patientFormData, [name]: value });
+    
+    // Show other gender input when "other" is selected
+    if (name === "sex") {
+      setShowOtherGenderInput(value === "other");
+      // Clear sexDetails when changing from "other" to something else
+      if (value !== "other") {
+        setPatientFormData((prev: any) => ({ ...prev, sexDetails: "" }));
+      }
+    }
   };
 
   const handleImageChange = (file: File | null, preview: string) => {
-    setPatientFormData({ 
-      ...patientFormData, 
+    setPatientFormData({
+      ...patientFormData,
       pic: file,
-      profilePicPreview: preview 
+      profilePicPreview: preview
     });
   };
 
@@ -93,6 +106,18 @@ export default function PatientRegistration({
               onChange={(val) => handleSelectChange("sex", val)}
             />
           </div>
+          {/* Other Gender Input - Shows when "Other" is selected */}
+          {showOtherGenderInput && (
+            <div className="mt-3">
+              <Input
+                type="text"
+                name="sexDetails"
+                placeholder="Please specify your gender *"
+                value={patientFormData.sexDetails || ""}
+                onChange={handleInputChange}
+              />
+            </div>
+          )}
         </div>
 
         {/* Contact Info */}

@@ -10,7 +10,6 @@ import {
   HorizontaLDots,
   ListIcon,
   PageIcon,
-  PieChartIcon,
   TableIcon,
   UserCircleIcon,
   Patients,
@@ -97,14 +96,6 @@ const navItems: NavItem[] = [
 
 const othersItems: NavItem[] = [
   {
-    icon: <PieChartIcon />,
-    name: "Charts",
-    subItems: [
-      { name: "Line Chart", path: "/line-chart", pro: false },
-      { name: "Bar Chart", path: "/bar-chart", pro: false },
-    ],
-  },
-  {
     icon: <BoxCubeIcon />,
     name: "UI Elements",
     subItems: [
@@ -113,7 +104,6 @@ const othersItems: NavItem[] = [
       { name: "Badge", path: "/badge", pro: false },
       { name: "Buttons", path: "/buttons", pro: false },
       { name: "Images", path: "/images", pro: false },
-      { name: "Videos", path: "/videos", pro: false },
     ],
   }
 ];

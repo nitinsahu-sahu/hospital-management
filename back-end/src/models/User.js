@@ -47,7 +47,6 @@ const userSchema = new mongoose.Schema(
         // ================= PATIENT FIELDS =================
         UH_ID: {
             type: String,
-            unique: true,
             sparse: true,
         },
         age: {
@@ -57,8 +56,12 @@ const userSchema = new mongoose.Schema(
         sex: {
             type: String,
             enum: ["male", "female", "other"],
+            default: "female"
         },
-
+        sexDetails: {
+            type: String,
+            required: false
+        },
         maritalStatus: {
             type: String,
             enum: ["single", "married", "divorced", "widowed", "other"],
@@ -82,7 +85,7 @@ const userSchema = new mongoose.Schema(
             //     "youtube",
             //     "other",
             // ],
-            default:"google"
+            default: "google"
         },
 
         referredByDoctorName: {
@@ -99,7 +102,7 @@ const userSchema = new mongoose.Schema(
                 "driving_license",
                 "voter",
             ],
-            default:"aadhaar"
+            default: "aadhaar"
         },
 
         infertiliyType: {
@@ -108,7 +111,7 @@ const userSchema = new mongoose.Schema(
                 "primary",
                 "secondary",
             ],
-            default:"primary"
+            default: "primary"
         },
 
         idProofNumber: {

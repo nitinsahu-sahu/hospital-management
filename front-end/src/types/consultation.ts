@@ -1,6 +1,7 @@
 export interface AdditionalFee {
   name: string;
   amount: number;
+  // addedAt:string;
 }
 
 export interface ConsultationFees {

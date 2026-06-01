@@ -8,8 +8,6 @@ With TailAdmin, you get access to all the necessary dashboard UI components, ele
 feature-rich and complete dashboard or admin panel. Whether you're building dashboard or admin panel for a complex web
 application or a simple website, TailAdmin is the perfect solution to help you get up and running quickly.
 
-![TailAdmin React.js Dashboard Preview](./banner.png)
-
 ## Overview
 
 TailAdmin provides essential UI components and layouts for building feature-rich, data-driven admin dashboards and

@@ -44,7 +44,6 @@ import { ReactComponent as TaskIcon } from "./task-icon.svg?react";
 import { ReactComponent as ListIcon } from "./list.svg?react";
 import { ReactComponent as TableIcon } from "./table.svg?react";
 import { ReactComponent as PageIcon } from "./page.svg?react";
-import { ReactComponent as PieChartIcon } from "./pie-chart.svg?react";
 import { ReactComponent as BoxCubeIcon } from "./box-cube.svg?react";
 import { ReactComponent as PlugInIcon } from "./plug-in.svg?react";
 import { ReactComponent as DocsIcon } from "./docs.svg?react";
@@ -62,8 +61,10 @@ import { ReactComponent as PatientHistory } from "./patient-history.svg?react";
 import { ReactComponent as Couple } from "./couple.svg?react";
 import { ReactComponent as EditIcon } from "./edit.svg?react";
 import { ReactComponent as ViewIcon } from "./view.svg?react";
+import { ReactComponent as MenuDotIcon } from "./menu-dot.svg?react";
 
 export {
+  MenuDotIcon,
   ViewIcon,
   EditIcon,
   PatientHistory,
@@ -118,7 +119,6 @@ export {
   ListIcon,
   TableIcon,
   PageIcon,
-  PieChartIcon,
   BoxCubeIcon,
   PlugInIcon,
   DocsIcon,

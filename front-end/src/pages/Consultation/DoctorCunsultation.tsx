@@ -41,7 +41,7 @@ export default function DoctorConsultation() {
     total += Number(formData.fees.emergencyConsultationFee) || 0;
     total += Number(formData.fees.geneticConsultationFee) || 0;
     total += Number(formData.fees.opdConsultationFee) || 0;
-    formData.fees.additionalFees.forEach((fee: AdditionalFee) => {
+    formData.fees.additionalFees.forEach((fee: any) => {
       total += fee.amount || 0;
     });
     return total;
@@ -68,7 +68,6 @@ export default function DoctorConsultation() {
   
   try {
     const result = await dispatch(getConsultationByPatientId(patientId) as any);
-    console.log("getConsultationByPatientId", result);
     
     if (result?.type === "GET_CONSULTATION_BY_PATIENT_ID_SUCCESS" && result.payload) {
       const consultationData = result.payload;

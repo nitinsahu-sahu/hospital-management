@@ -8,7 +8,22 @@ interface AdditionalFeesManagerProps {
   onRemoveFee: (index: number) => void;
 }
 
-export const AdditionalFeesManager: React.FC<AdditionalFeesManagerProps> = ({ fees, onAddFee, onRemoveFee }) => {
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  const options: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  };
+  return date.toLocaleDateString('en-IN', options);
+};
+
+export const AdditionalFeesManager= ({ fees, onAddFee, onRemoveFee }:any) => {
+  console.log("fees",fees);
+  
   const [newFee, setNewFee] = useState<NewFee>({ name: '', amount: '' });
 
   const handleAddFee = () => {
@@ -64,16 +79,27 @@ export const AdditionalFeesManager: React.FC<AdditionalFeesManagerProps> = ({ fe
       {/* Fees List */}
       {fees.length > 0 ? (
         <div className="space-y-3">
-          {fees.map((fee, index) => (
+          {fees.map((fee:any, index:any) => (
             <div key={index} className="flex items-center justify-between bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 hover:shadow-sm">
-              <div>
-                <h3 className="font-medium text-gray-900 dark:text-white">{fee.name}</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">₹{fee.amount.toLocaleString()}</p>
+              <div className="flex-1">
+                <div className="flex items-center gap-3">
+                  <h3 className="font-medium text-gray-900 dark:text-white">{fee.name}</h3>
+                  <span className="text-lg font-semibold text-blue-600 dark:text-blue-400">₹{fee.amount.toLocaleString()}</span>
+                </div>
+                {/* Date and Time Display */}
+                {fee.addedAt && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-1">
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {formatDate(fee.addedAt)}
+                  </p>
+                )}
               </div>
               <button
                 type="button"
                 onClick={() => onRemoveFee(index)}
-                className="p-2 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                className="p-2 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors ml-3"
               >
                 <TrashBinIcon />
               </button>

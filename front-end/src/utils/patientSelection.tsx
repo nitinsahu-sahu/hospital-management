@@ -11,7 +11,7 @@ export const REGISTRATION_STEPS = [
 export const genderOptions: Option[] = [
     { value: "male", label: "Male" },
     { value: "female", label: "Female" },
-    // { value: "other", label: "Other" },
+    { value: "other", label: "Other" },
 ];
 
 export const maritalStatusOptions: Option[] = [

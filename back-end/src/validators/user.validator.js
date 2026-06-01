@@ -52,9 +52,10 @@ exports.createPatientValidation = [
         .withMessage("ID proof type is required")
         .isIn([
             "aadhaar",
-            "pan_card",
+            "pancard",
             "passport",
             "driving_license",
+            "voter",
         ])
         .withMessage("Invalid ID proof type"),
 
@@ -68,7 +69,6 @@ exports.createPatientValidation = [
 // ================= CREATE RELATIVE =================
 
 exports.createRelativeValidation = [
-
     body("name")
         .notEmpty()
         .withMessage("Name is required"),

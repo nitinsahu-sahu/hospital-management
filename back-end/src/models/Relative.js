@@ -23,7 +23,10 @@ const relativeSchema = new mongoose.Schema(
             type: String,
             enum: ["male", "female", "other"],
         },
-
+sexDetails: {
+            type: String,
+            required: false
+        },
         mobileNumber: {
             type: String,
             required: true,

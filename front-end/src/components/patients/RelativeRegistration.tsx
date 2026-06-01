@@ -1,5 +1,5 @@
 // components/patient/RelativeRegistration.tsx
-import { ChangeEvent, FormEvent } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 import Input from "../../components/form/input/InputField";
 import Select from "../../components/form/Select";
 import {
@@ -30,6 +30,10 @@ export default function RelativeRegistration({
   error,
   success,
 }: RelativeFormProps) {
+  const [showOtherGenderInput, setShowOtherGenderInput] = useState(
+    relativeFormData.sex === "other" || false
+  );
+
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setRelativeFormData({ ...relativeFormData, [name]: value });
@@ -37,13 +41,22 @@ export default function RelativeRegistration({
 
   const handleSelectChange = (name: string, value: string) => {
     setRelativeFormData({ ...relativeFormData, [name]: value });
+
+    // Show other gender input when "other" is selected
+    if (name === "sex") {
+      setShowOtherGenderInput(value === "other");
+      // Clear sexDetails when changing from "other" to something else
+      if (value !== "other") {
+        setRelativeFormData((prev: any) => ({ ...prev, sexDetails: "" }));
+      }
+    }
   };
 
   const handleImageChange = (file: File | null, preview: string) => {
-    setRelativeFormData({ 
-      ...relativeFormData, 
+    setRelativeFormData({
+      ...relativeFormData,
       pic: file,
-      profilePicPreview: preview 
+      profilePicPreview: preview
     });
   };
 
@@ -101,7 +114,17 @@ export default function RelativeRegistration({
             />
           </div>
         </div>
-
+        {showOtherGenderInput && (
+          <div className="mt-3">
+            <Input
+              type="text"
+              name="sexDetails"
+              placeholder="Please specify your gender *"
+              value={relativeFormData.sexDetails || ""}
+              onChange={handleInputChange}
+            />
+          </div>
+        )}
         {/* Contact Info */}
         <div>
           <h4 className="mb-3 font-medium text-gray-700 dark:text-white">

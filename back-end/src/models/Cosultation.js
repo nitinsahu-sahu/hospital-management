@@ -31,7 +31,11 @@ const consultationSchema = new mongoose.Schema({
       amount: {
         type: Number,
         required: true
-      }
+      },
+      addedAt: {
+        type: Date,
+        default: Date.now
+      },
     }]
   },
   totalAmount: {

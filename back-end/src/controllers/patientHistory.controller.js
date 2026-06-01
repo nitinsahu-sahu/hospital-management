@@ -5,8 +5,6 @@ const Patient = require('../models/User');
 
 // Create Patient History
 exports.createPatientHistory = async (req, res) => {
-  console.log(req.body);
-  
   try {
     const {
       patientId,
