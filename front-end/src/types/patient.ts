@@ -8,9 +8,12 @@ export interface Patient {
   email?: string;
   gender?: string;
   sex?: string;
+  sexDetails?:string;
   dateOfBirth?: string;
   age?: number;
   maritalStatus?: string;
+  maritalStatusDetails?:string;
+  infertiliyTypeDetails?:string;
   bloodGroup?: string;
   mobileNumber: string;
   relative?:any;
@@ -32,9 +35,11 @@ export interface Patient {
   paymentMode: "Cash" | "UPI" | "Card";
   paymentStatus: "Paid" | "Pending";
   idProofType?: string;
+  idProofTypeDetails?:string;
   idProofNumber?: string;
   infertiliyType?: string;
   howToFindClinic?: string;
+  howToFindClinicDetails?:string;
   referredByDoctorName?: string;
   durationOfMarriage?: string;
   isActive?: boolean;

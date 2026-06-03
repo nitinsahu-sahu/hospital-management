@@ -1,24 +1,22 @@
-// controllers/patientHistory.controller.js
 const PatientHistory = require('../models/PatientHistory');
 const Consultation = require('../models/Cosultation');
 const Patient = require('../models/User');
 
 // Create Patient History
 exports.createPatientHistory = async (req, res) => {
-  console.log(req.body);
-  
   try {
     const {
       patientId,
       consultationId,
       chiefComplaints,
-      amenorrhoea,
-      complaint,
+      chiefComplaintsDetails,
+      // amenorrhoea,
+      // complaint,
       historyOfIllness,
       menstrualHistory,
       obstetricHistory,
       wifeMedicalHistory,
-      husbandHistory
+      husbandMedicalHistory
     } = req.body;
 
     // Check if patient exists
@@ -43,8 +41,9 @@ exports.createPatientHistory = async (req, res) => {
       patientId,
       consultationId,
       chiefComplaints,
-      amenorrhoea,
-      complaint,
+      chiefComplaintsDetails,
+      // amenorrhoea,
+      // complaint,
       historyOfIllness: {
         onset: historyOfIllness?.onset,
         duration: historyOfIllness?.duration,
@@ -53,14 +52,16 @@ exports.createPatientHistory = async (req, res) => {
       menstrualHistory: {
         cycleLength: menstrualHistory?.cycleLength,
         daysOfFlow: menstrualHistory?.daysOfFlow,
-        associatedSymptoms: menstrualHistory?.associatedSymptoms
+        associatedSymptoms: menstrualHistory?.associatedSymptoms,
+        lmp: menstrualHistory?.lmp
       },
       obstetricHistory: {
         gravida: obstetricHistory?.gravida,
         para: obstetricHistory?.para,
         living: obstetricHistory?.living,
         abortion: obstetricHistory?.abortion,
-        ectopic: obstetricHistory?.ectopic
+        sb_iod_dead: obstetricHistory?.sb_iod_dead,
+        ectopic: obstetricHistory?.ectopic 
       },
       wifeMedicalHistory: {
         diabetes: wifeMedicalHistory?.diabetes,
@@ -75,8 +76,18 @@ exports.createPatientHistory = async (req, res) => {
         smoking: wifeMedicalHistory?.smoking,
         drugAddiction: wifeMedicalHistory?.drugAddiction
       },
-      husbandHistory: {
-        clinicalHistory: husbandHistory?.clinicalHistory
+      husbandMedicalHistory: {
+        diabetes: husbandMedicalHistory?.diabetes,
+        hypertension: husbandMedicalHistory?.hypertension,
+        asthma: husbandMedicalHistory?.asthma,
+        thyroid: husbandMedicalHistory?.thyroid,
+        drugAllergy: husbandMedicalHistory?.drugAllergy,
+        drugAllergyDetails: husbandMedicalHistory?.drugAllergyDetails,
+        geneticDiseaseSelf: husbandMedicalHistory?.geneticDiseaseSelf,
+        geneticDiseaseFamily: husbandMedicalHistory?.geneticDiseaseFamily,
+        downSyndrome: husbandMedicalHistory?.downSyndrome,
+        smoking: husbandMedicalHistory?.smoking,
+        drugAddiction: husbandMedicalHistory?.drugAddiction
       },
       createdBy: req.user.id,
       updatedBy: req.user.id
@@ -97,7 +108,6 @@ exports.createPatientHistory = async (req, res) => {
       data: patientHistory
     });
   } catch (error) {
-    console.error('Error creating patient history:', error);
     res.status(500).json({
       success: false,
       message: 'Error creating patient history',
@@ -144,13 +154,14 @@ exports.updatePatientHistory = async (req, res) => {
     const { patientId } = req.params;
     const {
       chiefComplaints,
-      amenorrhoea,
-      complaint,
+      chiefComplaintsDetails,
+      // amenorrhoea,
+      // complaint,
       historyOfIllness,
       menstrualHistory,
       obstetricHistory,
       wifeMedicalHistory,
-      husbandHistory,
+      husbandMedicalHistory,
       consultationId
     } = req.body;
 
@@ -162,8 +173,9 @@ exports.updatePatientHistory = async (req, res) => {
 
     if (consultationId !== undefined) updateData.consultationId = consultationId;
     if (chiefComplaints !== undefined) updateData.chiefComplaints = chiefComplaints;
-    if (amenorrhoea !== undefined) updateData.amenorrhoea = amenorrhoea;
-    if (complaint !== undefined) updateData.complaint = complaint;
+    if (chiefComplaintsDetails !== undefined) updateData.chiefComplaintsDetails = chiefComplaintsDetails;
+    // if (amenorrhoea !== undefined) updateData.amenorrhoea = amenorrhoea;
+    // if (complaint !== undefined) updateData.complaint = complaint;
 
     if (historyOfIllness) {
       updateData.historyOfIllness = {};
@@ -177,6 +189,7 @@ exports.updatePatientHistory = async (req, res) => {
       if (menstrualHistory.cycleLength) updateData.menstrualHistory.cycleLength = menstrualHistory.cycleLength;
       if (menstrualHistory.daysOfFlow) updateData.menstrualHistory.daysOfFlow = menstrualHistory.daysOfFlow;
       if (menstrualHistory.associatedSymptoms) updateData.menstrualHistory.associatedSymptoms = menstrualHistory.associatedSymptoms;
+      if (menstrualHistory.lmp) updateData.menstrualHistory.lmp = menstrualHistory.lmp;
     }
 
     if (obstetricHistory) {
@@ -186,6 +199,7 @@ exports.updatePatientHistory = async (req, res) => {
       if (obstetricHistory.living) updateData.obstetricHistory.living = obstetricHistory.living;
       if (obstetricHistory.abortion) updateData.obstetricHistory.abortion = obstetricHistory.abortion;
       if (obstetricHistory.ectopic) updateData.obstetricHistory.ectopic = obstetricHistory.ectopic;
+      if (obstetricHistory.sb_iod_dead) updateData.obstetricHistory.sb_iod_dead = obstetricHistory.sb_iod_dead;
     }
 
     if (wifeMedicalHistory) {
@@ -197,9 +211,13 @@ exports.updatePatientHistory = async (req, res) => {
       });
     }
 
-    if (husbandHistory) {
-      updateData.husbandHistory = {};
-      if (husbandHistory.clinicalHistory) updateData.husbandHistory.clinicalHistory = husbandHistory.clinicalHistory;
+    if (husbandMedicalHistory) {
+      updateData.husbandMedicalHistory = {};
+      Object.keys(husbandMedicalHistory).forEach(key => {
+        if (husbandMedicalHistory[key] !== undefined) {
+          updateData.husbandMedicalHistory[key] = husbandMedicalHistory[key];
+        }
+      });
     }
 
     const patientHistory = await PatientHistory.findOneAndUpdate(
@@ -228,7 +246,6 @@ exports.updatePatientHistory = async (req, res) => {
       data: patientHistory
     });
   } catch (error) {
-    console.error('Error updating patient history:', error);
     res.status(500).json({
       success: false,
       message: 'Error updating patient history',

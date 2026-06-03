@@ -14,7 +14,6 @@ const relativeSchema = new mongoose.Schema(
             required: true,
             trim: true,
         },
-
         age: {
             type: Number,
         },
@@ -23,7 +22,10 @@ const relativeSchema = new mongoose.Schema(
             type: String,
             enum: ["male", "female", "other"],
         },
-
+        sexDetails: {
+            type: String,
+            required: false
+        },
         mobileNumber: {
             type: String,
             required: true,
@@ -49,8 +51,12 @@ const relativeSchema = new mongoose.Schema(
 
         maritalStatus: {
             type: String,
-            enum: ["single", "married", "divorced", "widowed"],
-            default:"married"
+            enum: ["single", "married", "divorced", "widowed", "other"],
+            default: "married"
+        },
+        maritalStatusDetails: {
+            type: String,
+            required: false
         },
 
         idProofType: {
@@ -61,8 +67,13 @@ const relativeSchema = new mongoose.Schema(
                 "passport",
                 "driving_license",
                 "voter",
+                "other",
             ],
-            default:"aadhaar"
+            default: "aadhaar"
+        },
+        idProofTypeDetails: {
+            type: String,
+            required: false
         },
 
         idProofNumber: {
@@ -73,7 +84,7 @@ const relativeSchema = new mongoose.Schema(
             type: String,
             unique: true,
         },
-        
+
         isActive: {
             type: Boolean,
             default: true,

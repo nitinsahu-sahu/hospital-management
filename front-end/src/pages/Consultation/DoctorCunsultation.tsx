@@ -41,7 +41,7 @@ export default function DoctorConsultation() {
     total += Number(formData.fees.emergencyConsultationFee) || 0;
     total += Number(formData.fees.geneticConsultationFee) || 0;
     total += Number(formData.fees.opdConsultationFee) || 0;
-    formData.fees.additionalFees.forEach((fee: AdditionalFee) => {
+    formData.fees.additionalFees.forEach((fee: any) => {
       total += fee.amount || 0;
     });
     return total;
@@ -68,7 +68,6 @@ export default function DoctorConsultation() {
   
   try {
     const result = await dispatch(getConsultationByPatientId(patientId) as any);
-    console.log("getConsultationByPatientId", result);
     
     if (result?.type === "GET_CONSULTATION_BY_PATIENT_ID_SUCCESS" && result.payload) {
       const consultationData = result.payload;
@@ -179,12 +178,20 @@ export default function DoctorConsultation() {
       result = await dispatch(updateConsultation(existingConsultationId, consultationData) as any);
       if (result?.status === 200) {
         setSuccessMessage('Consultation updated successfully!');
+         setTimeout(()=>{
+        setSuccessMessage('');
+
+        },5000)
         fetchConsultationForPatient(selectedPatient._id);
       }
     } else {
       result = await dispatch(createConsultation(consultationData) as any);
       if (result?.status === 201 || result?.status === 200) {
         setSuccessMessage('Consultation created successfully!');
+        setTimeout(()=>{
+        setSuccessMessage('');
+
+        },5000)
         if (result?.payload?._id) {
           setExistingConsultationId(result.payload._id);
           setIsExistingConsultation(true);
@@ -218,7 +225,6 @@ export default function DoctorConsultation() {
           )}
           {error && (
             <div className='mb-6'>
-
               <Alert
                 variant="error"
                 title="Error Message"

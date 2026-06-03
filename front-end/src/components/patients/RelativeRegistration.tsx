@@ -9,6 +9,7 @@ import {
   relativeRoleOptions,
 } from "../../utils/patientSelection";
 import ImageUpload from "../../pages/Forms/ImageUpload";
+import OtherFieldGroup from "../form/OtherFieldGroup";
 
 interface RelativeFormProps {
   relativeFormData: any;
@@ -30,20 +31,39 @@ export default function RelativeRegistration({
   error,
   success,
 }: RelativeFormProps) {
+
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setRelativeFormData({ ...relativeFormData, [name]: value });
   };
 
   const handleSelectChange = (name: string, value: string) => {
-    setRelativeFormData({ ...relativeFormData, [name]: value });
+    setRelativeFormData((prev: any) => {
+      const newData = { ...prev, [name]: value };
+      
+      // Clear related "other" details field if value is not "other"
+      if (value !== "other") {
+        const detailsFieldMap: Record<string, string> = {
+          sex: "sexDetails",
+          maritalStatus: "maritalStatusDetails",
+          idProofType: "idProofTypeDetails",
+        };
+        
+        const detailsField = detailsFieldMap[name];
+        if (detailsField) {
+          newData[detailsField] = "";
+        }
+      }
+      
+      return newData;
+    });
   };
 
   const handleImageChange = (file: File | null, preview: string) => {
-    setRelativeFormData({ 
-      ...relativeFormData, 
+    setRelativeFormData({
+      ...relativeFormData,
       pic: file,
-      profilePicPreview: preview 
+      profilePicPreview: preview
     });
   };
 
@@ -93,11 +113,17 @@ export default function RelativeRegistration({
               value={relativeFormData.age}
               onChange={handleInputChange}
             />
-            <Select
-              options={genderOptions}
-              placeholder="Select Gender *"
-              value={relativeFormData.sex}
-              onChange={(val) => handleSelectChange("sex", val)}
+            <OtherFieldGroup
+              selectName="sex"
+              selectOptions={genderOptions}
+              selectValue={relativeFormData.sex}
+              selectPlaceholder="Select Gender *"
+              onSelectChange={handleSelectChange}
+              otherInputName="sexDetails"
+              otherInputValue={relativeFormData.sexDetails || ""}
+              otherInputPlaceholder="Please specify your gender"
+              onOtherInputChange={handleInputChange}
+              required={true}
             />
           </div>
         </div>
@@ -115,11 +141,16 @@ export default function RelativeRegistration({
               value={relativeFormData.mobileNumber}
               onChange={handleInputChange}
             />
-            <Select
-              options={maritalStatusOptions}
-              placeholder="Marital Status"
-              value={relativeFormData.maritalStatus}
-              onChange={(val) => handleSelectChange("maritalStatus", val)}
+            <OtherFieldGroup
+              selectName="maritalStatus"
+              selectOptions={maritalStatusOptions}
+              selectValue={relativeFormData.maritalStatus}
+              selectPlaceholder="Marital Status"
+              onSelectChange={handleSelectChange}
+              otherInputName="maritalStatusDetails"
+              otherInputValue={relativeFormData.maritalStatusDetails || ""}
+              otherInputPlaceholder="Please specify marital status"
+              onOtherInputChange={handleInputChange}
             />
           </div>
         </div>
@@ -170,11 +201,17 @@ export default function RelativeRegistration({
             ID Proof Details
           </h4>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <Select
-              options={idProofTypeOptions}
-              placeholder="ID Proof Type *"
-              value={relativeFormData.idProofType}
-              onChange={(val) => handleSelectChange("idProofType", val)}
+            <OtherFieldGroup
+              selectName="idProofType"
+              selectOptions={idProofTypeOptions}
+              selectValue={relativeFormData.idProofType}
+              selectPlaceholder="ID Proof Type *"
+              onSelectChange={handleSelectChange}
+              otherInputName="idProofTypeDetails"
+              otherInputValue={relativeFormData.idProofTypeDetails || ""}
+              otherInputPlaceholder="Please specify ID proof type"
+              onOtherInputChange={handleInputChange}
+              required={true}
             />
             <Input
               type="text"

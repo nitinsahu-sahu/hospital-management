@@ -1,5 +1,5 @@
 // components/patient/PatientTable.tsx
-import { EditIcon,  TrashBinIcon, ViewIcon } from "../../../icons";
+import { EditIcon, TrashBinIcon, ViewIcon } from "../../../icons";
 import { Patient } from "../../../types/patient";
 import Pagination from "../../common/Pagination";
 
@@ -86,18 +86,20 @@ export default function PatientTable({
                 {patient.age || "N/A"}
               </td>
               <td className="px-4 py-3 text-sm dark:text-white/90 capitalize">
-                {patient.sex || "N/A"}
+                {patient.sex === "other" ? patient.sexDetails : patient.sex}
               </td>
               <td className="px-4 py-3 text-sm dark:text-white/90 capitalize">
-                {patient.maritalStatus || "N/A"}
+                {patient.maritalStatus === "other" ? patient.maritalStatusDetails : patient.maritalStatus}
+
               </td>
               <td className="px-4 py-3 text-sm">
                 <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                  {patient.infertiliyType || "N/A"}
+                {patient.infertiliyType === "other" ? patient.infertiliyTypeDetails : patient.infertiliyType}
+
                 </span>
               </td>
 
-               <td className="px-4 py-3 text-sm">
+              <td className="px-4 py-3 text-sm">
                 <div className="flex justify-center gap-1">
                   <button
                     onClick={() => onView(patient)}

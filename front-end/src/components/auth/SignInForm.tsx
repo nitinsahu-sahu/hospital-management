@@ -29,10 +29,14 @@ export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
 
   const [formData, setFormData] = useState({
-    email: "nitinsahu911111@gmail.com",
-    password: "vinod@!232",
+    email: "",
+    password: "",
   });
 
+  // const [formData, setFormData] = useState({
+  //   email: "nitinsahu911111@gmail.com",
+  //   password: "vinod@!232",
+  // });
   // Redirect after login - only if user is authenticated and comes to signin page
   useEffect(() => {
     if (authenticate && !hasNavigated.current) {
@@ -168,7 +172,7 @@ export default function SignInForm() {
               </div>
             </form>
 
-            <div className="mt-5">
+            {/* <div className="mt-5">
               <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
                 Don&apos;t have an account?{" "}
 
@@ -179,7 +183,7 @@ export default function SignInForm() {
                   Sign Up
                 </Link>
               </p>
-            </div>
+            </div> */}
 
           </div>
         </div>

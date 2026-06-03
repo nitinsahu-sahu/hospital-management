@@ -69,9 +69,6 @@ export default function PatientView() {
 
   // Handle Edit Submit - NOW WITH API CALL
   const handleEditSubmit = async (patientData: Partial<Patient>): Promise<void> => {
-    console.log("=== EDIT SUBMISSION ===");
-    console.log("Patient ID:", editingPatient?._id);
-    console.log("Updated Data:", patientData);
     
     try {
       // Dispatch the update action
@@ -100,8 +97,6 @@ export default function PatientView() {
     );
     
     if (!confirmDelete) return;
-    
-    console.log("Deleting patient:", patient._id);
     
     try {
       const result = await dispatch(deletePatient(patient._id));

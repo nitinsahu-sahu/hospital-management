@@ -53,13 +53,13 @@ export default function PatientViewModal({ patient, onClose }: PatientViewModalP
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <InfoItem label="Full Name" value={patient.name} />
               <InfoItem label="Age" value={patient.age?.toString()} />
-              <InfoItem label="Sex" value={patient.sex} capitalize />
-              <InfoItem label="Marital Status" value={patient.maritalStatus} capitalize />
+              <InfoItem label="Sex" value={patient.sex === "other" ? patient.sexDetails : patient.sex} capitalize />
+              <InfoItem label="Marital Status" value={patient.maritalStatus === "other" ? patient.maritalStatusDetails : patient.maritalStatus} capitalize />
               <InfoItem
                 label="Duration of Marriage"
                 value={patient.durationOfMarriage ? `${patient.durationOfMarriage} years` : "N/A"}
               />
-              <InfoItem label="Infertility Type" value={patient.infertiliyType} capitalize />
+              <InfoItem label="Infertility Type" value={patient.infertiliyType=== "other"?patient.infertiliyTypeDetails:patient.infertiliyType} capitalize />
             </div>
           </PatientInfoSection>
 
@@ -75,7 +75,7 @@ export default function PatientViewModal({ patient, onClose }: PatientViewModalP
           {/* ID Proof Details */}
           <PatientInfoSection title="ID Proof Details">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <InfoItem label="ID Proof Type" value={patient.idProofType} capitalize />
+              <InfoItem label="ID Proof Type" value={patient.idProofType==="other"?patient.idProofTypeDetails:patient.idProofType} capitalize />
               <InfoItem label="ID Proof Number" value={patient.idProofNumber} />
             </div>
           </PatientInfoSection>
@@ -83,7 +83,7 @@ export default function PatientViewModal({ patient, onClose }: PatientViewModalP
           {/* Referral Information */}
           <PatientInfoSection title="Referral Information">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <InfoItem label="How Found Clinic" value={patient.howToFindClinic} capitalize />
+              <InfoItem label="How Found Clinic" value={patient.howToFindClinic==="other"?patient.howToFindClinicDetails:patient.howToFindClinic} capitalize />
               <InfoItem label="Referred By Doctor" value={patient.referredByDoctorName || "N/A"} />
             </div>
           </PatientInfoSection>

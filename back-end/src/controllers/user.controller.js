@@ -9,6 +9,8 @@ const cloudinaryService = require("../services/cloudinary.service");
 
 // ================= CREATE DOCTOR =================
 exports.createDoctor = async (req, res) => {
+    console.log(req.body);
+    
     try {
         const data = req.body;
 

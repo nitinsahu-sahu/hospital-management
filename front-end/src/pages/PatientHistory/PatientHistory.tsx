@@ -11,12 +11,15 @@ import { PatientInfoCard } from '../../components/consultation/PatientInfoCard';
 import Alert from '../../components/ui/alert/Alert';
 import { complaintOptions, amenorrhoeaOptions, chiefComplaintsOptions } from '../../utils/patientHistory';
 import { PatientHistoryForm } from '../../types/patientHistory';
+import OtherFieldGroup from '../../components/form/OtherFieldGroup';
+import DatePicker from '../../components/form/date-picker';
 
 
 
 export default function PatientHistory() {
   const dispatch = useDispatch();
   const { error } = useSelector((state: RootState) => state.consultation);
+  const [successMessage, setSuccessMessage] = useState<string>('');
   const [selectedPatient, setSelectedPatient] = useState<any | null>(null);
   const [isExistingConsultation, setIsExistingConsultation] = useState(false);
   const [isExistingPatientHistory, setIsExistingPatientHistory] = useState(false);
@@ -31,8 +34,11 @@ export default function PatientHistory() {
 
   const [formData, setFormData] = useState<PatientHistoryForm>({
     chiefComplaints: '',
-    amenorrhoea: '',
-    complaint: '',
+    chiefComplaintsDetails: '',
+    lmp: '',
+    sb_iod_dead: '',
+    // amenorrhoea: '',
+    // complaint: '',
     onset: '',
     duration: '',
     associatedSymptoms: '',
@@ -44,6 +50,7 @@ export default function PatientHistory() {
     living: '',
     abortion: '',
     ectopic: '',
+
     diabetes: '',
     hypertension: '',
     asthma: '',
@@ -55,7 +62,18 @@ export default function PatientHistory() {
     downSyndrome: '',
     smoking: '',
     drugAddiction: '',
-    husbandClinicalHistory: '',
+
+    husbandDiabetes: '',
+    husbandHypertension: '',
+    husbandAsthma: '',
+    husbandThyroid: '',
+    husbandDrugAllergy: '',
+    husbandDrugAllergyDetails: '',
+    husbandGeneticDiseaseSelf: '',
+    husbandGeneticDiseaseFamily: '',
+    husbandDownSyndrome: '',
+    husbandSmoking: '',
+    husbandDrugAddiction: '',
   });
 
   // Helper function to format date for input fields
@@ -73,8 +91,11 @@ export default function PatientHistory() {
   const resetFormData = useCallback(() => {
     setFormData({
       chiefComplaints: '',
-      amenorrhoea: '',
-      complaint: '',
+      chiefComplaintsDetails: '',
+      lmp: '',
+      sb_iod_dead: '',
+      // amenorrhoea: '',
+      // complaint: '',
       onset: '',
       duration: '',
       associatedSymptoms: '',
@@ -97,7 +118,17 @@ export default function PatientHistory() {
       downSyndrome: '',
       smoking: '',
       drugAddiction: '',
-      husbandClinicalHistory: '',
+      husbandDiabetes: '',
+      husbandHypertension: '',
+      husbandAsthma: '',
+      husbandThyroid: '',
+      husbandDrugAllergy: '',
+      husbandDrugAllergyDetails: '',
+      husbandGeneticDiseaseSelf: '',
+      husbandGeneticDiseaseFamily: '',
+      husbandDownSyndrome: '',
+      husbandSmoking: '',
+      husbandDrugAddiction: '',
     });
   }, []);
 
@@ -105,21 +136,19 @@ export default function PatientHistory() {
     setIsLoadingHistory(true);
     try {
       const result = await dispatch(getPatientHistoryByPatientId(patientId) as any);
-      console.log("patient history result for patient:", patientId, result);
-
-      // Check if we got a successful response with data
       if (result?.payload && result?.type === 'PATIENT_HISTORY_GET_SUCCESS') {
         const history = result.payload;
-        console.log("history data to populate:", history);
-
         setIsExistingPatientHistory(true);
         setPatientHistoryId(history._id);
 
         // Populate form with existing data
         setFormData({
           chiefComplaints: history.chiefComplaints || '',
-          amenorrhoea: history.amenorrhoea || '',
-          complaint: history.complaint || '',
+          chiefComplaintsDetails: history.chiefComplaintsDetails || '',
+          lmp: history.lmp || '',
+          sb_iod_dead: history.sb_iod_dead || '',
+          // amenorrhoea: history.amenorrhoea || '',
+          // complaint: history.complaint || '',
           onset: history.historyOfIllness?.onset ? formatDateForInput(history.historyOfIllness.onset) : '',
           duration: history.historyOfIllness?.duration ? formatDateForInput(history.historyOfIllness.duration) : '',
           associatedSymptoms: history.historyOfIllness?.associatedSymptoms || '',
@@ -142,7 +171,18 @@ export default function PatientHistory() {
           downSyndrome: history.wifeMedicalHistory?.downSyndrome || '',
           smoking: history.wifeMedicalHistory?.smoking || '',
           drugAddiction: history.wifeMedicalHistory?.drugAddiction || '',
-          husbandClinicalHistory: history.husbandHistory?.clinicalHistory || '',
+
+          husbandDiabetes: history.husbandMedicalHistory?.diabetes || '',
+          husbandHypertension: history.husbandMedicalHistory?.hypertension || '',
+          husbandAsthma: history.husbandMedicalHistory?.asthma || '',
+          husbandThyroid: history.husbandMedicalHistory?.thyroid || '',
+          husbandDrugAllergy: history.husbandMedicalHistory?.drugAllergy || '',
+          husbandDrugAllergyDetails: history.husbandMedicalHistory?.drugAllergyDetails || '',
+          husbandGeneticDiseaseSelf: history.husbandMedicalHistory?.geneticDiseaseSelf || '',
+          husbandGeneticDiseaseFamily: history.husbandMedicalHistory?.geneticDiseaseFamily || '',
+          husbandDownSyndrome: history.husbandMedicalHistory?.downSyndrome || '',
+          husbandSmoking: history.husbandMedicalHistory?.smoking || '',
+          husbandDrugAddiction: history.husbandMedicalHistory?.drugAddiction || '',
         });
       } else {
         // No existing history found - make sure form is cleared
@@ -196,8 +236,6 @@ export default function PatientHistory() {
 
           // Check if patient has changed using ref
           if (currentPatientIdRef.current !== patient._id) {
-            console.log("Patient changed from", currentPatientIdRef.current, "to", patient._id);
-
             // Update ref immediately
             currentPatientIdRef.current = patient._id;
 
@@ -216,7 +254,6 @@ export default function PatientHistory() {
             fetchPatientHistory(patient._id);
           }
         } catch (error) {
-          console.error('Error parsing patient data:', error);
           if (currentPatientIdRef.current !== null) {
             currentPatientIdRef.current = null;
             setSelectedPatient(null);
@@ -266,7 +303,8 @@ export default function PatientHistory() {
       ...prev,
       [name]: value,
       // Reset drug allergy details if drug allergy is set to 'no'
-      ...(name === 'drugAllergy' && value === 'no' ? { drugAllergyDetails: '' } : {})
+      ...(name === 'drugAllergy' && value === 'no' ? { drugAllergyDetails: '' } : {}),
+      ...(name === 'husbandDrugAllergy' && value === 'no' ? { husbandDrugAllergyDetails: '' } : {})
     }));
   };
 
@@ -279,6 +317,19 @@ export default function PatientHistory() {
       // If new record, clear all fields
       resetFormData();
     }
+  };
+
+
+  const handleSelectChange = (name: string, value: string) => {
+    setFormData(prev => {
+      const newData = { ...prev, [name]: value };
+
+      if (name === "chiefComplaints" && value !== "other") {
+        newData.chiefComplaintsDetails = "";
+      }
+
+      return newData;
+    });
   };
 
   // Update the handleSubmit function in PatientHistory.tsx
@@ -295,8 +346,9 @@ export default function PatientHistory() {
       patientId: selectedPatient._id,
       consultationId: consultationId, // if available
       chiefComplaints: formData.chiefComplaints,
-      amenorrhoea: formData.amenorrhoea,
-      complaint: formData.complaint,
+      chiefComplaintsDetails: formData.chiefComplaintsDetails,
+      // amenorrhoea: formData.amenorrhoea,
+      // complaint: formData.complaint,
       historyOfIllness: {
         onset: formData.onset,
         duration: formData.duration,
@@ -305,14 +357,16 @@ export default function PatientHistory() {
       menstrualHistory: {
         cycleLength: formData.cycleLength,
         daysOfFlow: formData.daysOfFlow,
-        associatedSymptoms: formData.menstrualSymptoms
+        associatedSymptoms: formData.menstrualSymptoms,
+        lmp: formData.lmp
       },
       obstetricHistory: {
         gravida: formData.gravida,
         para: formData.para,
         living: formData.living,
         abortion: formData.abortion,
-        ectopic: formData.ectopic
+        ectopic: formData.ectopic,
+        sb_iod_dead: formData.sb_iod_dead
       },
       wifeMedicalHistory: {
         diabetes: formData.diabetes,
@@ -327,13 +381,20 @@ export default function PatientHistory() {
         smoking: formData.smoking,
         drugAddiction: formData.drugAddiction
       },
-      husbandHistory: {
-        clinicalHistory: formData.husbandClinicalHistory
-      }
+      husbandMedicalHistory: {
+        diabetes: formData.husbandDiabetes,
+        hypertension: formData.husbandHypertension,
+        asthma: formData.husbandAsthma,
+        thyroid: formData.husbandThyroid,
+        drugAllergy: formData.husbandDrugAllergy,
+        drugAllergyDetails: formData.husbandDrugAllergyDetails,
+        geneticDiseaseSelf: formData.husbandGeneticDiseaseSelf,
+        geneticDiseaseFamily: formData.husbandGeneticDiseaseFamily,
+        downSyndrome: formData.husbandDownSyndrome,
+        smoking: formData.husbandSmoking,
+        drugAddiction: formData.husbandDrugAddiction
+      },
     };
-
-    // Log form data to console
-    console.log('Patient History Form Data:', patientHistoryData);
 
     setIsSubmitting(true);
 
@@ -341,26 +402,30 @@ export default function PatientHistory() {
       if (isExistingPatientHistory) {
         // Update existing patient history
         const result = await dispatch(updatePatientHistory(selectedPatient._id, patientHistoryData) as any);
-        console.log('Patient history updated successfully', result);
-        alert('Patient history updated successfully!');
+        
+        setSuccessMessage(result.message);
+        setTimeout(() => {
+          setSuccessMessage('');
+        }, 5000)
       } else {
         // Create new patient history
         const result = await dispatch(createPatientHistory(patientHistoryData) as any);
-        console.log('Patient history created successfully', result);
-        // After successful creation, update states
         if (result?.payload?._id) {
           setIsExistingPatientHistory(true);
           setPatientHistoryId(result.payload._id);
         }
-        alert('Patient history saved successfully!');
+        setSuccessMessage('Patient history saved successfully!');
+        setTimeout(() => {
+          setSuccessMessage('');
+        }, 5000)
       }
     } catch (error: any) {
-      console.error('Error submitting form:', error);
       alert(error.response?.data?.message || error.message || 'Error saving patient history');
     } finally {
       setIsSubmitting(false);
     }
   };
+
 
   return (
     <>
@@ -376,6 +441,18 @@ export default function PatientHistory() {
           </div>
 
           {/* Messages */}
+          {/* Messages */}
+          {successMessage && (
+            <div className='mb-6'>
+              <Alert
+                variant="success"
+                title="Success Message"
+                message={successMessage}
+                showLink={false}
+
+              />
+            </div>
+          )}
           {error && (
             <div className='mb-6'>
               <Alert
@@ -413,24 +490,23 @@ export default function PatientHistory() {
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Chief Complaints
                   </label>
-                  <select
-                    name="chiefComplaints"
-                    value={formData.chiefComplaints}
-                    onChange={handleInputChange}
-                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200"
-                  >
-                    <option value="">Select Chief Complaint</option>
-                    {chiefComplaintsOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
+                  <OtherFieldGroup
+                    selectName="chiefComplaints"
+                    selectOptions={chiefComplaintsOptions}
+                    selectValue={formData.chiefComplaints}
+                    selectPlaceholder="Select Chief Complaint"
+                    onSelectChange={handleSelectChange}
+                    otherInputName="chiefComplaintsDetails"
+                    otherInputValue={formData.chiefComplaintsDetails || ""}
+                    otherInputPlaceholder="Please specify chief complaint"
+                    onOtherInputChange={handleInputChange}
+                    required={true}
+                  />
                 </div>
               </div>
 
               {/* Section 2: Amenorrhoea/Missed Periods */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 transition-colors duration-200">
+              {/* <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 transition-colors duration-200">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
                   Amenorrhoea/Missed Periods
                 </h2>
@@ -452,10 +528,10 @@ export default function PatientHistory() {
                     ))}
                   </select>
                 </div>
-              </div>
+              </div> */}
 
               {/* Section 3: Complaint */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 transition-colors duration-200">
+              {/* <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 transition-colors duration-200">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
                   Complaint
                 </h2>
@@ -477,7 +553,7 @@ export default function PatientHistory() {
                     ))}
                   </select>
                 </div>
-              </div>
+              </div> */}
 
               {/* Section 4: History of Patient Illness */}
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 transition-colors duration-200">
@@ -530,7 +606,7 @@ export default function PatientHistory() {
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
                   Menstrual History
                 </h2>
-                <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Cycle Length (days)
@@ -568,6 +644,20 @@ export default function PatientHistory() {
                       onChange={handleInputChange}
                       placeholder="Enter associated symptoms"
                       className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200"
+                    />
+                  </div>
+                  <div>
+                    <DatePicker
+                      id="lmp"
+                      label="Last Menstrual Period (LMP)"
+                      placeholder="Select last menstrual period date"
+                      value={formData.lmp}
+                      onChange={(dates, currentDateString) => {
+                        setFormData((prev: any) => ({
+                          ...prev,
+                          lmp: currentDateString
+                        }));
+                      }}
                     />
                   </div>
                 </div>
@@ -631,7 +721,21 @@ export default function PatientHistory() {
                       className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200"
                     />
                   </div>
-                  <div className="md:col-span-2">
+
+                  <div >
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      SB / IUD / DEAD
+                    </label>
+                    <input
+                      type="text"
+                      name="sb_iod_dead"
+                      value={formData.sb_iod_dead}
+                      onChange={handleInputChange}
+                      placeholder="Enter SB / IUD / DEAD"
+                      className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200"
+                    />
+                  </div>
+                  <div >
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Ectopic
                     </label>
@@ -978,20 +1082,328 @@ export default function PatientHistory() {
               {/* Section 8: Husband History */}
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 transition-colors duration-200">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                  Husband History
+                  Husband Medical History
                 </h2>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Clinical History
-                  </label>
-                  <textarea
-                    name="husbandClinicalHistory"
-                    value={formData.husbandClinicalHistory}
-                    onChange={handleInputChange}
-                    rows={4}
-                    placeholder="Enter husband's clinical history..."
-                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 resize-none"
-                  />
+                <div className="space-y-4">
+                  {/* Diabetes */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Diabetes
+                    </label>
+                    <div className="flex gap-6">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="husbandDiabetes"
+                          value="yes"
+                          checked={formData.husbandDiabetes === 'yes'}
+                          onChange={(e) => handleRadioChange('husbandDiabetes', e.target.value as 'yes')}
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">Yes</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="husbandDiabetes"
+                          value="no"
+                          checked={formData.husbandDiabetes === 'no'}
+                          onChange={(e) => handleRadioChange('husbandDiabetes', e.target.value as 'no')}
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">No</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Hypertension */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Hypertension
+                    </label>
+                    <div className="flex gap-6">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="husbandHypertension"
+                          value="yes"
+                          checked={formData.husbandHypertension === 'yes'}
+                          onChange={(e) => handleRadioChange('husbandHypertension', e.target.value as 'yes')}
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">Yes</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="husbandHypertension"
+                          value="no"
+                          checked={formData.husbandHypertension === 'no'}
+                          onChange={(e) => handleRadioChange('husbandHypertension', e.target.value as 'no')}
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">No</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Asthma */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Asthma
+                    </label>
+                    <div className="flex gap-6">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="husbandAsthma"
+                          value="yes"
+                          checked={formData.husbandAsthma === 'yes'}
+                          onChange={(e) => handleRadioChange('husbandAsthma', e.target.value as 'yes')}
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">Yes</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="husbandAsthma"
+                          value="no"
+                          checked={formData.husbandAsthma === 'no'}
+                          onChange={(e) => handleRadioChange('husbandAsthma', e.target.value as 'no')}
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">No</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Thyroid */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Thyroid
+                    </label>
+                    <div className="flex gap-6">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="husbandThyroid"
+                          value="yes"
+                          checked={formData.husbandThyroid === 'yes'}
+                          onChange={(e) => handleRadioChange('husbandThyroid', e.target.value as 'yes')}
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">Yes</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="husbandThyroid"
+                          value="no"
+                          checked={formData.husbandThyroid === 'no'}
+                          onChange={(e) => handleRadioChange('husbandThyroid', e.target.value as 'no')}
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">No</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Drug Allergy */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Any History of Drug Allergy
+                    </label>
+                    <div className="flex gap-6 mb-3">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="husbandDrugAllergy"
+                          value="yes"
+                          checked={formData.husbandDrugAllergy === 'yes'}
+                          onChange={(e) => handleRadioChange('husbandDrugAllergy', e.target.value as 'yes')}
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">Yes</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="husbandDrugAllergy"
+                          value="no"
+                          checked={formData.husbandDrugAllergy === 'no'}
+                          onChange={(e) => handleRadioChange('husbandDrugAllergy', e.target.value as 'no')}
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">No</span>
+                      </label>
+                    </div>
+                    {formData.husbandDrugAllergy === 'yes' && (
+                      <input
+                        type="text"
+                        name="husbandDrugAllergyDetails"
+                        value={formData.husbandDrugAllergyDetails}
+                        onChange={handleInputChange}
+                        placeholder="Please specify drug allergy details"
+                        className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200"
+                      />
+                    )}
+                  </div>
+
+                  {/* Genetic Disease Self */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Any History of Genetic Disease (Self)
+                    </label>
+                    <div className="flex gap-6">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="husbandGeneticDiseaseSelf"
+                          value="yes"
+                          checked={formData.husbandGeneticDiseaseSelf === 'yes'}
+                          onChange={(e) => handleRadioChange('husbandGeneticDiseaseSelf', e.target.value as 'yes')}
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">Yes</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="husbandGeneticDiseaseSelf"
+                          value="no"
+                          checked={formData.husbandGeneticDiseaseSelf === 'no'}
+                          onChange={(e) => handleRadioChange('husbandGeneticDiseaseSelf', e.target.value as 'no')}
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">No</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Genetic Disease Family */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Any History of Genetic Disease in Family
+                    </label>
+                    <div className="flex gap-6">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="husbandGeneticDiseaseFamily"
+                          value="yes"
+                          checked={formData.husbandGeneticDiseaseFamily === 'yes'}
+                          onChange={(e) => handleRadioChange('husbandGeneticDiseaseFamily', e.target.value as 'yes')}
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">Yes</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="husbandGeneticDiseaseFamily"
+                          value="no"
+                          checked={formData.husbandGeneticDiseaseFamily === 'no'}
+                          onChange={(e) => handleRadioChange('husbandGeneticDiseaseFamily', e.target.value as 'no')}
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">No</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Down Syndrome */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      H/O Down Syndrome
+                    </label>
+                    <div className="flex gap-6">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="husbandDownSyndrome"
+                          value="yes"
+                          checked={formData.husbandDownSyndrome === 'yes'}
+                          onChange={(e) => handleRadioChange('husbandDownSyndrome', e.target.value as 'yes')}
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">Yes</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="husbandDownSyndrome"
+                          value="no"
+                          checked={formData.husbandDownSyndrome === 'no'}
+                          onChange={(e) => handleRadioChange('husbandDownSyndrome', e.target.value as 'no')}
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">No</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Smoking */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Smoking
+                    </label>
+                    <div className="flex gap-6">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="husbandSmoking"
+                          value="yes"
+                          checked={formData.husbandSmoking === 'yes'}
+                          onChange={(e) => handleRadioChange('husbandSmoking', e.target.value as 'yes')}
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">Yes</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="husbandSmoking"
+                          value="no"
+                          checked={formData.husbandSmoking === 'no'}
+                          onChange={(e) => handleRadioChange('husbandSmoking', e.target.value as 'no')}
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">No</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Drug Addiction */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Drug Addiction
+                    </label>
+                    <div className="flex gap-6">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="husbandDrugAddiction"
+                          value="yes"
+                          checked={formData.husbandDrugAddiction === 'yes'}
+                          onChange={(e) => handleRadioChange('husbandDrugAddiction', e.target.value as 'yes')}
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">Yes</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="husbandDrugAddiction"
+                          value="no"
+                          checked={formData.husbandDrugAddiction === 'no'}
+                          onChange={(e) => handleRadioChange('husbandDrugAddiction', e.target.value as 'no')}
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">No</span>
+                      </label>
+                    </div>
+                  </div>
                 </div>
               </div>
 

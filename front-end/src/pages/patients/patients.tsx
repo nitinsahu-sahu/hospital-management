@@ -27,6 +27,7 @@ export default function Patients() {
     name: "",
     age: "",
     sex: "",
+    sexDetails: "",
     mobileNumber: "",
     address: "",
     maritalStatus: "",
@@ -35,8 +36,8 @@ export default function Patients() {
     referredByDoctorName: "",
     idProofType: "",
     idProofNumber: "",
-    pic: null, 
-    profilePicPreview: "", 
+    pic: null,
+    profilePicPreview: "",
     infertiliyType: "",
   });
 
@@ -45,6 +46,7 @@ export default function Patients() {
     name: "",
     age: "",
     sex: "",
+    sexDetails: "",
     mobileNumber: "",
     address: "",
     maritalStatus: "",
@@ -68,6 +70,10 @@ export default function Patients() {
     }
     if (!patientFormData.sex) {
       setError("Gender is required");
+      return false;
+    }
+    if (patientFormData.sex === "other" && !patientFormData.sexDetails?.trim()) {
+      setError("Please specify your gender");
       return false;
     }
     if (!patientFormData.mobileNumber.trim()) {
@@ -101,6 +107,10 @@ export default function Patients() {
     }
     if (!relativeFormData.sex) {
       setError("Gender is required");
+      return false;
+    }
+if (relativeFormData.sex === "other" && !relativeFormData.sexDetails?.trim()) {
+      setError("Please specify your gender");
       return false;
     }
     if (!relativeFormData.mobileNumber.trim()) {
@@ -137,7 +147,7 @@ export default function Patients() {
     try {
       // Create FormData for file upload
       const formData = new FormData();
-      
+
       // Append all patient data to FormData
       Object.keys(patientFormData).forEach((key) => {
         if (key === "pic" && patientFormData[key]) {
@@ -183,12 +193,12 @@ export default function Patients() {
     try {
       // Create FormData for file upload
       const formData = new FormData();
-      
+
       // Append all relative data to FormData
       Object.keys(relativeFormData).forEach((key) => {
         if (key === "UH_ID") {
-        return; // Skip this iteration
-      }
+          return; // Skip this iteration
+        }
         if (key === "pic" && relativeFormData[key]) {
           formData.append("pic", relativeFormData[key]);
         } else if (key !== "profilePicPreview" && relativeFormData[key] !== null && relativeFormData[key] !== "") {
@@ -197,7 +207,7 @@ export default function Patients() {
       });
 
       const uhId = patientUHID || relativeFormData.UH_ID;
-    formData.append("UH_ID", uhId);
+      formData.append("UH_ID", uhId);
 
       const response = await dispatch(createRelative(formData));
 
