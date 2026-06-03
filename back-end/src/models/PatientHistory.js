@@ -17,16 +17,20 @@ const patientHistorySchema = new mongoose.Schema({
     type: String,
     required: false
   },
+  chiefComplaintsDetails: {
+    type: String,
+    required: false
+  },
   // Amenorrhoea
-  amenorrhoea: {
-    type: String,
-    required: false
-  },
+  // amenorrhoea: {
+  //   type: String,
+  //   required: false
+  // },
   // Complaint
-  complaint: {
-    type: String,
-    required: false
-  },
+  // complaint: {
+  //   type: String,
+  //   required: false
+  // },
   // History of Patient Illness
   historyOfIllness: {
     onset: {
@@ -55,6 +59,10 @@ const patientHistorySchema = new mongoose.Schema({
     associatedSymptoms: {
       type: String,
       required: false
+    },
+    lmp: {
+      type: String,
+      required: false
     }
   },
   // Obstetric History
@@ -72,6 +80,10 @@ const patientHistorySchema = new mongoose.Schema({
       required: false
     },
     abortion: {
+      type: String,
+      required: false
+    },
+    sb_iod_dead: {
       type: String,
       required: false
     },
@@ -138,10 +150,60 @@ const patientHistorySchema = new mongoose.Schema({
     }
   },
   // Husband History
-  husbandHistory: {
-    clinicalHistory: {
+  husbandMedicalHistory: {
+    diabetes: {
+      type: String,
+      enum: ['yes', 'no', ''],
+      default: ''
+    },
+    hypertension: {
+      type: String,
+      enum: ['yes', 'no', ''],
+      default: ''
+    },
+    asthma: {
+      type: String,
+      enum: ['yes', 'no', ''],
+      default: ''
+    },
+    thyroid: {
+      type: String,
+      enum: ['yes', 'no', ''],
+      default: ''
+    },
+    drugAllergy: {
+      type: String,
+      enum: ['yes', 'no', ''],
+      default: ''
+    },
+    drugAllergyDetails: {
       type: String,
       required: false
+    },
+    geneticDiseaseSelf: {
+      type: String,
+      enum: ['yes', 'no', ''],
+      default: ''
+    },
+    geneticDiseaseFamily: {
+      type: String,
+      enum: ['yes', 'no', ''],
+      default: ''
+    },
+    downSyndrome: {
+      type: String,
+      enum: ['yes', 'no', ''],
+      default: ''
+    },
+    smoking: {
+      type: String,
+      enum: ['yes', 'no', ''],
+      default: ''
+    },
+    drugAddiction: {
+      type: String,
+      enum: ['yes', 'no', ''],
+      default: ''
     }
   },
   createdBy: {

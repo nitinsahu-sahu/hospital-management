@@ -13,15 +13,20 @@ exports.createPatient = async (req, res) => {
       name,
       age,
       sex,
+      sexDetails,
       mobileNumber,
       address,
       maritalStatus,
+      maritalStatusDetails,
       durationOfMarriage,
       howToFindClinic,
+      howToFindClinicDetails,
       referredByDoctorName,
       idProofType,
+      idProofTypeDetails,
       idProofNumber,
-      infertiliyType
+      infertiliyType,
+      infertiliyTypeDetails
     } = req.body;
 
 
@@ -57,14 +62,20 @@ exports.createPatient = async (req, res) => {
       name,
       age,
       infertiliyType,
+      infertiliyTypeDetails,
       sex,
+      sexDetails,
       mobileNumber,
       address,
       maritalStatus,
+      maritalStatusDetails,
       durationOfMarriage,
       howToFindClinic,
+      howToFindClinicDetails,
+      maritalStatusDetails,
       referredByDoctorName,
       idProofType,
+      idProofTypeDetails,
       idProofNumber,
       pic,
       createdBy: req.user.id,
@@ -74,8 +85,6 @@ exports.createPatient = async (req, res) => {
     return sendResponse(res, true, "Patient created successfully", patient, 201);
 
   } catch (error) {
-    console.log(error);
-    
     return sendResponse(res, false, error.message, null, 500);
   }
 };
@@ -87,14 +96,17 @@ exports.createRelative = async (req, res) => {
       name,
       age,
       sex,
+      sexDetails,
       mobileNumber,
       address,
       email,
       maritalStatus,
+      maritalStatusDetails,
       idProofType,
+      idProofTypeDetails,
       idProofNumber,
       role,
-      UH_ID
+      UH_ID,
     } = req.body;
 
     const existingPatient = await Relative.findOne({ mobileNumber });
@@ -127,21 +139,23 @@ exports.createRelative = async (req, res) => {
       name,
       age,
       email,
+      sexDetails,
       sex,
       mobileNumber,
       address,
       maritalStatus,
+      maritalStatusDetails,
       idProofType,
       idProofNumber,
       pic,
-      UH_ID
+      UH_ID,
+      idProofTypeDetails,
+
     });
 
     return sendResponse(res, true, "Registration successfully", patient, 201);
 
   } catch (error) {
-    console.log(error);
-
     return sendResponse(res, false, error.message, null, 500);
   }
 };
@@ -302,24 +316,29 @@ exports.getPatientById = async (req, res) => {
 
 // ================= UPDATE PATIENT =================
 exports.updatePatient = async (req, res) => {
-
   try {
     const { id } = req.params;
     const {
       name,
+      email,
       age,
       sex,
+      sexDetails,
       mobileNumber,
       address,
       maritalStatus,
+      maritalStatusDetails,
       durationOfMarriage,
       howToFindClinic,
+      howToFindClinicDetails,
       referredByDoctorName,
       idProofType,
+      idProofTypeDetails,
       idProofNumber,
       infertiliyType,
+      infertiliyTypeDetails,
       isActive,
-      relative  // Get relative data from request body
+      relative
     } = req.body;
 
     // Find existing patient
@@ -332,7 +351,6 @@ exports.updatePatient = async (req, res) => {
       return sendResponse(res, false, "Patient not found", null, 404);
     }
 
-    // Check if mobile number is being changed and if it's already taken
     if (mobileNumber && mobileNumber !== existingPatient.mobileNumber) {
       const mobileExists = await User.findOne({
         mobileNumber,
@@ -350,17 +368,23 @@ exports.updatePatient = async (req, res) => {
 
     // Only add fields that are provided
     if (name !== undefined) updateData.name = name;
+    if (email !== undefined) updateData.email = email;
     if (age !== undefined) updateData.age = age;
     if (sex !== undefined) updateData.sex = sex;
+    if (sexDetails !== undefined) updateData.sexDetails = sexDetails;
     if (mobileNumber !== undefined) updateData.mobileNumber = mobileNumber;
     if (address !== undefined) updateData.address = address;
     if (maritalStatus !== undefined) updateData.maritalStatus = maritalStatus;
+    if (maritalStatusDetails !== undefined) updateData.maritalStatusDetails = maritalStatusDetails;
     if (durationOfMarriage !== undefined) updateData.durationOfMarriage = durationOfMarriage;
     if (howToFindClinic !== undefined) updateData.howToFindClinic = howToFindClinic;
+    if (howToFindClinicDetails !== undefined) updateData.howToFindClinicDetails = howToFindClinicDetails;
     if (referredByDoctorName !== undefined) updateData.referredByDoctorName = referredByDoctorName;
     if (idProofType !== undefined) updateData.idProofType = idProofType;
+    if (idProofTypeDetails !== undefined) updateData.idProofTypeDetails = idProofTypeDetails;
     if (idProofNumber !== undefined) updateData.idProofNumber = idProofNumber;
     if (infertiliyType !== undefined) updateData.infertiliyType = infertiliyType;
+    if (infertiliyTypeDetails !== undefined) updateData.infertiliyTypeDetails = infertiliyTypeDetails;
     if (isActive !== undefined) updateData.isActive = isActive;
 
     // Handle profile picture update
@@ -410,10 +434,13 @@ exports.updatePatient = async (req, res) => {
           name: relative.name,
           age: relative.age,
           sex: relative.sex,
+          sexDetails: relative.sexDetails,
           mobileNumber: relative.mobileNumber,
           address: relative.address,
           maritalStatus: relative.maritalStatus,
+          maritalStatusDetails: relative.maritalStatusDetails,
           idProofType: relative.idProofType,
+          idProofTypeDetails: relative.idProofTypeDetails,
           idProofNumber: relative.idProofNumber,
           UH_ID: existingPatient.UH_ID,
           isActive: relative.isActive !== undefined ? relative.isActive : true,
@@ -426,7 +453,6 @@ exports.updatePatient = async (req, res) => {
             _id: { $ne: existingRelative._id }
           });
           if (mobileExists) {
-            // Rollback patient update? Or just return error
             return sendResponse(res, false, "Relative mobile number already exists", null, 400);
           }
         } else if (!existingRelative) {
@@ -472,7 +498,6 @@ exports.updatePatient = async (req, res) => {
     );
 
   } catch (error) {
-    console.log(error);
     return sendResponse(res, false, error.message, null, 500);
   }
 };
@@ -482,7 +507,6 @@ exports.deletePatient = async (req, res) => {
 
   const session = await mongoose.startSession();
   session.startTransaction();
-
   try {
     const { id } = req.params;
 

@@ -8,16 +8,14 @@ import {
   ChevronDownIcon,
   GridIcon,
   HorizontaLDots,
-  ListIcon,
-  PageIcon,
-  PieChartIcon,
-  TableIcon,
-  UserCircleIcon,
   Patients,
   Prescription,
   Consultation,
   PatientHistory,
-  Couple
+  Couple,
+  DischargeIcon,
+  ProcedureIcon,
+  InvestigationIcon
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 
@@ -58,6 +56,20 @@ const navItems: NavItem[] = [
     path: "/examination-of-couple",
   },
   {
+    icon: <InvestigationIcon />,
+    name: "Investigation",
+    subItems: [
+      { name: "Ultrasound", path: "/investigation/ultrasound", pro: false },
+      { name: "Routine Blood Test", path: "/investigation/routine-blood-test", pro: false },
+      { name: "Genetic Blood Test", path: "/investigation/genetic-blood-test", pro: false },
+    ],
+  },
+  {
+    icon: <ProcedureIcon />,
+    name: "Procedure",
+    path: "/procedure",
+  },
+  {
     icon: <Prescription />,
     name: "Prescription",
     subItems: [
@@ -66,44 +78,13 @@ const navItems: NavItem[] = [
     ],
   },
   {
-    icon: <CalenderIcon />,
-    name: "OPD",
-    path: "/calendar",
-  },
-  {
-    icon: <UserCircleIcon />,
-    name: "investigations",
-    path: "/profile",
-  },
-  {
-    name: "IVF / OT",
-    icon: <ListIcon />,
-    subItems: [{ name: "Form Elements", path: "/form-elements", pro: false }],
-  },
-  {
-    name: "Andrology",
-    icon: <TableIcon />,
-    subItems: [{ name: "Basic Tables", path: "/basic-tables", pro: false }],
-  },
-  {
-    name: "Genetic Tests",
-    icon: <PageIcon />,
-    subItems: [
-      { name: "Blank Page", path: "/blank", pro: false },
-      { name: "404 Error", path: "/error-404", pro: false },
-    ],
+    icon: <DischargeIcon />,
+    name: "Discharge",
+    path: "/discharge",
   },
 ];
 
 const othersItems: NavItem[] = [
-  {
-    icon: <PieChartIcon />,
-    name: "Charts",
-    subItems: [
-      { name: "Line Chart", path: "/line-chart", pro: false },
-      { name: "Bar Chart", path: "/bar-chart", pro: false },
-    ],
-  },
   {
     icon: <BoxCubeIcon />,
     name: "UI Elements",
@@ -112,8 +93,6 @@ const othersItems: NavItem[] = [
       { name: "Avatar", path: "/avatars", pro: false },
       { name: "Badge", path: "/badge", pro: false },
       { name: "Buttons", path: "/buttons", pro: false },
-      { name: "Images", path: "/images", pro: false },
-      { name: "Videos", path: "/videos", pro: false },
     ],
   }
 ];
@@ -364,7 +343,7 @@ const AppSidebar: React.FC = () => {
               </h2>
               {renderMenuItems(navItems, "main")}
             </div>
-            <div className="">
+            {/* <div className="">
               <h2
                 className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${!isExpanded && !isHovered
                     ? "lg:justify-center"
@@ -378,7 +357,7 @@ const AppSidebar: React.FC = () => {
                 )}
               </h2>
               {renderMenuItems(othersItems, "others")}
-            </div>
+            </div> */}
           </div>
         </nav>
       </div>

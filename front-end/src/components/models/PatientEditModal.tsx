@@ -1,7 +1,16 @@
 // components/patient/PatientEditModal.tsx
-import { useState, useEffect } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 import { Patient } from "../../types/patient";
-import { genderOptions, howToFindClinicOptions, idProofTypeOptions, infertiliyTypeOptions, maritalStatusOptions } from "../../utils/patientSelection";
+import {
+  genderOptions,
+  howToFindClinicOptions,
+  idProofTypeOptions,
+  infertiliyTypeOptions,
+  maritalStatusOptions
+} from "../../utils/patientSelection";
+import OtherFieldGroup from "../form/OtherFieldGroup";
+import Input from "../form/input/InputField";
+import Label from "../form/Label";
 
 interface Relative {
   _id?: string;
@@ -9,10 +18,13 @@ interface Relative {
   name: string;
   age: number;
   sex: string;
+  sexDetails?: string;
   mobileNumber: string;
   address: string;
   maritalStatus: string;
+  maritalStatusDetails?: string;
   idProofType: string;
+  idProofTypeDetails?: string;
   idProofNumber: string;
 }
 
@@ -23,85 +35,132 @@ interface PatientEditModalProps {
 }
 
 export default function PatientEditModal({ patient, onClose, onSubmit }: PatientEditModalProps) {
-  const [formData, setFormData] = useState<any>({});
+  console.log("Patient data:", patient);
+
+  const [formData, setFormData] = useState<any>({
+    name: "",
+    UH_ID: "",
+    mobileNumber: "",
+    email: "",
+    age: undefined,
+    sex: "",
+    sexDetails: "",
+    maritalStatus: "",
+    maritalStatusDetails: "",
+    durationOfMarriage: undefined,
+    address: "",
+    infertiliyType: "",
+    infertiliyTypeDetails: "",
+    idProofType: "",
+    idProofTypeDetails: "",
+    idProofNumber: "",
+    howToFindClinic: "",
+    howToFindClinicDetails: "",
+    referredByDoctorName: "",
+    isActive: true,
+  });
+
+  console.log("formData", formData);
+
   const [relative, setRelative] = useState<Relative>({
     role: "",
     name: "",
     age: 0,
     sex: "",
+    sexDetails: "",
     mobileNumber: "",
     address: "",
     maritalStatus: "",
+    maritalStatusDetails: "",
     idProofType: "",
+    idProofTypeDetails: "",
     idProofNumber: "",
   });
   const [hasRelative, setHasRelative] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  console.log("==edit patient data", patient);
-
-  // Initialize form data when patient prop changes
   useEffect(() => {
-    setFormData({
+    console.log("Setting form data from patient:", patient);
+
+    const newFormData = {
       name: patient.name || "",
       UH_ID: patient.UH_ID || "",
       mobileNumber: patient.mobileNumber || "",
       email: patient.email || "",
       age: patient.age || undefined,
       sex: patient.sex || "",
+      sexDetails: patient.sexDetails || "",
       maritalStatus: patient.maritalStatus || "",
+      maritalStatusDetails: patient.maritalStatusDetails || "",
       durationOfMarriage: patient.durationOfMarriage || undefined,
       address: patient.address || "",
       infertiliyType: patient.infertiliyType || "",
+      infertiliyTypeDetails: patient.infertiliyTypeDetails || "",
       idProofType: patient.idProofType || "",
+      idProofTypeDetails: patient.idProofTypeDetails || "",
       idProofNumber: patient.idProofNumber || "",
       howToFindClinic: patient.howToFindClinic || "",
+      howToFindClinicDetails: patient.howToFindClinicDetails || "",
       referredByDoctorName: patient.referredByDoctorName || "",
       isActive: patient.isActive !== undefined ? patient.isActive : true,
-    });
-    
+    };
+
+    setFormData(newFormData);
+    console.log("New form data set:", newFormData);
+
     // Initialize single relative from patient.relative (object, not array)
     if (patient.relative) {
-      setRelative({
+      const relativeData = {
         _id: patient.relative._id,
         role: patient.relative.role || "",
         name: patient.relative.name || "",
         age: patient.relative.age || 0,
         sex: patient.relative.sex || "",
+        sexDetails: patient.relative.sexDetails || "",
         mobileNumber: patient.relative.mobileNumber || "",
         address: patient.relative.address || "",
         maritalStatus: patient.relative.maritalStatus || "",
+        maritalStatusDetails: patient.relative.maritalStatusDetails || "",
         idProofType: patient.relative.idProofType || "",
+        idProofTypeDetails: patient.relative.idProofTypeDetails || "",
         idProofNumber: patient.relative.idProofNumber || "",
-      });
+      };
+      setRelative(relativeData);
       setHasRelative(true);
+      console.log("Relative data set:", relativeData);
     } else {
       setRelative({
         role: "",
         name: "",
         age: 0,
         sex: "",
+        sexDetails: "",
         mobileNumber: "",
         address: "",
         maritalStatus: "",
+        maritalStatusDetails: "",
         idProofType: "",
+        idProofTypeDetails: "",
         idProofNumber: "",
       });
       setHasRelative(false);
     }
+
+    setIsInitialized(true);
   }, [patient]);
 
   // Handle input change for main patient form
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
-    
+
     let processedValue: any = value;
-    
+
     // Handle different input types
     if (type === "number") {
       processedValue = value === "" ? undefined : Number(value);
     }
-    
+
     setFormData((prev: any) => ({
       ...prev,
       [name]: processedValue
@@ -109,20 +168,66 @@ export default function PatientEditModal({ patient, onClose, onSubmit }: Patient
     setIsDirty(true);
   };
 
+  // Handle select change for patient form
+  const handlePatientSelectChange = (name: string, value: string) => {
+    setFormData((prev: any) => {
+      const newData = { ...prev, [name]: value };
+
+      // Clear related "other" details field if value is not "other"
+      if (value !== "other") {
+        const detailsFieldMap: Record<string, string> = {
+          sex: "sexDetails",
+          maritalStatus: "maritalStatusDetails",
+          howToFindClinic: "howToFindClinicDetails",
+          idProofType: "idProofTypeDetails",
+          infertiliyType: "infertiliyTypeDetails",
+        };
+
+        const detailsField = detailsFieldMap[name];
+        if (detailsField && newData[detailsField]) {
+          newData[detailsField] = "";
+          console.log(`Cleared ${detailsField}`);
+        }
+      }
+
+      return newData;
+    });
+    setIsDirty(true);
+  };
+
   // Handle relative input change (single object, no array)
   const handleRelativeChange = (field: string, value: any, type: string = "text") => {
     let processedValue: any = value;
-    
+
     // Handle number type
     if (type === "number") {
       processedValue = value === "" ? 0 : Number(value);
     }
-    
-    setRelative((prev:any) => ({
-      ...prev,
-      [field]: processedValue
-    }));
+
+    console.log(`Relative change: ${field} = ${processedValue}`);
+
+    setRelative((prev: any) => {
+      const newData = { ...prev, [field]: processedValue };
+
+      // Clear related "other" details field if value is not "other"
+      if (field === "sex" && value !== "other" && newData.sexDetails) {
+        newData.sexDetails = "";
+      }
+      if (field === "maritalStatus" && value !== "other" && newData.maritalStatusDetails) {
+        newData.maritalStatusDetails = "";
+      }
+      if (field === "idProofType" && value !== "other" && newData.idProofTypeDetails) {
+        newData.idProofTypeDetails = "";
+      }
+
+      return newData;
+    });
     setIsDirty(true);
+  };
+
+  // Handle relative select change
+  const handleRelativeSelectChange = (name: string, value: string) => {
+    handleRelativeChange(name, value);
   };
 
   // Toggle relative section
@@ -135,10 +240,13 @@ export default function PatientEditModal({ patient, onClose, onSubmit }: Patient
         name: "",
         age: 0,
         sex: "",
+        sexDetails: "",
         mobileNumber: "",
         address: "",
         maritalStatus: "",
+        maritalStatusDetails: "",
         idProofType: "",
+        idProofTypeDetails: "",
         idProofNumber: "",
       });
     }
@@ -148,7 +256,7 @@ export default function PatientEditModal({ patient, onClose, onSubmit }: Patient
   // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Prepare the complete data object with single relative object
     const completeData = {
       ...formData,
@@ -158,53 +266,25 @@ export default function PatientEditModal({ patient, onClose, onSubmit }: Patient
         name: relative.name,
         age: relative.age,
         sex: relative.sex,
+        sexDetails: relative.sexDetails,
         mobileNumber: relative.mobileNumber,
         address: relative.address,
         maritalStatus: relative.maritalStatus,
+        maritalStatusDetails: relative.maritalStatusDetails,
         idProofType: relative.idProofType,
+        idProofTypeDetails: relative.idProofTypeDetails,
         idProofNumber: relative.idProofNumber,
         UH_ID: patient.UH_ID,
         isActive: true,
       } : null
     };
-    
-    // Console log the edited data for now
+
     console.log("=== EDIT SUBMISSION ===");
-    console.log("Original Patient Data:", patient);
-    console.log("Edited Patient Data:", formData);
-    console.log("Relative Data:", hasRelative ? relative : null);
     console.log("Complete Data to Submit:", completeData);
-    console.log("Changed Fields:", getChangedFields());
     console.log("======================");
-    
+
     // Pass the complete form data to parent
     onSubmit(completeData);
-  };
-
-  // Get fields that were actually changed
-  const getChangedFields = () => {
-    const changedFields: Record<string, { old: any; new: any }> = {};
-    
-    Object.keys(formData).forEach(key => {
-      if (formData[key] !== patient[key as keyof Patient]) {
-        changedFields[key] = {
-          old: patient[key as keyof Patient],
-          new: formData[key]
-        };
-      }
-    });
-    
-    // Check if relative changed
-    const originalRelative = patient.relative || null;
-    const currentRelative = hasRelative ? relative : null;
-    if (JSON.stringify(originalRelative) !== JSON.stringify(currentRelative)) {
-      changedFields.relative = {
-        old: originalRelative,
-        new: currentRelative
-      };
-    }
-    
-    return changedFields;
   };
 
   // Handle modal close
@@ -215,6 +295,16 @@ export default function PatientEditModal({ patient, onClose, onSubmit }: Patient
     }
     onClose();
   };
+
+  if (!isInitialized) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-6">
+          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -255,13 +345,16 @@ export default function PatientEditModal({ patient, onClose, onSubmit }: Patient
                 Personal Information
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <FormField
-                  label="Full Name"
-                  name="name"
-                  value={formData.name || ""}
-                  onChange={handleChange}
-                  required
-                />
+                <div>
+                  <Label htmlFor="name">Full Name</Label>
+                  <Input
+                    type="text"
+                    name="name"
+                    placeholder="Full Name"
+                    value={formData.name || ""}
+                    onChange={handleChange}
+                  />
+                </div>
                 <FormField
                   label="Age"
                   name="age"
@@ -269,22 +362,41 @@ export default function PatientEditModal({ patient, onClose, onSubmit }: Patient
                   value={formData.age?.toString() || ""}
                   onChange={handleChange}
                 />
-                <FormField
-                  label="Sex"
-                  name="sex"
-                  type="select"
-                  value={formData.sex || ""}
-                  onChange={handleChange}
-                  options={genderOptions}
-                />
-                <FormField
-                  label="Marital Status"
-                  name="maritalStatus"
-                  type="select"
-                  value={formData.maritalStatus || ""}
-                  onChange={handleChange}
-                  options={maritalStatusOptions}
-                />
+                {/* Gender with OtherFieldGroup */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Gender <span className="text-red-500">*</span>
+                  </label>
+                  <OtherFieldGroup
+                    selectName="sex"
+                    selectOptions={genderOptions}
+                    selectValue={formData.sex}
+                    selectPlaceholder="Select Gender *"
+                    onSelectChange={handlePatientSelectChange}
+                    otherInputName="sexDetails"
+                    otherInputValue={formData.sexDetails || ""}
+                    otherInputPlaceholder="Please specify your gender"
+                    onOtherInputChange={handleChange}
+                    required={true}
+                  />
+                </div>
+                {/* Marital Status with OtherFieldGroup */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Marital Status
+                  </label>
+                  <OtherFieldGroup
+                    selectName="maritalStatus"
+                    selectOptions={maritalStatusOptions}
+                    selectValue={formData.maritalStatus || ""}
+                    selectPlaceholder="Marital Status"
+                    onSelectChange={handlePatientSelectChange}
+                    otherInputName="maritalStatusDetails"
+                    otherInputValue={formData.maritalStatusDetails || ""}
+                    otherInputPlaceholder="Please specify marital status"
+                    onOtherInputChange={handleChange}
+                  />
+                </div>
                 <FormField
                   label="Duration of Marriage (years)"
                   name="durationOfMarriage"
@@ -292,14 +404,23 @@ export default function PatientEditModal({ patient, onClose, onSubmit }: Patient
                   value={formData.durationOfMarriage?.toString() || ""}
                   onChange={handleChange}
                 />
-                <FormField
-                  label="Infertility Type"
-                  name="infertiliyType"
-                  type="select"
-                  value={formData.infertiliyType || ""}
-                  onChange={handleChange}
-                  options={infertiliyTypeOptions}
-                />
+                {/* Infertility Type with OtherFieldGroup */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Infertility Type
+                  </label>
+                  <OtherFieldGroup
+                    selectName="infertiliyType"
+                    selectOptions={infertiliyTypeOptions}
+                    selectValue={formData.infertiliyType || ""}
+                    selectPlaceholder="Infertility Type"
+                    onSelectChange={handlePatientSelectChange}
+                    otherInputName="infertiliyTypeDetails"
+                    otherInputValue={formData.infertiliyTypeDetails || ""}
+                    otherInputPlaceholder="Please specify infertility type"
+                    onOtherInputChange={handleChange}
+                  />
+                </div>
               </div>
             </section>
 
@@ -347,14 +468,24 @@ export default function PatientEditModal({ patient, onClose, onSubmit }: Patient
                 ID Proof Details
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  label="ID Proof Type"
-                  name="idProofType"
-                  type="select"
-                  value={formData.idProofType || ""}
-                  onChange={handleChange}
-                  options={idProofTypeOptions}
-                />
+                {/* ID Proof Type with OtherFieldGroup */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    ID Proof Type <span className="text-red-500">*</span>
+                  </label>
+                  <OtherFieldGroup
+                    selectName="idProofType"
+                    selectOptions={idProofTypeOptions}
+                    selectValue={formData.idProofType || ""}
+                    selectPlaceholder="ID Proof Type *"
+                    onSelectChange={handlePatientSelectChange}
+                    otherInputName="idProofTypeDetails"
+                    otherInputValue={formData.idProofTypeDetails || ""}
+                    otherInputPlaceholder="Please specify ID proof type"
+                    onOtherInputChange={handleChange}
+                    required={true}
+                  />
+                </div>
                 <FormField
                   label="ID Proof Number"
                   name="idProofNumber"
@@ -374,14 +505,23 @@ export default function PatientEditModal({ patient, onClose, onSubmit }: Patient
                 Referral Information
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  label="How Found Clinic"
-                  name="howToFindClinic"
-                  type="select"
-                  value={formData.howToFindClinic || ""}
-                  onChange={handleChange}
-                  options={howToFindClinicOptions}
-                />
+                {/* How to Find Clinic with OtherFieldGroup */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    How Found Clinic
+                  </label>
+                  <OtherFieldGroup
+                    selectName="howToFindClinic"
+                    selectOptions={howToFindClinicOptions}
+                    selectValue={formData.howToFindClinic || ""}
+                    selectPlaceholder="How did you find the clinic?"
+                    onSelectChange={handlePatientSelectChange}
+                    otherInputName="howToFindClinicDetails"
+                    otherInputValue={formData.howToFindClinicDetails || ""}
+                    otherInputPlaceholder="Please specify how you found us"
+                    onOtherInputChange={handleChange}
+                  />
+                </div>
                 <FormField
                   label="Referred By Doctor"
                   name="referredByDoctorName"
@@ -474,20 +614,23 @@ export default function PatientEditModal({ patient, onClose, onSubmit }: Patient
                         min="0"
                       />
                     </div>
+                    {/* Relative Gender with OtherFieldGroup */}
                     <div>
                       <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                        Sex
+                        Sex <span className="text-red-500">*</span>
                       </label>
-                      <select
-                        value={relative.sex}
-                        onChange={(e) => handleRelativeChange("sex", e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        <option value="">Select Sex</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                        <option value="other">Other</option>
-                      </select>
+                      <OtherFieldGroup
+                        selectName="relativeSex"
+                        selectOptions={genderOptions}
+                        selectValue={relative.sex}
+                        selectPlaceholder="Select Gender *"
+                        onSelectChange={(name, value) => handleRelativeSelectChange("sex", value)}
+                        otherInputName="relativeSexDetails"
+                        otherInputValue={relative.sexDetails || ""}
+                        otherInputPlaceholder="Please specify gender"
+                        onOtherInputChange={(e) => handleRelativeChange("sexDetails", e.target.value)}
+                        required={true}
+                      />
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
@@ -502,38 +645,39 @@ export default function PatientEditModal({ patient, onClose, onSubmit }: Patient
                         required
                       />
                     </div>
+                    {/* Relative Marital Status with OtherFieldGroup */}
                     <div>
                       <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
                         Marital Status
                       </label>
-                      <select
-                        value={relative.maritalStatus}
-                        onChange={(e) => handleRelativeChange("maritalStatus", e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        <option value="">Select Status</option>
-                        <option value="single">Single</option>
-                        <option value="married">Married</option>
-                        <option value="divorced">Divorced</option>
-                        <option value="widowed">Widowed</option>
-                      </select>
+                      <OtherFieldGroup
+                        selectName="relativeMaritalStatus"
+                        selectOptions={maritalStatusOptions}
+                        selectValue={relative.maritalStatus}
+                        selectPlaceholder="Marital Status"
+                        onSelectChange={(name, value) => handleRelativeSelectChange("maritalStatus", value)}
+                        otherInputName="relativeMaritalStatusDetails"
+                        otherInputValue={relative.maritalStatusDetails || ""}
+                        otherInputPlaceholder="Please specify marital status"
+                        onOtherInputChange={(e) => handleRelativeChange("maritalStatusDetails", e.target.value)}
+                      />
                     </div>
+                    {/* Relative ID Proof Type with OtherFieldGroup */}
                     <div>
                       <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
                         ID Proof Type
                       </label>
-                      <select
-                        value={relative.idProofType}
-                        onChange={(e) => handleRelativeChange("idProofType", e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        <option value="">Select ID Type</option>
-                        <option value="aadhaar">Aadhar Card</option>
-                        <option value="pan">PAN Card</option>
-                        <option value="voter">Voter ID</option>
-                        <option value="driving">Driving License</option>
-                        <option value="passport">Passport</option>
-                      </select>
+                      <OtherFieldGroup
+                        selectName="relativeIdProofType"
+                        selectOptions={idProofTypeOptions}
+                        selectValue={relative.idProofType}
+                        selectPlaceholder="ID Proof Type"
+                        onSelectChange={(name, value) => handleRelativeSelectChange("idProofType", value)}
+                        otherInputName="relativeIdProofTypeDetails"
+                        otherInputValue={relative.idProofTypeDetails || ""}
+                        otherInputPlaceholder="Please specify ID proof type"
+                        onOtherInputChange={(e) => handleRelativeChange("idProofTypeDetails", e.target.value)}
+                      />
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
@@ -621,7 +765,7 @@ interface FormFieldProps {
   name: string;
   type?: "text" | "number" | "email" | "select" | "textarea";
   value: string;
-  onChange: (e: React.ChangeEvent<any>) => void;
+  onChange: (e: ChangeEvent<any>) => void;
   options?: Array<{ value: string; label: string }>;
   required?: boolean;
   placeholder?: string;
@@ -639,7 +783,7 @@ const FormField = ({
 }: FormFieldProps) => {
   const baseInputClass =
     "w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed";
-  
+
   const baseLabelClass = "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1";
 
   return (
@@ -648,7 +792,7 @@ const FormField = ({
         {label}
         {required && <span className="text-red-500 ml-1">*</span>}
       </label>
-      
+
       {type === "select" && options ? (
         <select
           name={name}
@@ -657,6 +801,7 @@ const FormField = ({
           className={baseInputClass}
           required={required}
         >
+          <option value="">Select {label.toLowerCase()}</option>
           {options.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}

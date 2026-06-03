@@ -38,8 +38,11 @@ export interface HusbandHistory {
 
 export interface PatientHistoryForm {
   chiefComplaints: string;
-  amenorrhoea: string;
-  complaint: string;
+  chiefComplaintsDetails?: string;
+  lmp?: string;
+  sb_iod_dead?: string;
+  // amenorrhoea: string;
+  // complaint: string;
   onset: string;
   duration: string;
   associatedSymptoms: string;
@@ -62,7 +65,18 @@ export interface PatientHistoryForm {
   downSyndrome: 'yes' | 'no' | '';
   smoking: 'yes' | 'no' | '';
   drugAddiction: 'yes' | 'no' | '';
-  husbandClinicalHistory: string;
+
+  husbandDiabetes: 'yes' | 'no' | '',
+  husbandHypertension: 'yes' | 'no' | '',
+  husbandAsthma: 'yes' | 'no' | '',
+  husbandThyroid: 'yes' | 'no' | '',
+  husbandDrugAllergy: 'yes' | 'no' | '',
+  husbandDrugAllergyDetails: string,
+  husbandGeneticDiseaseSelf: 'yes' | 'no' | '',
+  husbandGeneticDiseaseFamily: 'yes' | 'no' | '',
+  husbandDownSyndrome: 'yes' | 'no' | '',
+  husbandSmoking: 'yes' | 'no' | '',
+  husbandDrugAddiction: 'yes' | 'no' | '',
 }
 
 export interface PatientHistoryPayload {

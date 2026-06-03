@@ -58,10 +58,10 @@ export default function RelativeCard({ relativedata }: any) {
         <div className="px-4 pb-4 border-t border-gray-200 dark:border-gray-700">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
             <InfoItemMini label="Age" value={relativedata.age?.toString()} />
-            <InfoItemMini label="Sex" value={relativedata.sex} capitalize />
+            <InfoItemMini label="Sex" value={relativedata.sex === "other" ? relativedata.sexDetails : relativedata.sex} capitalize />
             <InfoItemMini label="Mobile" value={relativedata.mobileNumber} />
-            <InfoItemMini label="Marital Status" value={relativedata.maritalStatus} capitalize />
-            <InfoItemMini label="ID Proof Type" value={relativedata.idProofType} capitalize />
+            <InfoItemMini label="Marital Status" value={relativedata.maritalStatus === "other" ? relativedata.maritalStatusDetails : relativedata.maritalStatus} capitalize />
+            <InfoItemMini label="ID Proof Type" value={relativedata.idProofType==="other"?relativedata.idProofTypeDetails:relativedata.idProofType} capitalize />
             <InfoItemMini label="ID Proof Number" value={relativedata.idProofNumber} />
             {relativedata.email && <InfoItemMini label="Email" value={relativedata.email} />}
             {relativedata.address && (

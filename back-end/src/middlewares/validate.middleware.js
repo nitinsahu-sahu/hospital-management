@@ -3,8 +3,6 @@
 const { validationResult } = require("express-validator");
 
 exports.validate = (req, res, next) => {
-console.log(req.files);
-
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {

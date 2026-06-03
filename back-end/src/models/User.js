@@ -47,7 +47,6 @@ const userSchema = new mongoose.Schema(
         // ================= PATIENT FIELDS =================
         UH_ID: {
             type: String,
-            unique: true,
             sparse: true,
         },
         age: {
@@ -57,34 +56,45 @@ const userSchema = new mongoose.Schema(
         sex: {
             type: String,
             enum: ["male", "female", "other"],
+            default: "female"
         },
-
+        sexDetails: {
+            type: String,
+            required: false
+        },
         maritalStatus: {
             type: String,
             enum: ["single", "married", "divorced", "widowed", "other"],
+            default: "married"
         },
-
+        maritalStatusDetails: {
+            type: String,
+            required: false
+        },
         durationOfMarriage: {
             type: String,
         },
 
         howToFindClinic: {
             type: String,
-            // enum: [
-            //     "google",
-            //     "justdial",
-            //     "instagram",
-            //     "facebook",
-            //     "friend",
-            //     "relative",
-            //     "doctor",
-            //     "newspaper",
-            //     "youtube",
-            //     "other",
-            // ],
-            default:"google"
+            enum: [
+                "google",
+                "justdial",
+                "instagram",
+                "facebook",
+                "friend",
+                "relative",
+                "doctor",
+                "newspaper",
+                "youtube",
+                "other",
+            ],
+            default: "google"
         },
-
+        howToFindClinicDetails: {
+            type: String,
+            required: false
+        },
         referredByDoctorName: {
             type: String,
             trim: true,
@@ -98,19 +108,27 @@ const userSchema = new mongoose.Schema(
                 "passport",
                 "driving_license",
                 "voter",
+                "other",
             ],
-            default:"aadhaar"
+            default: "aadhaar"
         },
-
+        idProofTypeDetails: {
+            type: String,
+            required: false
+        },
         infertiliyType: {
             type: String,
             enum: [
                 "primary",
                 "secondary",
+                "other",
             ],
-            default:"primary"
+            default: "primary"
         },
-
+        infertiliyTypeDetails: {
+            type: String,
+            required: false
+        },
         idProofNumber: {
             type: String,
         },
