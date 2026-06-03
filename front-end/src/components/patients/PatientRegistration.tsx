@@ -1,7 +1,8 @@
 // components/patient/PatientRegistration.tsx
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent } from "react";
 import Input from "../../components/form/input/InputField";
-import Select from "../../components/form/Select";
+// import Select from "../../components/form/Select";
+import OtherFieldGroup from "../../components/form/OtherFieldGroup";
 import ImageUpload from "../../pages/Forms/ImageUpload";
 
 import {
@@ -30,9 +31,6 @@ export default function PatientRegistration({
   error,
   success,
 }: PatientFormProps) {
-  const [showOtherGenderInput, setShowOtherGenderInput] = useState(
-    patientFormData.sex === "other" || false
-  );
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -40,23 +38,33 @@ export default function PatientRegistration({
   };
 
   const handleSelectChange = (name: string, value: string) => {
-    setPatientFormData({ ...patientFormData, [name]: value });
-    
-    // Show other gender input when "other" is selected
-    if (name === "sex") {
-      setShowOtherGenderInput(value === "other");
-      // Clear sexDetails when changing from "other" to something else
+    setPatientFormData((prev: any) => {
+      const newData = { ...prev, [name]: value };
+      
       if (value !== "other") {
-        setPatientFormData((prev: any) => ({ ...prev, sexDetails: "" }));
+        const detailsFieldMap: Record<string, string> = {
+          sex: "sexDetails",
+          maritalStatus: "maritalStatusDetails",
+          howToFindClinic: "howToFindClinicDetails",
+          idProofType: "idProofTypeDetails",
+          infertiliyType: "infertiliyTypeDetails",
+        };
+        
+        const detailsField = detailsFieldMap[name];
+        if (detailsField) {
+          newData[detailsField] = "";
+        }
       }
-    }
+      
+      return newData;
+    });
   };
 
   const handleImageChange = (file: File | null, preview: string) => {
     setPatientFormData({
       ...patientFormData,
       pic: file,
-      profilePicPreview: preview
+      profilePicPreview: preview,
     });
   };
 
@@ -99,25 +107,19 @@ export default function PatientRegistration({
               value={patientFormData.age}
               onChange={handleInputChange}
             />
-            <Select
-              options={genderOptions}
-              placeholder="Select Gender *"
-              value={patientFormData.sex}
-              onChange={(val) => handleSelectChange("sex", val)}
+            <OtherFieldGroup
+              selectName="sex"
+              selectOptions={genderOptions}
+              selectValue={patientFormData.sex}
+              selectPlaceholder="Select Gender *"
+              onSelectChange={handleSelectChange}
+              otherInputName="sexDetails"
+              otherInputValue={patientFormData.sexDetails || ""}
+              otherInputPlaceholder="Please specify your gender"
+              onOtherInputChange={handleInputChange}
+              required={true}
             />
           </div>
-          {/* Other Gender Input - Shows when "Other" is selected */}
-          {showOtherGenderInput && (
-            <div className="mt-3">
-              <Input
-                type="text"
-                name="sexDetails"
-                placeholder="Please specify your gender *"
-                value={patientFormData.sexDetails || ""}
-                onChange={handleInputChange}
-              />
-            </div>
-          )}
         </div>
 
         {/* Contact Info */}
@@ -133,11 +135,17 @@ export default function PatientRegistration({
               value={patientFormData.mobileNumber}
               onChange={handleInputChange}
             />
-            <Select
-              options={maritalStatusOptions}
-              placeholder="Marital Status *"
-              value={patientFormData.maritalStatus}
-              onChange={(val) => handleSelectChange("maritalStatus", val)}
+            {/* Using OtherFieldGroup for Marital Status */}
+            <OtherFieldGroup
+              selectName="maritalStatus"
+              selectOptions={maritalStatusOptions}
+              selectValue={patientFormData.maritalStatus}
+              selectPlaceholder="Marital Status"
+              onSelectChange={handleSelectChange}
+              otherInputName="maritalStatusDetails"
+              otherInputValue={patientFormData.maritalStatusDetails || ""}
+              otherInputPlaceholder="Please specify marital status"
+              onOtherInputChange={handleInputChange}
             />
           </div>
         </div>
@@ -172,11 +180,17 @@ export default function PatientRegistration({
               value={patientFormData.durationOfMarriage || ""}
               onChange={handleInputChange}
             />
-            <Select
-              options={infertiliyTypeOptions}
-              placeholder="Infertility Type"
-              value={patientFormData.infertiliyType || ""}
-              onChange={(val) => handleSelectChange("infertiliyType", val)}
+            {/* Using OtherFieldGroup for Infertility Type */}
+            <OtherFieldGroup
+              selectName="infertiliyType"
+              selectOptions={infertiliyTypeOptions}
+              selectValue={patientFormData.infertiliyType || ""}
+              selectPlaceholder="Infertility Type"
+              onSelectChange={handleSelectChange}
+              otherInputName="infertiliyTypeDetails"
+              otherInputValue={patientFormData.infertiliyTypeDetails || ""}
+              otherInputPlaceholder="Please specify infertility type"
+              onOtherInputChange={handleInputChange}
             />
           </div>
         </div>
@@ -187,11 +201,17 @@ export default function PatientRegistration({
             Referral Information
           </h4>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <Select
-              options={howToFindClinicOptions}
-              placeholder="How did you find the clinic?"
-              value={patientFormData.howToFindClinic || ""}
-              onChange={(val) => handleSelectChange("howToFindClinic", val)}
+            {/* Using OtherFieldGroup for How to Find Clinic */}
+            <OtherFieldGroup
+              selectName="howToFindClinic"
+              selectOptions={howToFindClinicOptions}
+              selectValue={patientFormData.howToFindClinic || ""}
+              selectPlaceholder="How did you find the clinic?"
+              onSelectChange={handleSelectChange}
+              otherInputName="howToFindClinicDetails"
+              otherInputValue={patientFormData.howToFindClinicDetails || ""}
+              otherInputPlaceholder="Please specify how you found us"
+              onOtherInputChange={handleInputChange}
             />
             <Input
               type="text"
@@ -209,11 +229,18 @@ export default function PatientRegistration({
             ID Proof Details
           </h4>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <Select
-              options={idProofTypeOptions}
-              placeholder="ID Proof Type *"
-              value={patientFormData.idProofType}
-              onChange={(val) => handleSelectChange("idProofType", val)}
+            {/* Using OtherFieldGroup for ID Proof Type */}
+            <OtherFieldGroup
+              selectName="idProofType"
+              selectOptions={idProofTypeOptions}
+              selectValue={patientFormData.idProofType}
+              selectPlaceholder="ID Proof Type *"
+              onSelectChange={handleSelectChange}
+              otherInputName="idProofTypeDetails"
+              otherInputValue={patientFormData.idProofTypeDetails || ""}
+              otherInputPlaceholder="Please specify ID proof type"
+              onOtherInputChange={handleInputChange}
+              required={true}
             />
             <Input
               type="text"

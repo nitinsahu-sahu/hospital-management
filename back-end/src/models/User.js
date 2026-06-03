@@ -65,29 +65,36 @@ const userSchema = new mongoose.Schema(
         maritalStatus: {
             type: String,
             enum: ["single", "married", "divorced", "widowed", "other"],
+            default: "married"
         },
-
+        maritalStatusDetails: {
+            type: String,
+            required: false
+        },
         durationOfMarriage: {
             type: String,
         },
 
         howToFindClinic: {
             type: String,
-            // enum: [
-            //     "google",
-            //     "justdial",
-            //     "instagram",
-            //     "facebook",
-            //     "friend",
-            //     "relative",
-            //     "doctor",
-            //     "newspaper",
-            //     "youtube",
-            //     "other",
-            // ],
+            enum: [
+                "google",
+                "justdial",
+                "instagram",
+                "facebook",
+                "friend",
+                "relative",
+                "doctor",
+                "newspaper",
+                "youtube",
+                "other",
+            ],
             default: "google"
         },
-
+        howToFindClinicDetails: {
+            type: String,
+            required: false
+        },
         referredByDoctorName: {
             type: String,
             trim: true,
@@ -101,19 +108,27 @@ const userSchema = new mongoose.Schema(
                 "passport",
                 "driving_license",
                 "voter",
+                "other",
             ],
             default: "aadhaar"
         },
-
+        idProofTypeDetails: {
+            type: String,
+            required: false
+        },
         infertiliyType: {
             type: String,
             enum: [
                 "primary",
                 "secondary",
+                "other",
             ],
             default: "primary"
         },
-
+        infertiliyTypeDetails: {
+            type: String,
+            required: false
+        },
         idProofNumber: {
             type: String,
         },

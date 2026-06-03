@@ -62,8 +62,18 @@ import { ReactComponent as Couple } from "./couple.svg?react";
 import { ReactComponent as EditIcon } from "./edit.svg?react";
 import { ReactComponent as ViewIcon } from "./view.svg?react";
 import { ReactComponent as MenuDotIcon } from "./menu-dot.svg?react";
+import { ReactComponent as CrossIcon } from "./cross.svg?react";
+import { ReactComponent as SearchIcon } from "./search.svg?react";
+import { ReactComponent as DischargeIcon } from "./discharge.svg?react";
+import { ReactComponent as ProcedureIcon } from "./procedure.svg?react";
+import { ReactComponent as InvestigationIcon } from "./investigation.svg?react";
 
 export {
+  InvestigationIcon,
+  ProcedureIcon,
+  DischargeIcon,
+  SearchIcon,
+  CrossIcon,
   MenuDotIcon,
   ViewIcon,
   EditIcon,

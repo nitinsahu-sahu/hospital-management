@@ -38,6 +38,7 @@ layer(base);
 
   --color-current: currentColor;
   --color-transparent: transparent;
+  /* --color-white: #e9d69b; */
   --color-white: #ffffff;
   --color-black: #101828;
 
@@ -68,9 +69,11 @@ layer(base);
   --color-blue-light-950: #062c41;
 
   --color-gray-25: #fcfcfd;
+  /* --color-gray-50: #d2bc76; */
   --color-gray-50: #f9fafb;
   --color-gray-100: #f2f4f7;
   --color-gray-200: #e4e7ec;
+  /* --color-gray-300: #d0d5dd; */
   --color-gray-300: #d0d5dd;
   --color-gray-400: #98a2b3;
   --color-gray-500: #667085;

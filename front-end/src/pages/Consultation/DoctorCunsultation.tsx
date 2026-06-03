@@ -178,12 +178,20 @@ export default function DoctorConsultation() {
       result = await dispatch(updateConsultation(existingConsultationId, consultationData) as any);
       if (result?.status === 200) {
         setSuccessMessage('Consultation updated successfully!');
+         setTimeout(()=>{
+        setSuccessMessage('');
+
+        },5000)
         fetchConsultationForPatient(selectedPatient._id);
       }
     } else {
       result = await dispatch(createConsultation(consultationData) as any);
       if (result?.status === 201 || result?.status === 200) {
         setSuccessMessage('Consultation created successfully!');
+        setTimeout(()=>{
+        setSuccessMessage('');
+
+        },5000)
         if (result?.payload?._id) {
           setExistingConsultationId(result.payload._id);
           setIsExistingConsultation(true);
@@ -217,7 +225,6 @@ export default function DoctorConsultation() {
           )}
           {error && (
             <div className='mb-6'>
-
               <Alert
                 variant="error"
                 title="Error Message"

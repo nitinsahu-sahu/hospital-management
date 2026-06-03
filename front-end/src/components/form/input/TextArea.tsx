@@ -12,14 +12,14 @@ interface TextareaProps {
 }
 
 const TextArea: React.FC<TextareaProps> = ({
-  placeholder = "Enter your message", // Default placeholder
-  rows = 3, // Default number of rows
-  value = "", // Default value
-  onChange, // Callback for changes
-  className = "", // Additional custom styles
-  disabled = false, // Disabled state
-  error = false, // Error state
-  hint = "", // Default hint text
+  placeholder = "Enter your message",
+  rows = 3, 
+  value = "",
+  onChange,
+  className = "", 
+  disabled = false,
+  error = false,
+  hint = "",
 }) => {
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     if (onChange) {

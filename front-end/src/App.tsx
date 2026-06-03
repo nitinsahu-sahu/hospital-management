@@ -7,14 +7,10 @@ import SignUp from "./pages/AuthPages/SignUp";
 import NotFound from "./pages/OtherPage/NotFound";
 
 import UserProfiles from "./pages/UserProfiles";
-import Images from "./pages/UiElements/Images";
 import Alerts from "./pages/UiElements/Alerts";
 import Badges from "./pages/UiElements/Badges";
 import Avatars from "./pages/UiElements/Avatars";
 import Buttons from "./pages/UiElements/Buttons";
-
-import LineChart from "./pages/Charts/LineChart";
-import BarChart from "./pages/Charts/BarChart";
 
 import Calendar from "./pages/Calendar";
 import BasicTables from "./pages/Tables/BasicTables";
@@ -38,8 +34,13 @@ import Protected from "./redux/helper/HOC";
 import { RootState } from "./redux/store/store";
 //@ts-ignore
 import { isUserLoggedIn } from "./redux/actions/auth.actions";
-import ExaminationOfCouple from "./pages/ExaminationOfCouple/ExaminationOfCouple";
 import PatientHistory from "./pages/PatientHistory/PatientHistory";
+import Procedure from "./pages/Procedure/Procedure";
+import Discharge from "./pages/Discharge/Discharge";
+import UltraSound from "./pages/Investigation/Ultrasound";
+import RoutineBlood from "./pages/Investigation/RoutineBlood";
+import GeneticBlood from "./pages/Investigation/GeneticBlood";
+import ExaminationOfCouple from "./pages/ExaminationOfCouple/ExaminationOfCouple";
 
 export default function App() {
   
@@ -79,12 +80,17 @@ export default function App() {
           <Route path="/profile" element={<UserProfiles />} />
           <Route path="/patient-history" element={<PatientHistory />} />
           <Route path="/examination-of-couple" element={<ExaminationOfCouple />} />
+          <Route path="/investigation/ultrasound" element={<UltraSound />} />
+          <Route path="/investigation/routine-blood-test" element={<RoutineBlood />} />
+          <Route path="/investigation/genetic-blood-test" element={<GeneticBlood />} />
+          <Route path="/procedure" element={<Procedure />} />
+          <Route path="/discharge" element={<Discharge />} />
           <Route path="/consultation" element={<DoctorConsultation />} />
           <Route path="/patient/add" element={<Patients />} />
           <Route path="/patient/view" element={<PatientsListing />} />
           <Route path="/prescription/add" element={<Prescription />} />
           <Route path="/prescription/view" element={<PrescriptionView />} />
-          <Route path="/calendar" element={<Calendar />} />
+          <Route path="/discharge" element={<Calendar />} />
           <Route path="/blank" element={<Blank />} />
 
           {/* Forms */}
@@ -98,11 +104,6 @@ export default function App() {
           <Route path="/avatars" element={<Avatars />} />
           <Route path="/badge" element={<Badges />} />
           <Route path="/buttons" element={<Buttons />} />
-          <Route path="/images" element={<Images />} />
-
-          {/* Charts */}
-          <Route path="/line-chart" element={<LineChart />} />
-          <Route path="/bar-chart" element={<BarChart />} />
         </Route>
 
         {/* 404 */}

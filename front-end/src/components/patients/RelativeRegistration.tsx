@@ -1,5 +1,5 @@
 // components/patient/RelativeRegistration.tsx
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent } from "react";
 import Input from "../../components/form/input/InputField";
 import Select from "../../components/form/Select";
 import {
@@ -9,6 +9,7 @@ import {
   relativeRoleOptions,
 } from "../../utils/patientSelection";
 import ImageUpload from "../../pages/Forms/ImageUpload";
+import OtherFieldGroup from "../form/OtherFieldGroup";
 
 interface RelativeFormProps {
   relativeFormData: any;
@@ -30,9 +31,6 @@ export default function RelativeRegistration({
   error,
   success,
 }: RelativeFormProps) {
-  const [showOtherGenderInput, setShowOtherGenderInput] = useState(
-    relativeFormData.sex === "other" || false
-  );
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -40,16 +38,25 @@ export default function RelativeRegistration({
   };
 
   const handleSelectChange = (name: string, value: string) => {
-    setRelativeFormData({ ...relativeFormData, [name]: value });
-
-    // Show other gender input when "other" is selected
-    if (name === "sex") {
-      setShowOtherGenderInput(value === "other");
-      // Clear sexDetails when changing from "other" to something else
+    setRelativeFormData((prev: any) => {
+      const newData = { ...prev, [name]: value };
+      
+      // Clear related "other" details field if value is not "other"
       if (value !== "other") {
-        setRelativeFormData((prev: any) => ({ ...prev, sexDetails: "" }));
+        const detailsFieldMap: Record<string, string> = {
+          sex: "sexDetails",
+          maritalStatus: "maritalStatusDetails",
+          idProofType: "idProofTypeDetails",
+        };
+        
+        const detailsField = detailsFieldMap[name];
+        if (detailsField) {
+          newData[detailsField] = "";
+        }
       }
-    }
+      
+      return newData;
+    });
   };
 
   const handleImageChange = (file: File | null, preview: string) => {
@@ -106,25 +113,21 @@ export default function RelativeRegistration({
               value={relativeFormData.age}
               onChange={handleInputChange}
             />
-            <Select
-              options={genderOptions}
-              placeholder="Select Gender *"
-              value={relativeFormData.sex}
-              onChange={(val) => handleSelectChange("sex", val)}
+            <OtherFieldGroup
+              selectName="sex"
+              selectOptions={genderOptions}
+              selectValue={relativeFormData.sex}
+              selectPlaceholder="Select Gender *"
+              onSelectChange={handleSelectChange}
+              otherInputName="sexDetails"
+              otherInputValue={relativeFormData.sexDetails || ""}
+              otherInputPlaceholder="Please specify your gender"
+              onOtherInputChange={handleInputChange}
+              required={true}
             />
           </div>
         </div>
-        {showOtherGenderInput && (
-          <div className="mt-3">
-            <Input
-              type="text"
-              name="sexDetails"
-              placeholder="Please specify your gender *"
-              value={relativeFormData.sexDetails || ""}
-              onChange={handleInputChange}
-            />
-          </div>
-        )}
+
         {/* Contact Info */}
         <div>
           <h4 className="mb-3 font-medium text-gray-700 dark:text-white">
@@ -138,11 +141,16 @@ export default function RelativeRegistration({
               value={relativeFormData.mobileNumber}
               onChange={handleInputChange}
             />
-            <Select
-              options={maritalStatusOptions}
-              placeholder="Marital Status"
-              value={relativeFormData.maritalStatus}
-              onChange={(val) => handleSelectChange("maritalStatus", val)}
+            <OtherFieldGroup
+              selectName="maritalStatus"
+              selectOptions={maritalStatusOptions}
+              selectValue={relativeFormData.maritalStatus}
+              selectPlaceholder="Marital Status"
+              onSelectChange={handleSelectChange}
+              otherInputName="maritalStatusDetails"
+              otherInputValue={relativeFormData.maritalStatusDetails || ""}
+              otherInputPlaceholder="Please specify marital status"
+              onOtherInputChange={handleInputChange}
             />
           </div>
         </div>
@@ -193,11 +201,17 @@ export default function RelativeRegistration({
             ID Proof Details
           </h4>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <Select
-              options={idProofTypeOptions}
-              placeholder="ID Proof Type *"
-              value={relativeFormData.idProofType}
-              onChange={(val) => handleSelectChange("idProofType", val)}
+            <OtherFieldGroup
+              selectName="idProofType"
+              selectOptions={idProofTypeOptions}
+              selectValue={relativeFormData.idProofType}
+              selectPlaceholder="ID Proof Type *"
+              onSelectChange={handleSelectChange}
+              otherInputName="idProofTypeDetails"
+              otherInputValue={relativeFormData.idProofTypeDetails || ""}
+              otherInputPlaceholder="Please specify ID proof type"
+              onOtherInputChange={handleInputChange}
+              required={true}
             />
             <Input
               type="text"
