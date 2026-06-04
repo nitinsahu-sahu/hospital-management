@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import PageMeta from '../../components/common/PageMeta';
-import { RootState } from '../../redux/store/store';
 //@ts-ignore
 import { createPatientHistory, getPatientHistoryByPatientId, updatePatientHistory } from '../../redux/actions/patientHistory.action';
 //@ts-ignore
@@ -9,7 +8,7 @@ import { getConsultationByPatientId } from '../../redux/actions/consultation.act
 
 import { PatientInfoCard } from '../../components/consultation/PatientInfoCard';
 import Alert from '../../components/ui/alert/Alert';
-import { complaintOptions, amenorrhoeaOptions, chiefComplaintsOptions } from '../../utils/patientHistory';
+import { chiefComplaintsOptions } from '../../utils/patientHistory';
 import { PatientHistoryForm } from '../../types/patientHistory';
 import OtherFieldGroup from '../../components/form/OtherFieldGroup';
 import DatePicker from '../../components/form/date-picker';
@@ -18,7 +17,6 @@ import DatePicker from '../../components/form/date-picker';
 
 export default function PatientHistory() {
   const dispatch = useDispatch();
-  const { error } = useSelector((state: RootState) => state.consultation);
   const [successMessage, setSuccessMessage] = useState<string>('');
   const [selectedPatient, setSelectedPatient] = useState<any | null>(null);
   const [isExistingConsultation, setIsExistingConsultation] = useState(false);
@@ -27,9 +25,7 @@ export default function PatientHistory() {
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [consultationId, setConsultationId] = useState("");
-  const [patientHistoryId, setPatientHistoryId] = useState("");
-
-  // Add a ref to track current patient ID
+  const [error, setError] = useState("");
   const currentPatientIdRef = useRef<string | null>(null);
 
   const [formData, setFormData] = useState<PatientHistoryForm>({
@@ -139,9 +135,6 @@ export default function PatientHistory() {
       if (result?.payload && result?.type === 'PATIENT_HISTORY_GET_SUCCESS') {
         const history = result.payload;
         setIsExistingPatientHistory(true);
-        setPatientHistoryId(history._id);
-
-        // Populate form with existing data
         setFormData({
           chiefComplaints: history.chiefComplaints || '',
           chiefComplaintsDetails: history.chiefComplaintsDetails || '',
@@ -188,7 +181,6 @@ export default function PatientHistory() {
         // No existing history found - make sure form is cleared
         console.log("No history found for patient:", patientId);
         setIsExistingPatientHistory(false);
-        setPatientHistoryId("");
         resetFormData(); // Clear the form if no history found
       }
     } catch (error) {
@@ -247,9 +239,6 @@ export default function PatientHistory() {
             setIsExistingConsultation(false);
             setIsExistingPatientHistory(false);
             setConsultationId("");
-            setPatientHistoryId("");
-
-            // Fetch new patient data
             fetchConsultationForPatient(patient._id);
             fetchPatientHistory(patient._id);
           }
@@ -263,14 +252,12 @@ export default function PatientHistory() {
       } else {
         // No patient in session
         if (currentPatientIdRef.current !== null) {
-          console.log("Clearing patient data");
           currentPatientIdRef.current = null;
           setSelectedPatient(null);
           resetFormData();
           setIsExistingConsultation(false);
           setIsExistingPatientHistory(false);
           setConsultationId("");
-          setPatientHistoryId("");
         }
       }
     };
@@ -397,32 +384,33 @@ export default function PatientHistory() {
     };
 
     setIsSubmitting(true);
-
     try {
+      let result;
+
       if (isExistingPatientHistory) {
-        // Update existing patient history
-        const result = await dispatch(updatePatientHistory(selectedPatient._id, patientHistoryData) as any);
-        
-        setSuccessMessage(result.message);
-        setTimeout(() => {
-          setSuccessMessage('');
-        }, 5000)
+        result = await dispatch(updatePatientHistory(selectedPatient._id, patientHistoryData) as any);
+
       } else {
-        // Create new patient history
-        const result = await dispatch(createPatientHistory(patientHistoryData) as any);
-        if (result?.payload?._id) {
-          setIsExistingPatientHistory(true);
-          setPatientHistoryId(result.payload._id);
-        }
-        setSuccessMessage('Patient history saved successfully!');
+        result = await dispatch(createPatientHistory(patientHistoryData) as any);
+
+      }
+
+      if (result?.type === 'PATIENT_HISTORY_CREATE_SUCCESS' ||
+        result?.type === 'PATIENT_HISTORY_UPDATE_SUCCESS') {
+        setSuccessMessage(isExistingPatientHistory
+          ? 'Patient examination updated successfully!'
+          : 'Patient examination saved successfully!'
+        );
+
         setTimeout(() => {
-          setSuccessMessage('');
+          setSuccessMessage("")
         }, 5000)
+        setIsExistingPatientHistory(true);
+      } else {
+        setError(result?.payload || 'Failed to save examination')
       }
     } catch (error: any) {
-      alert(error.response?.data?.message || error.message || 'Error saving patient history');
-    } finally {
-      setIsSubmitting(false);
+      setError(error.message || 'Error saving examination');
     }
   };
 
@@ -1418,10 +1406,10 @@ export default function PatientHistory() {
                 </button>
                 <button
                   type="submit"
-                  disabled={isSubmitting}
+                  // disabled={isSubmitting}
                   className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isSubmitting ? 'Saving...' : isExistingPatientHistory ? 'Update Patient History' : 'Save Patient History'}
+                  {isExistingPatientHistory ? 'Update Patient History' : 'Save Patient History'}
                 </button>
               </div>
             </form>
