@@ -40,7 +40,8 @@ import Discharge from "./pages/Discharge/Discharge";
 import UltraSound from "./pages/Investigation/Ultrasound";
 import RoutineBlood from "./pages/Investigation/RoutineBlood";
 import GeneticBlood from "./pages/Investigation/GeneticBlood";
-import ExaminationOfCouple from "./pages/ExaminationOfCouple/ExaminationOfCouple";
+import PatientExamination from "./pages/ExaminationOfCouple/PatientExamination";
+import RelativeExamination from "./pages/ExaminationOfCouple/RelativeExamination";
 
 export default function App() {
   
@@ -79,7 +80,8 @@ export default function App() {
           {/* Others Page */}
           <Route path="/profile" element={<UserProfiles />} />
           <Route path="/patient-history" element={<PatientHistory />} />
-          <Route path="/examination-of-couple" element={<ExaminationOfCouple />} />
+          <Route path="/examination-of-couple/patient" element={<PatientExamination />} />
+          <Route path="/examination-of-couple/relative" element={<RelativeExamination />} />
           <Route path="/investigation/ultrasound" element={<UltraSound />} />
           <Route path="/investigation/routine-blood-test" element={<RoutineBlood />} />
           <Route path="/investigation/genetic-blood-test" element={<GeneticBlood />} />
