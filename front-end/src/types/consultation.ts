@@ -30,4 +30,7 @@ export interface SelectedPatient {
     url: string;
   };
   mobileNumber?: string;
+  relative?:{
+    _id?:string
+  }
 }

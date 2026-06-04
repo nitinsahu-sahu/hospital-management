@@ -11,6 +11,11 @@ const {
     deletePatientHistory,
     getAllPatientHistories
 } = require('../controllers/patientHistory.controller');
+const {
+    createPatientHistoryValidation,
+    updatePatientHistoryValidation
+} = require('../validators/patientHistory.validator');
+const { validate } = require('../middlewares/validate.middleware');
 
 // All routes are protected
 router.use(isAuth);
@@ -19,13 +24,13 @@ router.use(isAuth);
 router.get('/', getAllPatientHistories);
 
 // Create patient history
-router.post('/', createPatientHistory);
+router.post('/', createPatientHistoryValidation, validate, createPatientHistory);
 
 // Get patient history by patient ID
 router.get('/patient/:patientId', getPatientHistoryByPatientId);
 
 // Update patient history
-router.put('/patient/:patientId', updatePatientHistory);
+router.put('/patient/:patientId', updatePatientHistoryValidation, validate, updatePatientHistory);
 
 // Delete patient history
 router.delete('/patient/:patientId', deletePatientHistory);

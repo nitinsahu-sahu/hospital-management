@@ -6,7 +6,7 @@ export const createPatientHistory = (patientHistoryData) => async (dispatch, get
     try {
         dispatch({ type: patientHistoryConstants.PATIENT_HISTORY_CREATE_REQUEST });
 
-        const { data } = await APIs.post("/patient-history",patientHistoryData);
+        const { data } = await APIs.post("/patient-history", patientHistoryData);
 
         dispatch({
             type: patientHistoryConstants.PATIENT_HISTORY_CREATE_SUCCESS,
@@ -64,14 +64,19 @@ export const updatePatientHistory = (patientId, patientHistoryData) => async (di
             type: patientHistoryConstants.PATIENT_HISTORY_UPDATE_SUCCESS,
             payload: data.data,
         });
-
-        return data;
+        return {
+            type: patientHistoryConstants.PATIENT_HISTORY_UPDATE_SUCCESS,
+            payload: data.data
+        };
     } catch (error) {
         dispatch({
             type: patientHistoryConstants.PATIENT_HISTORY_UPDATE_FAILURE,
             payload: error.response?.data?.message || 'Error updating patient history',
         });
-        throw error;
+        return {
+            type: patientHistoryConstants.PATIENT_HISTORY_UPDATE_FAILURE,
+            payload: error.response?.data?.message || 'Error updating patient examination'
+        };
     }
 };
 

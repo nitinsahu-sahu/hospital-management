@@ -150,6 +150,7 @@ exports.getPatientHistoryByPatientId = async (req, res) => {
 
 // Update Patient History
 exports.updatePatientHistory = async (req, res) => {
+  
   try {
     const { patientId } = req.params;
     const {

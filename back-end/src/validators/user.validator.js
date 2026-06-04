@@ -202,7 +202,6 @@ exports.createRelativeValidation = [
 
 
 // ================= LOGIN =================
-
 exports.loginValidation = [
 
     body("email")
@@ -217,7 +216,6 @@ exports.loginValidation = [
         .isLength({ min: 6 })
         .withMessage("Password must be at least 6 characters"),
 ];
-
 
 // ================= CREATE DOCTOR =================
 
@@ -256,9 +254,7 @@ exports.createDoctorValidation = [
         .withMessage("Password must be minimum 6 characters"),
 ];
 
-
 // ================= CREATE EMPLOYEE =================
-
 exports.createEmployeeValidation = [
 
     body("name")
