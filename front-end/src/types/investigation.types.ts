@@ -38,5 +38,4 @@ export interface InvestigationData {
   category: string;
   investigations: InvestigationItem[];
   totalAmount: number;
-  status: string;
 }

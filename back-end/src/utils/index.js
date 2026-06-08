@@ -65,6 +65,8 @@ app.use('/api/patient-history', require('../routes/patientHistory.routes'));
 app.use('/api/patient-examination', require('../routes/patientExamination.routes'));
 app.use('/api/relative-examination', require('../routes/relativeExamination.routes'));
 app.use('/api/investigations', require('../routes/investigation.routes'));
+app.use('/api/blood-investigations', require('../routes/bloodInvestigation.routes'));
+app.use('/api/genetic-investigations', require('../routes/geneticInvestigation.routes'));
 
 // Health check endpoint
 app.get('/health', (req, res) => {
