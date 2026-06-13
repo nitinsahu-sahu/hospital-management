@@ -4,6 +4,11 @@ export interface HistoryOfIllness {
   associatedSymptoms: string;
 }
 
+export interface DurationItem {
+  number: string;
+  unit: string;
+}
+
 export interface MenstrualHistory {
   cycleLength: string;
   daysOfFlow: string;
@@ -44,7 +49,7 @@ export interface PatientHistoryForm {
   // amenorrhoea: string;
   // complaint: string;
   onset: string;
-  duration: string;
+  duration: DurationItem[];
   associatedSymptoms: string;
   cycleLength: string;
   daysOfFlow: string;

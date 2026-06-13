@@ -12,6 +12,7 @@ import Alert from '../../components/ui/alert/Alert';
 import VitalsSection from '../../components/examination-of-couple/VitalsSection';
 import SystemExaminationSection from '../../components/examination-of-couple/SystemExaminationSection';
 import { ExaminationFormData } from '../../types/examination';
+import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 
 const getInitialVitals = () => ({
   pr: '',
@@ -58,7 +59,6 @@ export default function RelativeExamination() {
   const [localError, setLocalError] = useState('');
   const [isExistingExamination, setIsExistingExamination] = useState(false);
   const [relativeId, setRelativeId] = useState('');
-console.log(selectedPatient);
 
   const [formData, setFormData] = useState<ExaminationFormData>(getInitialExaminationForm());
 
@@ -82,13 +82,9 @@ console.log(selectedPatient);
 
   // Fetch existing examination
   const fetchExistingExamination = useCallback(async (relId: string) => {
-    console.log('fetchExistingExamination',relId);
-    console.log('selectedPatient?.relative?._id',selectedPatient?.relative?._id);
     
     try {
       const result = await dispatch(getRelativeExaminationByRelativeId(relId||selectedPatient?.relative?._id) as any);
-      console.log(result);
-      
       if (result?.type === 'GET_RELATIVE_EXAMINATION_SUCCESS') {
         setIsExistingExamination(true);
         const exam = result.payload;
@@ -133,7 +129,6 @@ console.log(selectedPatient);
         setFormData(getInitialExaminationForm());
       }
     } catch (error) {
-      console.error('Error fetching relative examination:', error);
       setIsExistingExamination(false);
     }
   }, [dispatch]);
@@ -282,17 +277,9 @@ console.log(selectedPatient);
   return (
     <>
       <PageMeta title="Husband Examination" description="Husband/Relative examination" />
+      <PageBreadcrumb pageTitle="Relative / Husband Examination" />
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-6 transition-colors duration-200">
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Husband/Relative Examination
-            </h1>
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-              {isExistingExamination ? 'Update existing examination' : 'Record new examination'}
-            </p>
-          </div>
+        <div className="max-w-4xl mx-auto"> 
 
           {/* Success Message */}
           {successMessage && (
@@ -378,18 +365,6 @@ console.log(selectedPatient);
                 </button>
               </div>
             </form>
-          )}
-
-          {/* No Patient Selected */}
-          {!selectedPatient && (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 text-center">
-              <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-              <p className="mt-4 text-gray-500 dark:text-gray-400">
-                Please select a patient from the patient list to record examination.
-              </p>
-            </div>
           )}
         </div>
       </div>

@@ -9,8 +9,9 @@ import { ConsultationFeesForm } from '../../components/consultation/Consultation
 import { AdditionalFeesManager } from '../../components/consultation/AdditionalFeesManager';
 import { TotalAmountCard } from '../../components/consultation/TotalAmountCard';
 import { FormActions } from '../../components/consultation/FormActions';
-import { AdditionalFee, ConsultationFees, FormData, NewFee, SelectedPatient } from '../../types/consultation';
+import { ConsultationFees, FormData, NewFee, SelectedPatient } from '../../types/consultation';
 import Alert from '../../components/ui/alert/Alert';
+import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 
 export default function DoctorConsultation() {
   const dispatch = useDispatch();
@@ -48,50 +49,50 @@ export default function DoctorConsultation() {
   }, [formData.fees]);
 
   const resetForm = useCallback(() => {
-  setExistingConsultationId(null);
-  setIsExistingConsultation(false);
-  setFormData({
-    fees: {
-      freeOfCost: 0,
-      emergencyConsultationFee: '',
-      geneticConsultationFee: '',
-      opdConsultationFee: '',
-      additionalFees: []
-    },
-    totalAmount: 0
-  });
-}, []);
+    setExistingConsultationId(null);
+    setIsExistingConsultation(false);
+    setFormData({
+      fees: {
+        freeOfCost: 0,
+        emergencyConsultationFee: '',
+        geneticConsultationFee: '',
+        opdConsultationFee: '',
+        additionalFees: []
+      },
+      totalAmount: 0
+    });
+  }, []);
   // Fetch consultation for patient
- const fetchConsultationForPatient = useCallback(async (patientId: string) => {
-  setIsLoadingConsultation(true);
-  resetForm(); // Reset before fetching new patient data
-  
-  try {
-    const result = await dispatch(getConsultationByPatientId(patientId) as any);
-    
-    if (result?.type === "GET_CONSULTATION_BY_PATIENT_ID_SUCCESS" && result.payload) {
-      const consultationData = result.payload;
-      setExistingConsultationId(consultationData._id);
-      setIsExistingConsultation(true);
-      setFormData({
-        fees: {
-          freeOfCost: consultationData.fees?.freeOfCost || 0,
-          emergencyConsultationFee: consultationData.fees?.emergencyConsultationFee || '',
-          geneticConsultationFee: consultationData.fees?.geneticConsultationFee || '',
-          opdConsultationFee: consultationData.fees?.opdConsultationFee || '',
-          additionalFees: consultationData.fees?.additionalFees || []
-        },
-        totalAmount: consultationData.totalAmount || 0
-      });
+  const fetchConsultationForPatient = useCallback(async (patientId: string) => {
+    setIsLoadingConsultation(true);
+    resetForm(); // Reset before fetching new patient data
+
+    try {
+      const result = await dispatch(getConsultationByPatientId(patientId) as any);
+
+      if (result?.type === "GET_CONSULTATION_BY_PATIENT_ID_SUCCESS" && result.payload) {
+        const consultationData = result.payload;
+        setExistingConsultationId(consultationData._id);
+        setIsExistingConsultation(true);
+        setFormData({
+          fees: {
+            freeOfCost: consultationData.fees?.freeOfCost || 0,
+            emergencyConsultationFee: consultationData.fees?.emergencyConsultationFee || '',
+            geneticConsultationFee: consultationData.fees?.geneticConsultationFee || '',
+            opdConsultationFee: consultationData.fees?.opdConsultationFee || '',
+            additionalFees: consultationData.fees?.additionalFees || []
+          },
+          totalAmount: consultationData.totalAmount || 0
+        });
+      }
+      // If failure, form is already reset by resetForm()
+    } catch (error) {
+      console.error('Error fetching consultation:', error);
+      // resetForm already called, so no need to do anything
+    } finally {
+      setIsLoadingConsultation(false);
     }
-    // If failure, form is already reset by resetForm()
-  } catch (error) {
-    console.error('Error fetching consultation:', error);
-    // resetForm already called, so no need to do anything
-  } finally {
-    setIsLoadingConsultation(false);
-  }
-}, [dispatch, resetForm]);
+  }, [dispatch, resetForm]);
 
   // Handle patient selection
   useEffect(() => {
@@ -178,20 +179,20 @@ export default function DoctorConsultation() {
       result = await dispatch(updateConsultation(existingConsultationId, consultationData) as any);
       if (result?.status === 200) {
         setSuccessMessage('Consultation updated successfully!');
-         setTimeout(()=>{
-        setSuccessMessage('');
+        setTimeout(() => {
+          setSuccessMessage('');
 
-        },5000)
+        }, 5000)
         fetchConsultationForPatient(selectedPatient._id);
       }
     } else {
       result = await dispatch(createConsultation(consultationData) as any);
       if (result?.status === 201 || result?.status === 200) {
         setSuccessMessage('Consultation created successfully!');
-        setTimeout(()=>{
-        setSuccessMessage('');
+        setTimeout(() => {
+          setSuccessMessage('');
 
-        },5000)
+        }, 5000)
         if (result?.payload?._id) {
           setExistingConsultationId(result.payload._id);
           setIsExistingConsultation(true);
@@ -203,68 +204,63 @@ export default function DoctorConsultation() {
   return (
     <>
       <PageMeta title="Consultation" description="Doctor Consultation" />
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-6 transition-colors duration-200">
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Doctor Consultation</h1>
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">Manage consultation fees and charges</p>
+      <PageBreadcrumb pageTitle="Consultation" />
+      
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
+
+        {/* Messages */}
+        {successMessage && (
+          <div className='mb-6'>
+            <Alert
+              variant="success"
+              title="Success Message"
+              message={successMessage}
+              showLink={false}
+
+            />
           </div>
+        )}
+        {error && (
+          <div className='mb-6'>
+            <Alert
+              variant="error"
+              title="Error Message"
+              message={error}
+              showLink={false}
+            />
+          </div>
+        )}
 
-          {/* Messages */}
-          {successMessage && (
-            <div className='mb-6'>
-              <Alert
-                variant="success"
-                title="Success Message"
-                message={successMessage}
-                showLink={false}
+        {/* Patient Info */}
+        <PatientInfoCard
+          selectedPatient={selectedPatient}
+          isExistingConsultation={isExistingConsultation}
+          isLoading={isLoadingConsultation}
+        />
 
+        {/* Form */}
+        {selectedPatient && !isLoadingConsultation && (
+          <form onSubmit={handleSubmit}>
+            <div className="grid gap-6">
+              <ConsultationFeesForm
+                fees={formData.fees}
+                onChange={handleFeeChange}
+                isExisting={isExistingConsultation}
+              />
+              <AdditionalFeesManager
+                fees={formData.fees.additionalFees}
+                onAddFee={handleAddFee}
+                onRemoveFee={handleRemoveFee}
+              />
+              <TotalAmountCard total={totalAmount} />
+              <FormActions
+                onSubmit={() => { }}
+                isSubmitting={isSubmitting}
+                isExisting={isExistingConsultation}
               />
             </div>
-          )}
-          {error && (
-            <div className='mb-6'>
-              <Alert
-                variant="error"
-                title="Error Message"
-                message={error}
-                showLink={false}
-              />
-            </div>
-          )}
-
-          {/* Patient Info */}
-          <PatientInfoCard
-            selectedPatient={selectedPatient}
-            isExistingConsultation={isExistingConsultation}
-            isLoading={isLoadingConsultation}
-          />
-
-          {/* Form */}
-          {selectedPatient && !isLoadingConsultation && (
-            <form onSubmit={handleSubmit}>
-              <div className="grid gap-6">
-                <ConsultationFeesForm
-                  fees={formData.fees}
-                  onChange={handleFeeChange}
-                  isExisting={isExistingConsultation}
-                />
-                <AdditionalFeesManager
-                  fees={formData.fees.additionalFees}
-                  onAddFee={handleAddFee}
-                  onRemoveFee={handleRemoveFee}
-                />
-                <TotalAmountCard total={totalAmount} />
-                <FormActions
-                  onSubmit={() => { }}
-                  isSubmitting={isSubmitting}
-                  isExisting={isExistingConsultation}
-                />
-              </div>
-            </form>
-          )}
-        </div>
+          </form>
+        )}
       </div>
     </>
   );
