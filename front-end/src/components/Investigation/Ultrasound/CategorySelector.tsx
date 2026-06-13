@@ -11,30 +11,67 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
 }) => {
   return (
     <>
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-        Select Investigation Category
-      </h2>
 
-      <div className="flex gap-4 mb-6">
+      {/* Responsive Button Group */}
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4 lg:gap-5 mb-6 sm:mb-8">
+        {/* PNDT Button */}
         <button
           onClick={() => onCategoryChange('pndt')}
-          className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
-            selectedMainCategory === 'pndt'
-              ? 'bg-blue-600 text-white shadow-md'
-              : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-          }`}
+          className={`
+            relative overflow-hidden group
+            w-full sm:flex-1
+            px-3 sm:px-4 md:px-6 lg:px-8
+            py-2 sm:py-2.5 md:py-3 lg:py-3.5
+            rounded-lg sm:rounded-xl
+            font-medium text-xs sm:text-sm md:text-base
+            transition-all duration-300
+            transform hover:scale-[1.02] active:scale-[0.98]
+            ${
+              selectedMainCategory === 'pndt'
+                ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg'
+                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 hover:shadow-md'
+            }
+          `}
         >
-          PNDT / ANTINUTOL
+          <span className="relative z-10">
+            PNDT / ANTINUTOL
+            {selectedMainCategory === 'pndt' && (
+              <span className="absolute -right-1 -top-1 flex h-2 w-2 sm:h-3 sm:w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 sm:h-3 sm:w-3 bg-white"></span>
+              </span>
+            )}
+          </span>
         </button>
+
+        {/* GYNAE Button */}
         <button
           onClick={() => onCategoryChange('gynae')}
-          className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
-            selectedMainCategory === 'gynae'
-              ? 'bg-blue-600 text-white shadow-md'
-              : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-          }`}
+          className={`
+            relative overflow-hidden group
+            w-full sm:flex-1
+            px-3 sm:px-4 md:px-6 lg:px-8
+            py-2 sm:py-2.5 md:py-3 lg:py-3.5
+            rounded-lg sm:rounded-xl
+            font-medium text-xs sm:text-sm md:text-base
+            transition-all duration-300
+            transform hover:scale-[1.02] active:scale-[0.98]
+            ${
+              selectedMainCategory === 'gynae'
+                ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg'
+                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 hover:shadow-md'
+            }
+          `}
         >
-          GYNAE
+          <span className="relative z-10">
+            GYNAE
+            {selectedMainCategory === 'gynae' && (
+              <span className="absolute -right-1 -top-1 flex h-2 w-2 sm:h-3 sm:w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 sm:h-3 sm:w-3 bg-white"></span>
+              </span>
+            )}
+          </span>
         </button>
       </div>
     </>

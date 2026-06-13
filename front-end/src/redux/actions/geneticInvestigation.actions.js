@@ -3,11 +3,11 @@ import { investigationConstants } from "./constants";
 
 
 // Create Blood Investigation
-export const createBloodInvestigation = (investigationData) => async (dispatch) => {
+export const createGeneticInvestigation = (investigationData) => async (dispatch) => {
     try {
         dispatch({ type: investigationConstants.CREATE_GENETIC_INVESTIGATION_REQUEST });
 
-        const { data } = await APIs.post(`${API_URL}/blood-investigations`, investigationData);
+        const { data } = await APIs.post(`/genetic-investigations`, investigationData);
 
         dispatch({
             type: investigationConstants.CREATE_GENETIC_INVESTIGATION_SUCCESS,
@@ -24,16 +24,16 @@ export const createBloodInvestigation = (investigationData) => async (dispatch) 
     }
 };
 
-// Get Blood Investigation by Patient ID
-export const getBloodInvestigationByPatientId = (patientId, category) => async (dispatch) => {
+// Get Genetic Investigation by Patient ID
+export const getGeneticInvestigationByPatientId = (patientId, category) => async (dispatch) => {
     try {
         dispatch({ type: investigationConstants.GET_GENETIC_INVESTIGATION_REQUEST });
 
         const url = category
-            ? `${API_URL}/blood-investigations/patient/${patientId}?category=${category}`
-            : `${API_URL}/blood-investigations/patient/${patientId}`;
+            ? `/genetic-investigations/patient/${patientId}?category=${category}`
+            : `/genetic-investigations/patient/${patientId}`;
 
-        const { data } = await APIs.get(url, investigationData);
+        const { data } = await APIs.get(url);
 
         dispatch({
             type: investigationConstants.GET_GENETIC_INVESTIGATION_SUCCESS,
@@ -58,12 +58,12 @@ export const getBloodInvestigationByPatientId = (patientId, category) => async (
     }
 };
 
-// Update Blood Investigation
-export const updateBloodInvestigation = (id, investigationData) => async (dispatch) => {
+// Update Genetic Investigation
+export const updateGeneticInvestigation = (id, investigationData) => async (dispatch) => {
     try {
         dispatch({ type: investigationConstants.UPDATE_GENETIC_INVESTIGATION_REQUEST });
 
-        const { data } = await APIs.put(`${API_URL}/blood-investigations/${id}`, investigationData);
+        const { data } = await APIs.put(`/genetic-investigations/${id}`, investigationData);
 
         dispatch({
             type: investigationConstants.UPDATE_GENETIC_INVESTIGATION_SUCCESS,
@@ -81,6 +81,6 @@ export const updateBloodInvestigation = (id, investigationData) => async (dispat
 };
 
 // Clear Error
-export const clearBloodInvestigationError = () => (dispatch) => {
+export const clearGeneticInvestigationError = () => (dispatch) => {
     dispatch({ type: investigationConstants.CLEAR_GENETIC_INVESTIGATION_ERROR });
 };

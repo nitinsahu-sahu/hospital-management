@@ -14,6 +14,7 @@ import GynaeInvestigations from '../../components/Investigation/Ultrasound/Gynae
 import SelectedInvestigationsList from '../../components/Investigation/Ultrasound/SelectedInvestigationsList';
 import { InvestigationItem, PNDTOption, GynaeOption, PelvicSubOption } from '../../types/investigation.types';
 import { pndtOptions, gynaeOptions, pelvicSubOptions } from '../../utils/investigationOptions';
+import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 
 export default function UltraSound() {
   const dispatch = useDispatch();
@@ -27,7 +28,7 @@ export default function UltraSound() {
   const [successMessage, setSuccessMessage] = useState('');
   const [consultationId, setConsultationId] = useState('');
   const [error, setError] = useState('');
-  
+
   // State for investigations
   const [selectedMainCategory, setSelectedMainCategory] = useState<'pndt' | 'gynae' | ''>('');
   const [selectedSubCategory, setSelectedSubCategory] = useState<string>('');
@@ -289,7 +290,7 @@ export default function UltraSound() {
 
     const hasPelvic = selectedInvestigations.some(item => item.category === 'pelvic');
     const hasFM = selectedInvestigations.some(item => item.id === 'fm');
-    
+
     if (hasPelvic) {
       mainCategory = 'gynae';
       subCategory = 'pelvic';
@@ -361,104 +362,98 @@ export default function UltraSound() {
   return (
     <>
       <PageMeta title="Ultrasound" description="Patient Ultrasound data" />
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-6 transition-colors duration-200">
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Ultrasound Investigations</h1>
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-              Select investigations for the patient
-            </p>
+      <PageBreadcrumb pageTitle="Ultrasound Investigation" />
+
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
+
+
+        {/* Messages */}
+        {successMessage && (
+          <div className="mb-6">
+            <Alert variant="success" title="Success" message={successMessage} showLink={false} />
           </div>
+        )}
 
-          {/* Messages */}
-          {successMessage && (
-            <div className="mb-6">
-              <Alert variant="success" title="Success" message={successMessage} showLink={false} />
-            </div>
-          )}
-          
-          {error && (
-            <div className="mb-6">
-              <Alert variant="error" title="Error" message={error} showLink={false} />
-            </div>
-          )}
+        {error && (
+          <div className="mb-6">
+            <Alert variant="error" title="Error" message={error} showLink={false} />
+          </div>
+        )}
 
-          {/* Patient Info */}
-          <PatientInfoCard
-            selectedPatient={selectedPatient}
-            isExistingConsultation={isExistingConsultation}
-            isLoading={isLoadingConsultation}
-          />
+        {/* Patient Info */}
+        <PatientInfoCard
+          selectedPatient={selectedPatient}
+          isExistingConsultation={isExistingConsultation}
+          isLoading={isLoadingConsultation}
+        />
 
-          {/* Loading Indicator */}
-          {isLoadingInvestigations && (
-            <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-              <p className="text-blue-700 dark:text-blue-300">Loading existing investigations...</p>
-            </div>
-          )}
+        {/* Loading Indicator */}
+        {isLoadingInvestigations && (
+          <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+            <p className="text-blue-700 dark:text-blue-300">Loading existing investigations...</p>
+          </div>
+        )}
 
-          {/* Investigation Form */}
-          {selectedPatient && !isLoadingInvestigations && (
-            <div className="mt-6 space-y-6">
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                <CategorySelector
-                  selectedMainCategory={selectedMainCategory}
-                  onCategoryChange={handleMainCategoryChange}
-                />
+        {/* Investigation Form */}
+        {selectedPatient && !isLoadingInvestigations && (
+          <div className="mt-6 space-y-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+              <CategorySelector
+                selectedMainCategory={selectedMainCategory}
+                onCategoryChange={handleMainCategoryChange}
+              />
 
-                {/* PNDT Options */}
-                {selectedMainCategory === 'pndt' && (
-                  <PNDTInvestigations
-                    options={pndtOptions}
-                    selectedInvestigations={selectedInvestigations}
-                    onSelectionChange={handlePNDTSelection}
-                    isSelected={isPNDTSelected}
-                  />
-                )}
-
-                {/* GYNAE Options */}
-                {selectedMainCategory === 'gynae' && (
-                  <GynaeInvestigations
-                    gynaeOptions={gynaeOptions}
-                    pelvicSubOptions={pelvicSubOptions}
-                    selectedSubCategory={selectedSubCategory}
-                    selectedInvestigations={selectedInvestigations}
-                    onGynaeSubCategoryChange={handleGynaeSubCategory}
-                    onPelvicSubSelection={handlePelvicSubSelection}
-                    isPelvicSelected={isPelvicSelected}
-                    getSelectedPelvicName={getSelectedPelvicName}
-                  />
-                )}
-              </div>
-
-              {/* Selected Investigations Summary */}
-              {selectedInvestigations.length > 0 && (
-                <SelectedInvestigationsList
-                  investigations={selectedInvestigations}
-                  totalAmount={totalAmount}
-                  onRemove={removeInvestigation}
+              {/* PNDT Options */}
+              {selectedMainCategory === 'pndt' && (
+                <PNDTInvestigations
+                  options={pndtOptions}
+                  selectedInvestigations={selectedInvestigations}
+                  onSelectionChange={handlePNDTSelection}
+                  isSelected={isPNDTSelected}
                 />
               )}
 
-              {/* Submit Button */}
-              <div className="flex justify-end">
-                <button
-                  onClick={handleSubmit}
-                  disabled={selectedInvestigations.length === 0 || isSubmitting}
-                  className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isSubmitting 
-                    ? 'Saving...' 
-                    : isExistingInvestigation 
-                      ? 'Update Investigation' 
-                      : 'Save Investigation'
-                  }
-                </button>
-              </div>
+              {/* GYNAE Options */}
+              {selectedMainCategory === 'gynae' && (
+                <GynaeInvestigations
+                  gynaeOptions={gynaeOptions}
+                  pelvicSubOptions={pelvicSubOptions}
+                  selectedSubCategory={selectedSubCategory}
+                  selectedInvestigations={selectedInvestigations}
+                  onGynaeSubCategoryChange={handleGynaeSubCategory}
+                  onPelvicSubSelection={handlePelvicSubSelection}
+                  isPelvicSelected={isPelvicSelected}
+                  getSelectedPelvicName={getSelectedPelvicName}
+                />
+              )}
             </div>
-          )}
-        </div>
+
+            {/* Selected Investigations Summary */}
+            {selectedInvestigations.length > 0 && (
+              <SelectedInvestigationsList
+                investigations={selectedInvestigations}
+                totalAmount={totalAmount}
+                onRemove={removeInvestigation}
+              />
+            )}
+
+            {/* Submit Button */}
+            <div className="flex justify-end">
+              <button
+                onClick={handleSubmit}
+                disabled={selectedInvestigations.length === 0 || isSubmitting}
+                className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSubmitting
+                  ? 'Saving...'
+                  : isExistingInvestigation
+                    ? 'Update Investigation'
+                    : 'Save Investigation'
+                }
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );

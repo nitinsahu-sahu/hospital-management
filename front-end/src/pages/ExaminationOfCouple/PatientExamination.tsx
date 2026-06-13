@@ -15,6 +15,7 @@ import LocalExaminationSection from '../../components/examination-of-couple/Loca
 import SystemExaminationSection from '../../components/examination-of-couple/SystemExaminationSection';
 //@ts-ignore
 import { createPatientExamination, getPatientExaminationByPatientId, updatePatientExamination } from '../../redux/actions/patientExamination.actions';
+import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 
 
 const getInitialVitals = () => ({
@@ -89,7 +90,7 @@ export default function PatientExamination() {
       if (result?.type === 'GET_PATIENT_EXAMINATION_SUCCESS') {
         setIsExistingExamination(true);
         const exam = result.payload;
-        
+
         // Populate form with existing data
         setFormData({
           vitals: {
@@ -250,16 +251,16 @@ export default function PatientExamination() {
         result = await dispatch(createPatientExamination(apiData) as any);
       }
 
-      if (result?.type === 'CREATE_PATIENT_EXAMINATION_SUCCESS' || 
-          result?.type === 'UPDATE_PATIENT_EXAMINATION_SUCCESS') {
-        setSuccessMessage(isExistingExamination 
-          ? 'Patient examination updated successfully!' 
+      if (result?.type === 'CREATE_PATIENT_EXAMINATION_SUCCESS' ||
+        result?.type === 'UPDATE_PATIENT_EXAMINATION_SUCCESS') {
+        setSuccessMessage(isExistingExamination
+          ? 'Patient examination updated successfully!'
           : 'Patient examination saved successfully!'
         );
 
-        setTimeout(()=>{
+        setTimeout(() => {
           setSuccessMessage("")
-        },5000)
+        }, 5000)
         setIsExistingExamination(true);
       } else {
         setError(result?.payload || 'Failed to save examination')
@@ -285,115 +286,105 @@ export default function PatientExamination() {
   return (
     <>
       <PageMeta title="Patient Examination" description="Patient examination" />
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-6 transition-colors duration-200">
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Patient Examination (Wife)
-            </h1>
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-              {isExistingExamination ? 'Update existing examination' : 'Record new examination'}
-            </p>
+      <PageBreadcrumb pageTitle="Patient / Wife Examination" />
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
+
+        {/* Success Message */}
+        {successMessage && (
+          <div className="mb-6">
+            <Alert
+              variant="success"
+              title="Success"
+              message={successMessage}
+              showLink={false}
+            />
           </div>
+        )}
 
-          {/* Success Message */}
-          {successMessage && (
-            <div className="mb-6">
-              <Alert
-                variant="success"
-                title="Success"
-                message={successMessage}
-                showLink={false}
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6">
+            <Alert
+              variant="error"
+              title="Error"
+              message={error}
+              showLink={false}
+            />
+          </div>
+        )}
+
+        {/* Patient Info */}
+        <PatientInfoCard
+          selectedPatient={selectedPatient}
+          isExistingConsultation={isExistingConsultation}
+          isLoading={isLoadingConsultation}
+        />
+
+        {/* Examination Form */}
+        {selectedPatient && (
+          <form onSubmit={handleSubmit} className="mt-6 space-y-6">
+            {/* Vitals Section */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 transition-colors duration-200">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                Vitals & Physical Examination
+              </h2>
+
+              <VitalsSection
+                vitals={formData.vitals}
+                onVitalsChange={handleVitalsChange}
               />
-            </div>
-          )}
 
-          {/* Error Message */}
-          {error && (
-            <div className="mb-6">
-              <Alert
-                variant="error"
-                title="Error"
-                message={error}
-                showLink={false}
-              />
-            </div>
-          )}
-
-          {/* Patient Info */}
-          <PatientInfoCard
-            selectedPatient={selectedPatient}
-            isExistingConsultation={isExistingConsultation}
-            isLoading={isLoadingConsultation}
-          />
-
-          {/* Examination Form */}
-          {selectedPatient && (
-            <form onSubmit={handleSubmit} className="mt-6 space-y-6">
-              {/* Vitals Section */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 transition-colors duration-200">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                  Vitals & Physical Examination
-                </h2>
-                
-                <VitalsSection
-                  vitals={formData.vitals}
-                  onVitalsChange={handleVitalsChange}
-                />
-                
-                {/* Local Examination - Only for Wife */}
-                <div className="mt-6 border-t border-gray-200 dark:border-gray-600 pt-6">
-                  <h3 className="text-lg font-medium text-gray-800 dark:text-white mb-3">
-                    Local Examination
-                  </h3>
-                  <LocalExaminationSection
-                    localExamination={formData.vitals.localExamination}
-                    onLocalExaminationChange={handleLocalExaminationChange}
-                  />
-                </div>
-              </div>
-
-              {/* System Examination Section */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 transition-colors duration-200">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                  System Examination
-                </h2>
-                <SystemExaminationSection
-                  cns={formData.cns}
-                  cvs={formData.cvs}
-                  respiratorySystem={formData.respiratorySystem}
-                  git={formData.git}
-                  onSystemExaminationChange={handleSystemExaminationChange}
-                  person="wife"
+              {/* Local Examination - Only for Wife */}
+              <div className="mt-6 border-t border-gray-200 dark:border-gray-600 pt-6">
+                <h3 className="text-lg font-medium text-gray-800 dark:text-white mb-3">
+                  Local Examination
+                </h3>
+                <LocalExaminationSection
+                  localExamination={formData.vitals.localExamination}
+                  onLocalExaminationChange={handleLocalExaminationChange}
                 />
               </div>
+            </div>
 
-              {/* Action Buttons */}
-              <div className="flex justify-end gap-4">
-                <button
-                  type="button"
-                  onClick={handleReset}
-                  className="px-6 py-2.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200 font-medium"
-                >
-                  Reset
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting || loading}
-                  className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isSubmitting || loading 
-                    ? 'Saving...' 
-                    : isExistingExamination 
-                      ? 'Update Examination' 
-                      : 'Save Examination'
-                  }
-                </button>
-              </div>
-            </form>
-          )}
-        </div>
+            {/* System Examination Section */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 transition-colors duration-200">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                System Examination
+              </h2>
+              <SystemExaminationSection
+                cns={formData.cns}
+                cvs={formData.cvs}
+                respiratorySystem={formData.respiratorySystem}
+                git={formData.git}
+                onSystemExaminationChange={handleSystemExaminationChange}
+                person="wife"
+              />
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex justify-end gap-4">
+              <button
+                type="button"
+                onClick={handleReset}
+                className="px-6 py-2.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200 font-medium"
+              >
+                Reset
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmitting || loading}
+                className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSubmitting || loading
+                  ? 'Saving...'
+                  : isExistingExamination
+                    ? 'Update Examination'
+                    : 'Save Examination'
+                }
+              </button>
+            </div>
+          </form>
+        )}
       </div>
     </>
   );

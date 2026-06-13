@@ -2,9 +2,9 @@ const express = require('express');
 const router = express.Router();
 const bloodInvestigationController = require('../controllers/geneticInvestigation.controller');
 const { 
-  createBloodInvestigationValidation, 
-  updateBloodInvestigationValidation 
-} = require('../validators/bloodInvestigation.validation');
+  createGeneticInvestigationValidation, 
+  updateGeneticInvestigationValidation 
+} = require('../validators/geneticInvestigation.validation');
 const { validate } = require('../middlewares/validate.middleware');
 const isAuth = require('../middlewares/isAuth.middleware');
 
@@ -15,7 +15,7 @@ router.use(isAuth);
 // Routes
 router.post(
   '/', 
-  createBloodInvestigationValidation, 
+  createGeneticInvestigationValidation, 
   validate, 
   bloodInvestigationController.createBloodInvestigation
 );
@@ -37,7 +37,7 @@ router.get(
 
 router.put(
   '/:id', 
-  updateBloodInvestigationValidation, 
+  updateGeneticInvestigationValidation, 
   validate, 
   bloodInvestigationController.updateBloodInvestigation
 );

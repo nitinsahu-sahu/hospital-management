@@ -13,6 +13,7 @@ import { InvestigationItem, InvestigationData } from '../../types/investigation.
 import { routineOptions } from '../../utils/investigationOptions';
 import SelectedInvestigationsSummary from '../../components/Investigation/Ultrasound/SelectedInvestigationsSummary';
 import BloodInvestigationsList from '../../components/Investigation/Ultrasound/BloodInvestigationsList';
+import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 
 export default function RoutineBlood() {
   const dispatch = useDispatch();
@@ -261,83 +262,80 @@ export default function RoutineBlood() {
 
   return (
     <>
-      <PageMeta title="Routine Blood" description="Patient Routine Blood data" />
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-6 transition-colors duration-200">
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Routine Blood Investigations</h1>
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-              Select routine blood tests for the patient
-            </p>
+      <PageMeta
+        title="Routine Boood Investigation | Dr. yogita verma"
+        description="Patient Routine Blood data"
+      />
+      <PageBreadcrumb pageTitle="Routine Blood Investigation" />
+
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
+
+
+        {/* Messages */}
+        {successMessage && (
+          <div className="mb-6">
+            <Alert variant="success" title="Success" message={successMessage} showLink={false} />
           </div>
+        )}
 
-          {/* Messages */}
-          {successMessage && (
-            <div className="mb-6">
-              <Alert variant="success" title="Success" message={successMessage} showLink={false} />
-            </div>
-          )}
+        {(error || consultationError) && (
+          <div className="mb-6">
+            <Alert variant="error" title="Error" message={error || consultationError} showLink={false} />
+          </div>
+        )}
 
-          {(error || consultationError) && (
-            <div className="mb-6">
-              <Alert variant="error" title="Error" message={error || consultationError} showLink={false} />
-            </div>
-          )}
+        {/* Patient Info */}
+        <PatientInfoCard
+          selectedPatient={selectedPatient}
+          isExistingConsultation={isExistingConsultation}
+          isLoading={isLoadingConsultation}
+        />
 
-          {/* Patient Info */}
-          <PatientInfoCard
-            selectedPatient={selectedPatient}
-            isExistingConsultation={isExistingConsultation}
-            isLoading={isLoadingConsultation}
-          />
+        {/* Loading Indicator */}
+        {(isLoadingInvestigations || bloodInvestigationLoading) && (
+          <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+            <p className="text-blue-700 dark:text-blue-300">Loading existing investigations...</p>
+          </div>
+        )}
 
-          {/* Loading Indicator */}
-          {(isLoadingInvestigations || bloodInvestigationLoading) && (
-            <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-              <p className="text-blue-700 dark:text-blue-300">Loading existing investigations...</p>
-            </div>
-          )}
-
-          {/* Investigation Form */}
-          {selectedPatient && !isLoadingInvestigations && !bloodInvestigationLoading && (
-            <div className="mt-6 space-y-6">
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                <BloodInvestigationsList
-                  title="Routine Blood Tests"
-                  options={routineOptions}
-                  selectedInvestigations={selectedInvestigations}
-                  category="routine"
-                  onSelectionChange={handleSelectionChange}
-                  isSelected={isSelected}
-                />
-              </div>
-
-              {/* Selected Investigations Summary */}
-              <SelectedInvestigationsSummary
-                investigations={selectedInvestigations}
-                totalAmount={totalAmount}
-                onRemove={removeInvestigation}
+        {/* Investigation Form */}
+        {selectedPatient && !isLoadingInvestigations && !bloodInvestigationLoading && (
+          <div className="mt-6 space-y-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+              <BloodInvestigationsList
+                title="Routine Blood Tests"
+                options={routineOptions}
+                selectedInvestigations={selectedInvestigations}
+                category="routine"
+                onSelectionChange={handleSelectionChange}
+                isSelected={isSelected}
               />
-
-              {/* Submit Button */}
-              <div className="flex justify-end">
-                <button
-                  onClick={handleSubmit}
-                  disabled={selectedInvestigations.length === 0 || isSubmitting || bloodInvestigationLoading}
-                  className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isSubmitting || bloodInvestigationLoading
-                    ? 'Saving...'
-                    : isExistingInvestigation
-                      ? 'Update Routine Investigations'
-                      : 'Save Routine Investigations'
-                  }
-                </button>
-              </div>
             </div>
-          )}
-        </div>
+
+            {/* Selected Investigations Summary */}
+            <SelectedInvestigationsSummary
+              investigations={selectedInvestigations}
+              totalAmount={totalAmount}
+              onRemove={removeInvestigation}
+            />
+
+            {/* Submit Button */}
+            <div className="flex justify-end">
+              <button
+                onClick={handleSubmit}
+                disabled={selectedInvestigations.length === 0 || isSubmitting || bloodInvestigationLoading}
+                className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSubmitting || bloodInvestigationLoading
+                  ? 'Saving...'
+                  : isExistingInvestigation
+                    ? 'Update Routine Investigations'
+                    : 'Save Routine Investigations'
+                }
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );

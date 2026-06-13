@@ -8,27 +8,30 @@ import { PatientInfoCard } from '../../components/consultation/PatientInfoCard';
 import { SelectedPatient } from '../../types/consultation';
 import Alert from '../../components/ui/alert/Alert';
 //@ts-ignore
-import { getInvestigationByPatientId, updateInvestigation, createInvestigation } from '../../redux/actions/investigation.actions';
-// import BloodInvestigationsList from '../../components/BloodInvestigationsList';
+import { getGeneticInvestigationByPatientId, updateGeneticInvestigation, createGeneticInvestigation, clearGeneticInvestigationError } from '../../redux/actions/geneticInvestigation.actions';
 import { InvestigationItem, InvestigationData } from '../../types/investigation.types';
 import { geneticOptions } from '../../utils/investigationOptions';
 import SelectedInvestigationsSummary from '../../components/Investigation/Ultrasound/SelectedInvestigationsSummary';
 import BloodInvestigationsList from '../../components/Investigation/Ultrasound/BloodInvestigationsList';
+import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 
 export default function GeneticBlood() {
   const dispatch = useDispatch();
   const { error: consultationError } = useSelector((state: RootState) => state.consultation);
-  
+  const { loading: bloodInvestigationLoading, error: bloodInvestigationError, success } = useSelector(
+    (state: RootState) => state.bloodInvestigation
+  );
+
   const [selectedPatient, setSelectedPatient] = useState<SelectedPatient | null>(null);
   const [isExistingConsultation, setIsExistingConsultation] = useState(false);
   const [isLoadingConsultation, setIsLoadingConsultation] = useState(false);
   const [isExistingInvestigation, setIsExistingInvestigation] = useState(false);
-  const [existingInvestigationId, setExistingInvestigationId] = useState(null);
+  const [existingInvestigationId, setExistingInvestigationId] = useState<string | null>(null);
   const [consultationId, setConsultationId] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [error, setError] = useState('');
-  
+
   // State for investigations
   const [selectedInvestigations, setSelectedInvestigations] = useState<InvestigationItem[]>([]);
   const [totalAmount, setTotalAmount] = useState(0);
@@ -130,23 +133,31 @@ export default function GeneticBlood() {
       if (selectedPatient) {
         setIsLoadingInvestigations(true);
         try {
-          const result = await dispatch(getInvestigationByPatientId(selectedPatient._id) as any);
+          const result = await dispatch(getGeneticInvestigationByPatientId(selectedPatient._id, 'genetic') as any);
+          console.log("get", result);
 
-          if (result?.type === 'GET_INVESTIGATION_SUCCESS' && result.payload) {
-            // Filter only genetic investigations
-            const geneticInvestigations = result.payload.investigations?.filter(
+          // Check for success with payload
+          if (result?.type === 'GET_GENETIC_INVESTIGATION_SUCCESS' && result.payload) {
+            const routineInvestigations = result.payload.investigations?.filter(
               (item: any) => item.category === 'genetic'
             ) || [];
-            
-            if (geneticInvestigations.length > 0) {
+
+            if (routineInvestigations.length > 0) {
               setIsExistingInvestigation(true);
               setExistingInvestigationId(result.payload._id);
-              setSelectedInvestigations(geneticInvestigations);
+              setSelectedInvestigations(routineInvestigations);
               setConsultationId(result.payload.consultationId);
+            } else {
+              setIsExistingInvestigation(false);
+              setSelectedInvestigations([]);
             }
+          } else {
+            setIsExistingInvestigation(false);
+            setSelectedInvestigations([]);
           }
         } catch (error) {
-          console.error('Error fetching investigation:', error);
+          setIsExistingInvestigation(false);
+          setSelectedInvestigations([]);
         } finally {
           setIsLoadingInvestigations(false);
         }
@@ -155,6 +166,26 @@ export default function GeneticBlood() {
 
     fetchExistingInvestigation();
   }, [selectedPatient, dispatch]);
+
+  // Handle success message from Redux
+  useEffect(() => {
+    if (success) {
+      setTimeout(() => {
+        dispatch(clearGeneticInvestigationError());
+      }, 5000);
+    }
+  }, [success, dispatch]);
+
+  // Handle errors from Redux
+  useEffect(() => {
+    if (bloodInvestigationError) {
+      setError(bloodInvestigationError);
+      setTimeout(() => {
+        setError('');
+        dispatch(clearGeneticInvestigationError());
+      }, 5000);
+    }
+  }, [bloodInvestigationError, dispatch]);
 
   // Handle submit
   const handleSubmit = async () => {
@@ -181,45 +212,44 @@ export default function GeneticBlood() {
         selected: true
       })),
       totalAmount: totalAmount,
-      status: 'pending',
     };
 
-    console.log('Genetic Blood Investigation Data:', investigationData);
-
     setIsSubmitting(true);
+    setError('');
+    setSuccessMessage('');
 
     try {
       let result;
 
       if (isExistingInvestigation && existingInvestigationId) {
-        result = await dispatch(updateInvestigation(existingInvestigationId, {
-          category: investigationData.category,
+        result = await dispatch(updateGeneticInvestigation(existingInvestigationId, {
           investigations: investigationData.investigations,
           totalAmount: investigationData.totalAmount,
-        }));
+        }) as any);
 
-        if (result?.type === 'UPDATE_INVESTIGATION_SUCCESS') {
-          setSuccessMessage('Genetic investigations updated successfully!');
+        if (result?.type === 'UPDATE_GENETIC_INVESTIGATION_SUCCESS') {
+          setSuccessMessage('Routine blood investigations updated successfully!');
           setTimeout(() => setSuccessMessage(''), 5000);
+        } else if (result?.type === 'UPDATE_GENETIC_INVESTIGATION_FAILURE') {
+          setError(result.payload || 'Failed to update routine blood investigations');
+          setTimeout(() => setError(''), 5000);
         }
       } else {
-        result = await dispatch(createInvestigation(investigationData));
+        result = await dispatch(createGeneticInvestigation(investigationData) as any);
 
-        if (result?.type === 'CREATE_INVESTIGATION_SUCCESS') {
-          setSuccessMessage('Genetic investigations saved successfully!');
+        if (result?.type === 'CREATE_GENETIC_INVESTIGATION_SUCCESS') {
+          setSuccessMessage('Routine blood investigations saved successfully!');
           setTimeout(() => setSuccessMessage(''), 5000);
           setIsExistingInvestigation(true);
           setExistingInvestigationId(result.payload._id);
+        } else if (result?.type === 'CREATE_GENETIC_INVESTIGATION_FAILURE') {
+          setError(result.payload || 'Failed to save routine blood investigations');
+          setTimeout(() => setError(''), 5000);
         }
       }
-
-      if (result?.type?.includes('FAIL')) {
-        setError(result.payload || 'Failed to save genetic investigations');
-        setTimeout(() => setError(''), 5000);
-      }
     } catch (error: any) {
-      console.error('Error saving genetic investigations:', error);
-      setError(error?.message || 'Error saving genetic investigations');
+      console.error('Error saving routine blood investigations:', error);
+      setError(error?.message || 'Error saving routine blood investigations');
       setTimeout(() => setError(''), 5000);
     } finally {
       setIsSubmitting(false);
@@ -228,83 +258,79 @@ export default function GeneticBlood() {
 
   return (
     <>
-      <PageMeta title="Genetic Blood" description="Genetic Blood data" />
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-6 transition-colors duration-200">
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Genetic Blood Investigations</h1>
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-              Select genetic blood tests for the patient
-            </p>
+      <PageMeta
+        title="Genetic Boood | Dr. yogita verma"
+        description="Patient Genetic Blood data"
+      />
+      <PageBreadcrumb pageTitle="Genetic Blood Investigation" />
+
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
+
+
+        {/* Messages */}
+        {successMessage && (
+          <div className="mb-6">
+            <Alert variant="success" title="Success" message={successMessage} showLink={false} />
           </div>
+        )}
 
-          {/* Messages */}
-          {successMessage && (
-            <div className="mb-6">
-              <Alert variant="success" title="Success" message={successMessage} showLink={false} />
-            </div>
-          )}
-          
-          {(error || consultationError) && (
-            <div className="mb-6">
-              <Alert variant="error" title="Error" message={error || consultationError} showLink={false} />
-            </div>
-          )}
+        {(error || consultationError) && (
+          <div className="mb-6">
+            <Alert variant="error" title="Error" message={error || consultationError} showLink={false} />
+          </div>
+        )}
 
-          {/* Patient Info */}
-          <PatientInfoCard
-            selectedPatient={selectedPatient}
-            isExistingConsultation={isExistingConsultation}
-            isLoading={isLoadingConsultation}
-          />
+        {/* Patient Info */}
+        <PatientInfoCard
+          selectedPatient={selectedPatient}
+          isExistingConsultation={isExistingConsultation}
+          isLoading={isLoadingConsultation}
+        />
+        {/* Loading Indicator */}
+        {(isLoadingInvestigations || bloodInvestigationLoading) && (
+          <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+            <p className="text-blue-700 dark:text-blue-300">Loading existing investigations...</p>
+          </div>
+        )}
 
-          {/* Loading Indicator */}
-          {isLoadingInvestigations && (
-            <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-              <p className="text-blue-700 dark:text-blue-300">Loading existing investigations...</p>
-            </div>
-          )}
-
-          {/* Investigation Form */}
-          {selectedPatient && !isLoadingInvestigations && (
-            <div className="mt-6 space-y-6">
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                <BloodInvestigationsList
-                  title="Genetic Blood Tests"
-                  options={geneticOptions}
-                  selectedInvestigations={selectedInvestigations}
-                  category="genetic"
-                  onSelectionChange={handleSelectionChange}
-                  isSelected={isSelected}
-                />
-              </div>
-
-              {/* Selected Investigations Summary */}
-              <SelectedInvestigationsSummary
-                investigations={selectedInvestigations}
-                totalAmount={totalAmount}
-                onRemove={removeInvestigation}
+        {/* Investigation Form */}
+        {selectedPatient && !isLoadingInvestigations && !bloodInvestigationLoading && (
+          <div className="mt-6 space-y-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+              <BloodInvestigationsList
+                title="Genetic Blood Tests"
+                options={geneticOptions}
+                selectedInvestigations={selectedInvestigations}
+                category="genetic"
+                onSelectionChange={handleSelectionChange}
+                isSelected={isSelected}
               />
-
-              {/* Submit Button */}
-              <div className="flex justify-end">
-                <button
-                  onClick={handleSubmit}
-                  disabled={selectedInvestigations.length === 0 || isSubmitting}
-                  className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isSubmitting 
-                    ? 'Saving...' 
-                    : isExistingInvestigation 
-                      ? 'Update Genetic Investigations' 
-                      : 'Save Genetic Investigations'
-                  }
-                </button>
-              </div>
             </div>
-          )}
-        </div>
+
+            {/* Selected Investigations Summary */}
+            <SelectedInvestigationsSummary
+              investigations={selectedInvestigations}
+              totalAmount={totalAmount}
+              onRemove={removeInvestigation}
+            />
+
+            {/* Submit Button */}
+            <div className="flex justify-end">
+              <button
+                onClick={handleSubmit}
+                disabled={selectedInvestigations.length === 0 || isSubmitting || bloodInvestigationLoading}
+                className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSubmitting || bloodInvestigationLoading
+                  ? 'Saving...'
+                  : isExistingInvestigation
+                    ? 'Update Genetic Investigations'
+                    : 'Save Genetic Investigations'
+                }
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
