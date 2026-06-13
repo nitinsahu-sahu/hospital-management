@@ -12,6 +12,7 @@ interface PNDTInvestigationsProps {
 const PNDTInvestigations: React.FC<PNDTInvestigationsProps> = ({
   options,
   onSelectionChange,
+  selectedInvestigations,
   isSelected
 }) => {
   return (
@@ -19,7 +20,7 @@ const PNDTInvestigations: React.FC<PNDTInvestigationsProps> = ({
       <BloodInvestigationsList
         title="PNDT/ANTINUTOL Investigations"
         options={options}
-        selectedInvestigations={isSelected}
+        selectedInvestigations={selectedInvestigations}
         category="pndt"
         onSelectionChange={onSelectionChange}
         isSelected={isSelected}
