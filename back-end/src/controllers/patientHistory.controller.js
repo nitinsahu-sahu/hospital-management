@@ -37,6 +37,18 @@ exports.createPatientHistory = async (req, res) => {
       });
     }
 
+    if (historyOfIllness?.duration) {
+      const isValidDuration = historyOfIllness.duration.every(item =>
+        item.number && item.unit && ['months', 'weeks', 'days', 'years'].includes(item.unit)
+      );
+      if (!isValidDuration) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid duration format. Each duration item must have a number and a valid unit (months/weeks/days/years)'
+        });
+      }
+    }
+
     const patientHistory = new PatientHistory({
       patientId,
       consultationId,
@@ -46,7 +58,7 @@ exports.createPatientHistory = async (req, res) => {
       // complaint,
       historyOfIllness: {
         onset: historyOfIllness?.onset,
-        duration: historyOfIllness?.duration,
+        duration: historyOfIllness?.duration || [],
         associatedSymptoms: historyOfIllness?.associatedSymptoms
       },
       menstrualHistory: {
@@ -61,7 +73,7 @@ exports.createPatientHistory = async (req, res) => {
         living: obstetricHistory?.living,
         abortion: obstetricHistory?.abortion,
         sb_iod_dead: obstetricHistory?.sb_iod_dead,
-        ectopic: obstetricHistory?.ectopic 
+        ectopic: obstetricHistory?.ectopic
       },
       wifeMedicalHistory: {
         diabetes: wifeMedicalHistory?.diabetes,
@@ -116,41 +128,8 @@ exports.createPatientHistory = async (req, res) => {
   }
 };
 
-// Get Patient History by Patient ID
-exports.getPatientHistoryByPatientId = async (req, res) => {
-  try {
-    const { patientId } = req.params;
-
-    const patientHistory = await PatientHistory.findOne({ patientId })
-      .populate('patientId', 'name UHID age gender')
-      .populate('consultationId')
-      .populate('createdBy', 'name email')
-      .populate('updatedBy', 'name email');
-
-    if (!patientHistory) {
-      return res.status(404).json({
-        success: false,
-        message: 'Patient history not found'
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      data: patientHistory
-    });
-  } catch (error) {
-    console.error('Error fetching patient history:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error fetching patient history',
-      error: error.message
-    });
-  }
-};
-
 // Update Patient History
 exports.updatePatientHistory = async (req, res) => {
-  
   try {
     const { patientId } = req.params;
     const {
@@ -181,7 +160,21 @@ exports.updatePatientHistory = async (req, res) => {
     if (historyOfIllness) {
       updateData.historyOfIllness = {};
       if (historyOfIllness.onset) updateData.historyOfIllness.onset = historyOfIllness.onset;
-      if (historyOfIllness.duration) updateData.historyOfIllness.duration = historyOfIllness.duration;
+      if (historyOfIllness.duration !== undefined) {
+        // Validate duration format if provided and not empty
+        if (Array.isArray(historyOfIllness.duration) && historyOfIllness.duration.length > 0) {
+          const isValidDuration = historyOfIllness.duration.every(item =>
+            item.number && item.unit && ['months', 'weeks', 'days', 'years'].includes(item.unit)
+          );
+          if (!isValidDuration) {
+            return res.status(400).json({
+              success: false,
+              message: 'Invalid duration format. Each duration item must have a number and a valid unit (months/weeks/days/years)'
+            });
+          }
+        }
+        updateData.historyOfIllness.duration = historyOfIllness.duration;
+      }
       if (historyOfIllness.associatedSymptoms) updateData.historyOfIllness.associatedSymptoms = historyOfIllness.associatedSymptoms;
     }
 
@@ -255,6 +248,40 @@ exports.updatePatientHistory = async (req, res) => {
   }
 };
 
+// Get Patient History by Patient ID
+exports.getPatientHistoryByPatientId = async (req, res) => {
+  try {
+    const { patientId } = req.params;
+
+    const patientHistory = await PatientHistory.findOne({ patientId })
+      .populate('patientId', 'name UHID age gender')
+      .populate('consultationId')
+      .populate('createdBy', 'name email')
+      .populate('updatedBy', 'name email');
+
+    if (!patientHistory) {
+      return res.status(404).json({
+        success: false,
+        message: 'Patient history not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: patientHistory
+    });
+  } catch (error) {
+    console.error('Error fetching patient history:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching patient history',
+      error: error.message
+    });
+  }
+};
+
+
+
 // Delete Patient History
 exports.deletePatientHistory = async (req, res) => {
   try {
@@ -287,7 +314,7 @@ exports.deletePatientHistory = async (req, res) => {
 exports.getAllPatientHistories = async (req, res) => {
   try {
     const { page = 1, limit = 10, sortBy = 'createdAt', order = 'desc' } = req.query;
-    
+
     const options = {
       page: parseInt(page),
       limit: parseInt(limit),

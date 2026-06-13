@@ -18,7 +18,6 @@ interface VitalsSectionProps {
 export default function VitalsSection({
   vitals,
   onVitalsChange,
-  showLocalExamination = false,
 }: VitalsSectionProps) {
   return (
     <>

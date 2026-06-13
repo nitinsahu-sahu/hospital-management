@@ -28,15 +28,15 @@ export default function SignInForm() {
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-
   // const [formData, setFormData] = useState({
-  //   email: "nitinsahu911111@gmail.com",
-  //   password: "vinod@!232",
+  //   email: "",
+  //   password: "",
   // });
+
+  const [formData, setFormData] = useState({
+    email: "prdmagency@gmail.com",
+    password: "yogita@!232",
+  });
   // Redirect after login - only if user is authenticated and comes to signin page
   useEffect(() => {
     if (authenticate && !hasNavigated.current) {

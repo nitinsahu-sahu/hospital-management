@@ -1,0 +1,85 @@
+import { procedureConstants } from "../actions/constants";
+
+const initialState = {
+  procedures: [],
+  patientProcedures: [],
+  procedure: null,
+  loading: false,
+  creating: false,
+  updating: false,
+  error: null,
+  message: '',
+};
+
+const procedureReducer = (state = initialState, action) => {
+  switch (action.type) {
+    // Create
+    case procedureConstants.CREATE_PROCEDURE_REQUEST:
+      return { ...state, creating: true, error: null };
+    case procedureConstants.CREATE_PROCEDURE_SUCCESS:
+      return {
+        ...state,
+        creating: false,
+        procedures: [action.payload, ...state.procedures],
+        patientProcedures: [action.payload, ...state.patientProcedures],
+        message: 'Procedure created successfully',
+      };
+    case procedureConstants.CREATE_PROCEDURE_FAILURE:
+      return { ...state, creating: false, error: action.payload.message };
+
+    // Get All
+    case procedureConstants.GET_ALL_PROCEDURES_REQUEST:
+      return { ...state, loading: true, error: null };
+    case procedureConstants.GET_ALL_PROCEDURES_SUCCESS:
+      return { ...state, loading: false, procedures: action.payload };
+    case procedureConstants.GET_ALL_PROCEDURES_FAILURE:
+      return { ...state, loading: false, error: action.payload.message };
+
+    // Get By ID
+    case procedureConstants.GET_PROCEDURE_BY_ID_REQUEST:
+      return { ...state, loading: true, error: null };
+    case procedureConstants.GET_PROCEDURE_BY_ID_SUCCESS:
+      return { ...state, loading: false, procedure: action.payload };
+    case procedureConstants.GET_PROCEDURE_BY_ID_FAILURE:
+      return { ...state, loading: false, error: action.payload.message };
+
+    // Get By Patient ID
+    case procedureConstants.GET_PROCEDURES_BY_PATIENT_REQUEST:
+      return { ...state, loading: true, error: null };
+    case procedureConstants.GET_PROCEDURES_BY_PATIENT_SUCCESS:
+      return { ...state, loading: false, patientProcedures: action.payload.procedures };
+    case procedureConstants.GET_PROCEDURES_BY_PATIENT_FAILURE:
+      return { ...state, loading: false, error: action.payload.message };
+
+    // Update
+    case procedureConstants.UPDATE_PROCEDURE_REQUEST:
+      return { ...state, updating: true, error: null };
+    case procedureConstants.UPDATE_PROCEDURE_SUCCESS:
+      return {
+        ...state,
+        updating: false,
+        procedure: action.payload,
+        message: 'Procedure updated successfully',
+      };
+    case procedureConstants.UPDATE_PROCEDURE_FAILURE:
+      return { ...state, updating: false, error: action.payload.message };
+
+    // Delete
+    case procedureConstants.DELETE_PROCEDURE_REQUEST:
+      return { ...state, error: null };
+    case procedureConstants.DELETE_PROCEDURE_SUCCESS:
+      return {
+        ...state,
+        procedures: state.procedures.filter(p => p._id !== action.payload),
+        patientProcedures: state.patientProcedures.filter(p => p._id !== action.payload),
+        message: 'Procedure deleted successfully',
+      };
+    case procedureConstants.DELETE_PROCEDURE_FAILURE:
+      return { ...state, error: action.payload.message };
+
+    default:
+      return state;
+  }
+};
+
+export default procedureReducer;

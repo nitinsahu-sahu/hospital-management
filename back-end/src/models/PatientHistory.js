@@ -1,6 +1,18 @@
 // models/PatientHistory.js
 const mongoose = require('mongoose');
 
+const durationItemSchema = new mongoose.Schema({
+  number: {
+    type: String,
+    required: false
+  },
+  unit: {
+    type: String,
+    enum: ['months', 'weeks', 'days', 'years', ''],
+    required: false
+  }
+}, { _id: false });
+
 const patientHistorySchema = new mongoose.Schema({
   patientId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -38,8 +50,9 @@ const patientHistorySchema = new mongoose.Schema({
       required: false
     },
     duration: {
-      type: Date,
-      required: false
+      type: [durationItemSchema], 
+      required: false,
+      default: []
     },
     associatedSymptoms: {
       type: String,
