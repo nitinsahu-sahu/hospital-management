@@ -104,6 +104,7 @@ export default function Prescription() {
       //   doctorData = [doctorData];
       // }
       
+      setPatients([]);
       // setPatients(patientData);
       // setDoctors(doctorData);
     } catch (err) {
