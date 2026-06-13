@@ -1,12 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { PlusIcon, TrashBinIcon } from '../../icons';
-import { AdditionalFee, NewFee } from '../../types/consultation';
+import { NewFee } from '../../types/consultation';
 
-interface AdditionalFeesManagerProps {
-  fees: AdditionalFee[];
-  onAddFee: (fee: NewFee) => void;
-  onRemoveFee: (index: number) => void;
-}
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -21,9 +16,7 @@ const formatDate = (dateString: string) => {
   return date.toLocaleDateString('en-IN', options);
 };
 
-export const AdditionalFeesManager= ({ fees, onAddFee, onRemoveFee }:any) => {
-  console.log("fees",fees);
-  
+export const AdditionalFeesManager = ({ fees, onAddFee, onRemoveFee }: any) => {
   const [newFee, setNewFee] = useState<NewFee>({ name: '', amount: '' });
 
   const handleAddFee = () => {
@@ -79,7 +72,7 @@ export const AdditionalFeesManager= ({ fees, onAddFee, onRemoveFee }:any) => {
       {/* Fees List */}
       {fees.length > 0 ? (
         <div className="space-y-3">
-          {fees.map((fee:any, index:any) => (
+          {fees.map((fee: any, index: any) => (
             <div key={index} className="flex items-center justify-between bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 hover:shadow-sm">
               <div className="flex-1">
                 <div className="flex items-center gap-3">
