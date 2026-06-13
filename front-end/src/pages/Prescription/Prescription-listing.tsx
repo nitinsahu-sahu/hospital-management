@@ -4,8 +4,8 @@ import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import PageMeta from "../../components/common/PageMeta";
 import Input from "../../components/form/input/InputField";
 import Select from "../../components/form/Select";
-import DatePicker from "../../components/form/date-picker";
-import { getPrescriptions, deletePrescription, updatePrescription, getPrescriptionById } from "../../services/prescriptionService";
+// import DatePicker from "../../components/form/date-picker";
+import { getPrescriptions, deletePrescription, updatePrescription } from "../../services/prescriptionService";
 // import { getPatients } from "../../services/patientService";
 
 interface Medication {
@@ -128,6 +128,7 @@ export default function PrescriptionView() {
     try {
       // const response = await getPatients(1, 100);
       // setPatients(response.data);
+      setPatients([]);
     } catch (err) {
       console.error("Failed to fetch patients");
     }

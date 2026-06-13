@@ -68,7 +68,7 @@
 interface SelectProps {
   options: Array<{ value: string; label: string }>;
   placeholder?: string;
-  value: string;
+  value?: string;
   onChange: (value: string) => void;
   className?: string;
 }

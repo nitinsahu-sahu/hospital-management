@@ -35,7 +35,6 @@ interface PatientEditModalProps {
 }
 
 export default function PatientEditModal({ patient, onClose, onSubmit }: PatientEditModalProps) {
-  console.log("Patient data:", patient);
 
   const [formData, setFormData] = useState<any>({
     name: "",
@@ -107,9 +106,6 @@ export default function PatientEditModal({ patient, onClose, onSubmit }: Patient
     };
 
     setFormData(newFormData);
-    console.log("New form data set:", newFormData);
-
-    // Initialize single relative from patient.relative (object, not array)
     if (patient.relative) {
       const relativeData = {
         _id: patient.relative._id,
@@ -128,7 +124,6 @@ export default function PatientEditModal({ patient, onClose, onSubmit }: Patient
       };
       setRelative(relativeData);
       setHasRelative(true);
-      console.log("Relative data set:", relativeData);
     } else {
       setRelative({
         role: "",
@@ -624,7 +619,8 @@ export default function PatientEditModal({ patient, onClose, onSubmit }: Patient
                         selectOptions={genderOptions}
                         selectValue={relative.sex}
                         selectPlaceholder="Select Gender *"
-                        onSelectChange={(name, value) => handleRelativeSelectChange("sex", value)}
+                        // onSelectChange={(name, value) => handleRelativeSelectChange("sex", value)}
+                        onSelectChange={(value) => handleRelativeSelectChange("sex", value)}
                         otherInputName="relativeSexDetails"
                         otherInputValue={relative.sexDetails || ""}
                         otherInputPlaceholder="Please specify gender"
@@ -655,7 +651,8 @@ export default function PatientEditModal({ patient, onClose, onSubmit }: Patient
                         selectOptions={maritalStatusOptions}
                         selectValue={relative.maritalStatus}
                         selectPlaceholder="Marital Status"
-                        onSelectChange={(name, value) => handleRelativeSelectChange("maritalStatus", value)}
+                        onSelectChange={(value) => handleRelativeSelectChange("maritalStatus", value)}
+                        // onSelectChange={(name, value) => handleRelativeSelectChange("maritalStatus", value)}
                         otherInputName="relativeMaritalStatusDetails"
                         otherInputValue={relative.maritalStatusDetails || ""}
                         otherInputPlaceholder="Please specify marital status"
@@ -672,7 +669,8 @@ export default function PatientEditModal({ patient, onClose, onSubmit }: Patient
                         selectOptions={idProofTypeOptions}
                         selectValue={relative.idProofType}
                         selectPlaceholder="ID Proof Type"
-                        onSelectChange={(name, value) => handleRelativeSelectChange("idProofType", value)}
+                        onSelectChange={(value) => handleRelativeSelectChange("idProofType", value)}
+                        // onSelectChange={(name, value) => handleRelativeSelectChange("idProofType", value)}
                         otherInputName="relativeIdProofTypeDetails"
                         otherInputValue={relative.idProofTypeDetails || ""}
                         otherInputPlaceholder="Please specify ID proof type"

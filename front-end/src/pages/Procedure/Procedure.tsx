@@ -301,7 +301,9 @@ export default function Procedure() {
         result = await dispatch(updateProcedure(existingProcedure._id, procedureData) as any);
         if (result?.status === 200) {
           setSuccessMessage('Procedures updated successfully!');
-        }
+        }else(
+          setError(result.error)
+        )
       } else {
         // Create new procedure
         result = await dispatch(createProcedure(procedureData) as any);
@@ -309,7 +311,9 @@ export default function Procedure() {
           setSuccessMessage('Procedures saved successfully!');
           // After creating, set as existing
           setIsExistingProcedure(true);
-        }
+        }else(
+          setError(result.error)
+        )
       }
 
       if (result?.status === 200 || result?.status === 201) {

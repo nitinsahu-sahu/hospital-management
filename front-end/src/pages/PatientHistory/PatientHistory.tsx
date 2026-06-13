@@ -547,7 +547,13 @@ export default function PatientHistory() {
                     placeholder="Select onset date"
                     // value={formData.onset}
                     value={formData.onset}
-                    onChange={(dates, currentDateString) => {
+                    // onChange={(dates, currentDateString) => {
+                    //   setFormData((prev: any) => ({
+                    //     ...prev,
+                    //     onset: currentDateString
+                    //   }));
+                    // }}
+                    onChange={( currentDateString) => {
                       setFormData((prev: any) => ({
                         ...prev,
                         onset: currentDateString
@@ -706,12 +712,18 @@ export default function PatientHistory() {
                     label="Last Menstrual Period (LMP)"
                     placeholder="Select last menstrual period date"
                     value={formData.lmp}
-                    onChange={(dates, currentDateString) => {
+                    onChange={( currentDateString) => {
                       setFormData((prev: any) => ({
                         ...prev,
                         lmp: currentDateString
                       }));
                     }}
+                    // onChange={(dates, currentDateString) => {
+                    //   setFormData((prev: any) => ({
+                    //     ...prev,
+                    //     lmp: currentDateString
+                    //   }));
+                    // }}
                   />
                 </div>
               </div>
@@ -1472,10 +1484,15 @@ export default function PatientHistory() {
               </button>
               <button
                 type="submit"
-                // disabled={isSubmitting}
+                disabled={isSubmitting}
                 className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isExistingPatientHistory ? 'Update Patient History' : 'Save Patient History'}
+                 {isSubmitting
+                  ? 'Saving...'
+                  : isExistingPatientHistory
+                    ? 'Update Patient History' : 'Save Patient History'
+                }
+                {/* {isExistingPatientHistory ? 'Update Patient History' : 'Save Patient History'} */}
               </button>
             </div>
           </form>
