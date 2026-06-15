@@ -62,10 +62,11 @@ export default function DoctorConsultation() {
       totalAmount: 0
     });
   }, []);
+
   // Fetch consultation for patient
   const fetchConsultationForPatient = useCallback(async (patientId: string) => {
     setIsLoadingConsultation(true);
-    resetForm(); // Reset before fetching new patient data
+    resetForm(); 
 
     try {
       const result = await dispatch(getConsultationByPatientId(patientId) as any);
@@ -176,31 +177,35 @@ export default function DoctorConsultation() {
 
     let result;
     if (isExistingConsultation && existingConsultationId) {
+      // UPDATE EXISTING CONSULTATION
       result = await dispatch(updateConsultation(existingConsultationId, consultationData) as any);
       if (result?.status === 200) {
         setSuccessMessage('Consultation updated successfully!');
         setTimeout(() => {
           setSuccessMessage('');
-
-        }, 5000)
+        }, 5000);
         fetchConsultationForPatient(selectedPatient._id);
       }
     } else {
+      // CREATE NEW CONSULTATION
       result = await dispatch(createConsultation(consultationData) as any);
+      
       if (result?.status === 201 || result?.status === 200) {
         setSuccessMessage('Consultation created successfully!');
         setTimeout(() => {
           setSuccessMessage('');
-
-        }, 5000)
+        }, 5000);
+        
+        // IMPORTANT: Set the consultation as existing immediately
         if (result?.payload?._id) {
           setExistingConsultationId(result.payload._id);
           setIsExistingConsultation(true);
         }
+        // Also refetch to ensure we have the latest data
+        fetchConsultationForPatient(selectedPatient._id);
       }
     }
   }, [selectedPatient, formData.fees, totalAmount, isExistingConsultation, existingConsultationId, dispatch, fetchConsultationForPatient]);
-
   return (
     <>
       <PageMeta title="Consultation" description="Doctor Consultation" />

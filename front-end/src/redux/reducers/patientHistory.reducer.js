@@ -8,6 +8,8 @@ const initialState = {
   patientHistories: [],
   totalPages: 0,
   currentPage: 1,
+  creating: false,
+    updating: false,
   success: false,
 };
 
@@ -17,6 +19,7 @@ const patientHistoryReducer = (state = initialState, action) => {
     case patientHistoryConstants.PATIENT_HISTORY_CREATE_REQUEST:
       return {
         ...state,
+        creating: true,
         loading: true,
         error: null,
         success: false,
@@ -25,6 +28,7 @@ const patientHistoryReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
+        creating: false,
         success: true,
         patientHistory: action.payload,
         error: null,
@@ -35,6 +39,7 @@ const patientHistoryReducer = (state = initialState, action) => {
         loading: false,
         error: action.payload,
         success: false,
+        creating: false
       };
     case patientHistoryConstants.PATIENT_HISTORY_CREATE_RESET:
       return {

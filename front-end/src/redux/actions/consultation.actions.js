@@ -64,7 +64,13 @@ export const createConsultation = (consultationData) => async (dispatch) => {
             type: consultationConstants.CREATE_CONSULTATION_SUCCESS,
             payload: data,
         });
-        return { status: response.status, message: response.data.message };
+        dispatch(getConsultationByPatientId(data?.patientId))
+
+        return {
+            status: response.status,
+            message: response.data.message,
+            payload: data
+        };
     } catch (error) {
         dispatch({
             type: consultationConstants.CREATE_CONSULTATION_FAILURE,
