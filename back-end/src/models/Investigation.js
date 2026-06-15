@@ -67,7 +67,6 @@ const investigationSchema = new mongoose.Schema({
 });
 
 // Index for faster queries
-investigationSchema.index({ patientId: 1 });
 investigationSchema.index({ consultationId: 1 });
 investigationSchema.index({ date: -1 });
 
