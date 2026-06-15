@@ -9,7 +9,8 @@ const durationItemSchema = new mongoose.Schema({
   unit: {
     type: String,
     enum: ['months', 'weeks', 'days', 'years', ''],
-    required: false
+    required: false,
+    default:""
   }
 }, { _id: false });
 

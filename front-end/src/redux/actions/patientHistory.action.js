@@ -5,21 +5,26 @@ import { patientHistoryConstants } from "./constants";
 export const createPatientHistory = (patientHistoryData) => async (dispatch, getState) => {
     try {
         dispatch({ type: patientHistoryConstants.PATIENT_HISTORY_CREATE_REQUEST });
-
-        const { data } = await APIs.post("/patient-history", patientHistoryData);
+        const response = await APIs.post("patient-history", patientHistoryData);
+        const { data } = response.data;
 
         dispatch({
             type: patientHistoryConstants.PATIENT_HISTORY_CREATE_SUCCESS,
             payload: data.data,
         });
-
-        return data;
+        return {
+            status: response.status,
+            message: response.data.message,
+            payload: data,
+            type: patientHistoryConstants.PATIENT_HISTORY_CREATE_SUCCESS,
+        };
     } catch (error) {
         dispatch({
             type: patientHistoryConstants.PATIENT_HISTORY_CREATE_FAILURE,
             payload: error.response?.data?.message || 'Error creating patient history',
         });
-        throw error;
+        return { status: error.response?.status, message: error?.response?.data?.message };
+
     }
 };
 
