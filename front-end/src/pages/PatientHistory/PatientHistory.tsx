@@ -80,9 +80,6 @@ export default function PatientHistory() {
     husbandDrugAddiction: '',
   });
 
-
-
-  // Reset form to initial state
   const resetFormData = useCallback(() => {
     setFormData({
       chiefComplaints: '',
@@ -317,101 +314,107 @@ export default function PatientHistory() {
   };
 
   // Update the handleSubmit function in PatientHistory.tsx
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    if (!selectedPatient) {
-      alert('Please select a patient first');
-      return;
-    }
+  if (!selectedPatient) {
+    alert('Please select a patient first');
+    return;
+  }
 
-    // Transform form data to match backend structure
-    const patientHistoryData = {
-      patientId: selectedPatient._id,
-      consultationId: consultationId, // if available
-      chiefComplaints: formData.chiefComplaints,
-      chiefComplaintsDetails: formData.chiefComplaintsDetails,
-      // amenorrhoea: formData.amenorrhoea,
-      // complaint: formData.complaint,
-      historyOfIllness: {
-        onset: formData.onset,
-        duration: formData.duration,
-        associatedSymptoms: formData.associatedSymptoms
-      },
-      menstrualHistory: {
-        cycleLength: formData.cycleLength,
-        daysOfFlow: formData.daysOfFlow,
-        associatedSymptoms: formData.menstrualSymptoms,
-        lmp: formData.lmp
-      },
-      obstetricHistory: {
-        gravida: formData.gravida,
-        para: formData.para,
-        living: formData.living,
-        abortion: formData.abortion,
-        ectopic: formData.ectopic,
-        sb_iod_dead: formData.sb_iod_dead
-      },
-      wifeMedicalHistory: {
-        diabetes: formData.diabetes,
-        hypertension: formData.hypertension,
-        asthma: formData.asthma,
-        thyroid: formData.thyroid,
-        drugAllergy: formData.drugAllergy,
-        drugAllergyDetails: formData.drugAllergyDetails,
-        geneticDiseaseSelf: formData.geneticDiseaseSelf,
-        geneticDiseaseFamily: formData.geneticDiseaseFamily,
-        downSyndrome: formData.downSyndrome,
-        smoking: formData.smoking,
-        drugAddiction: formData.drugAddiction
-      },
-      husbandMedicalHistory: {
-        diabetes: formData.husbandDiabetes,
-        hypertension: formData.husbandHypertension,
-        asthma: formData.husbandAsthma,
-        thyroid: formData.husbandThyroid,
-        drugAllergy: formData.husbandDrugAllergy,
-        drugAllergyDetails: formData.husbandDrugAllergyDetails,
-        geneticDiseaseSelf: formData.husbandGeneticDiseaseSelf,
-        geneticDiseaseFamily: formData.husbandGeneticDiseaseFamily,
-        downSyndrome: formData.husbandDownSyndrome,
-        smoking: formData.husbandSmoking,
-        drugAddiction: formData.husbandDrugAddiction
-      },
-    };
-
-    setIsSubmitting(true);
-    try {
-      let result;
-
-      if (isExistingPatientHistory) {
-        result = await dispatch(updatePatientHistory(selectedPatient._id, patientHistoryData) as any);
-
-      } else {
-        result = await dispatch(createPatientHistory(patientHistoryData) as any);
-
-      }
-
-      if (result?.type === 'PATIENT_HISTORY_CREATE_SUCCESS' ||
-        result?.type === 'PATIENT_HISTORY_UPDATE_SUCCESS') {
-        setSuccessMessage(isExistingPatientHistory
-          ? 'Patient examination updated successfully!'
-          : 'Patient examination saved successfully!'
-        );
-
-        setTimeout(() => {
-          setSuccessMessage("")
-        }, 5000)
-        setIsExistingPatientHistory(true);
-      } else {
-        setError(result?.payload || 'Failed to save examination')
-      }
-    } catch (error: any) {
-      setError(error.message || 'Error saving examination');
-    }
+  // Transform form data to match backend structure
+  const patientHistoryData = {
+    patientId: selectedPatient._id,
+    consultationId: consultationId,
+    chiefComplaints: formData.chiefComplaints,
+    chiefComplaintsDetails: formData.chiefComplaintsDetails,
+    historyOfIllness: {
+      onset: formData.onset,
+      duration: formData.duration,
+      associatedSymptoms: formData.associatedSymptoms
+    },
+    menstrualHistory: {
+      cycleLength: formData.cycleLength,
+      daysOfFlow: formData.daysOfFlow,
+      associatedSymptoms: formData.menstrualSymptoms,
+      lmp: formData.lmp
+    },
+    obstetricHistory: {
+      gravida: formData.gravida,
+      para: formData.para,
+      living: formData.living,
+      abortion: formData.abortion,
+      ectopic: formData.ectopic,
+      sb_iod_dead: formData.sb_iod_dead
+    },
+    wifeMedicalHistory: {
+      diabetes: formData.diabetes,
+      hypertension: formData.hypertension,
+      asthma: formData.asthma,
+      thyroid: formData.thyroid,
+      drugAllergy: formData.drugAllergy,
+      drugAllergyDetails: formData.drugAllergyDetails,
+      geneticDiseaseSelf: formData.geneticDiseaseSelf,
+      geneticDiseaseFamily: formData.geneticDiseaseFamily,
+      downSyndrome: formData.downSyndrome,
+      smoking: formData.smoking,
+      drugAddiction: formData.drugAddiction
+    },
+    husbandMedicalHistory: {
+      diabetes: formData.husbandDiabetes,
+      hypertension: formData.husbandHypertension,
+      asthma: formData.husbandAsthma,
+      thyroid: formData.husbandThyroid,
+      drugAllergy: formData.husbandDrugAllergy,
+      drugAllergyDetails: formData.husbandDrugAllergyDetails,
+      geneticDiseaseSelf: formData.husbandGeneticDiseaseSelf,
+      geneticDiseaseFamily: formData.husbandGeneticDiseaseFamily,
+      downSyndrome: formData.husbandDownSyndrome,
+      smoking: formData.husbandSmoking,
+      drugAddiction: formData.husbandDrugAddiction
+    },
   };
-  console.log("===>", formData.onset);
-  console.log("===>lmp", formData.lmp);
+
+  setIsSubmitting(true);
+  setError(""); // Clear any previous errors
+  
+  try {
+    let result;
+
+    if (isExistingPatientHistory) {
+      result = await dispatch(updatePatientHistory(selectedPatient._id, patientHistoryData) as any);
+    } else {
+      result = await dispatch(createPatientHistory(patientHistoryData) as any);
+      
+    }
+
+    if (result?.type === 'PATIENT_HISTORY_CREATE_SUCCESS' ||
+        result?.type === 'PATIENT_HISTORY_UPDATE_SUCCESS') {
+      
+      setSuccessMessage(isExistingPatientHistory
+        ? 'Patient examination updated successfully!'
+        : 'Patient examination saved successfully!'
+      );
+      
+      // IMPORTANT: Fetch the updated history to refresh the state
+      await fetchPatientHistory(selectedPatient._id);
+      
+      // Set isExistingPatientHistory to true
+      setIsExistingPatientHistory(true);
+      
+      setTimeout(() => {
+        setSuccessMessage("");
+      }, 5000);
+      
+    } else {
+      setError(result?.payload || 'Failed to save examination');
+    }
+  } catch (error: any) {
+    setError(error.message || 'Error saving examination');
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
 
   return (
@@ -553,7 +556,7 @@ export default function PatientHistory() {
                     //     onset: currentDateString
                     //   }));
                     // }}
-                    onChange={( currentDateString) => {
+                    onChange={(currentDateString) => {
                       setFormData((prev: any) => ({
                         ...prev,
                         onset: currentDateString
@@ -712,18 +715,18 @@ export default function PatientHistory() {
                     label="Last Menstrual Period (LMP)"
                     placeholder="Select last menstrual period date"
                     value={formData.lmp}
-                    onChange={( currentDateString) => {
+                    onChange={(currentDateString) => {
                       setFormData((prev: any) => ({
                         ...prev,
                         lmp: currentDateString
                       }));
                     }}
-                    // onChange={(dates, currentDateString) => {
-                    //   setFormData((prev: any) => ({
-                    //     ...prev,
-                    //     lmp: currentDateString
-                    //   }));
-                    // }}
+                  // onChange={(dates, currentDateString) => {
+                  //   setFormData((prev: any) => ({
+                  //     ...prev,
+                  //     lmp: currentDateString
+                  //   }));
+                  // }}
                   />
                 </div>
               </div>
@@ -1487,7 +1490,7 @@ export default function PatientHistory() {
                 disabled={isSubmitting}
                 className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                 {isSubmitting
+                {isSubmitting
                   ? 'Saving...'
                   : isExistingPatientHistory
                     ? 'Update Patient History' : 'Save Patient History'

@@ -47,7 +47,7 @@ const getInitialExaminationForm = (): ExaminationFormData => ({
 
 export default function RelativeExamination() {
   const dispatch = useDispatch();
-  const { loading, error: reduxError} = useSelector(
+  const { loading} = useSelector(
     (state: RootState) => state.relativeExamination
   );
 
@@ -56,7 +56,7 @@ export default function RelativeExamination() {
   const [isLoadingConsultation, setIsLoadingConsultation] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
-  const [localError, setLocalError] = useState('');
+  const [error, setError] = useState('');
   const [isExistingExamination, setIsExistingExamination] = useState(false);
   const [relativeId, setRelativeId] = useState('');
 
@@ -153,7 +153,7 @@ export default function RelativeExamination() {
               fetchExistingExamination(relId);
             }
             setSuccessMessage('');
-            setLocalError('');
+            setError('');
           }
         } catch (error) {
           setSelectedPatient(null);
@@ -222,13 +222,13 @@ export default function RelativeExamination() {
     e.preventDefault();
 
     if (!selectedPatient) {
-      setLocalError('Please select a patient first');
+      setError('Please select a patient first');
       return;
     }
 
     setIsSubmitting(true);
     setSuccessMessage('');
-    setLocalError('');
+    setError('');
 
     const apiData = transformFormDataForAPI();
 
@@ -251,11 +251,10 @@ export default function RelativeExamination() {
         },5000)
         setIsExistingExamination(true);
       } else {
-        setLocalError(result?.payload || 'Failed to save examination');
+        setError(result?.payload || 'Failed to save examination');
       }
     } catch (error: any) {
-      console.error('Error saving examination:', error);
-      setLocalError(error.message || 'Error saving examination');
+      setError(error.message || 'Error saving examination');
     } finally {
       setIsSubmitting(false);
     }
@@ -269,10 +268,9 @@ export default function RelativeExamination() {
       setFormData(getInitialExaminationForm());
     }
     setSuccessMessage('');
-    setLocalError('');
+    setError('');
   };
 
-  const displayError = localError || reduxError;
 
   return (
     <>
@@ -294,12 +292,12 @@ export default function RelativeExamination() {
           )}
 
           {/* Error Message */}
-          {displayError && (
+          {error && (
             <div className="mb-6">
               <Alert
                 variant="error"
                 title="Error"
-                message={displayError}
+                message={error}
                 showLink={false}
               />
             </div>
