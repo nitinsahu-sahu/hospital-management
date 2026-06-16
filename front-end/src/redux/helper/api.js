@@ -2,7 +2,7 @@ import axios from 'axios'
 
 // for live
 const instance = axios.create({
-    baseURL: import.meta.env.VITE_LOCAL_LIVE_URL || 'http://localhost:8000/api',
+    baseURL: import.meta.env.VITE_LOCAL_LIVE_URL || 'https://www.api.wfcc.in/api',
     withCredentials: true,
     headers: {
         'Content-Type': 'application/json',
