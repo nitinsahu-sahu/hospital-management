@@ -7,21 +7,14 @@ import SignUp from "./pages/AuthPages/SignUp";
 import NotFound from "./pages/OtherPage/NotFound";
 
 import UserProfiles from "./pages/UserProfiles";
-import Alerts from "./pages/UiElements/Alerts";
-import Badges from "./pages/UiElements/Badges";
-import Avatars from "./pages/UiElements/Avatars";
-import Buttons from "./pages/UiElements/Buttons";
 
 import Calendar from "./pages/Calendar";
-import BasicTables from "./pages/Tables/BasicTables";
-import FormElements from "./pages/Forms/FormElements";
-
 import Blank from "./pages/Blank";
 import AppLayout from "./layout/AppLayout";
 
 import { ScrollToTop } from "./components/common/ScrollToTop";
 
-import Home from "./pages/Dashboard/Home";
+// import Home from "./pages/Dashboard/Home";
 
 import Patients from "./pages/patients/patients";
 import PatientsListing from "./pages/patients/patients-listing";
@@ -75,7 +68,7 @@ export default function App() {
             </Protected>
           }
         >
-          <Route index path="/" element={<Home />} />
+          {/* <Route index path="/" element={<Home />} /> */}
 
           {/* Others Page */}
           <Route path="/profile" element={<UserProfiles />} />
@@ -88,27 +81,13 @@ export default function App() {
           <Route path="/procedure" element={<Procedure />} />
           <Route path="/discharge" element={<Discharge />} />
           <Route path="/consultation" element={<DoctorConsultation />} />
-          <Route path="/patient/add" element={<Patients />} />
+          <Route path="/" element={<Patients />} />
           <Route path="/patient/view" element={<PatientsListing />} />
           <Route path="/prescription/add" element={<Prescription />} />
           <Route path="/prescription/view" element={<PrescriptionView />} />
           <Route path="/discharge" element={<Calendar />} />
           <Route path="/blank" element={<Blank />} />
-
-          {/* Forms */}
-          <Route path="/form-elements" element={<FormElements />} />
-
-          {/* Tables */}
-          <Route path="/basic-tables" element={<BasicTables />} />
-
-          {/* UI Elements */}
-          <Route path="/alerts" element={<Alerts />} />
-          <Route path="/avatars" element={<Avatars />} />
-          <Route path="/badge" element={<Badges />} />
-          <Route path="/buttons" element={<Buttons />} />
         </Route>
-
-        {/* 404 */}
         <Route path="*" element={<NotFound />} />
 
       </Routes>
