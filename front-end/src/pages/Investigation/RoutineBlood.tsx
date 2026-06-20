@@ -134,7 +134,6 @@ export default function RoutineBlood() {
         setIsLoadingInvestigations(true);
         try {
           const result = await dispatch(getBloodInvestigationByPatientId(selectedPatient._id, 'routine') as any);
-          console.log(result);
 
           // Check for success with payload
           if (result?.type === 'GET_BLOOD_INVESTIGATION_SUCCESS' && result.payload) {
