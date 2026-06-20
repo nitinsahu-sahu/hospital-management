@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 
 import { EyeCloseIcon, EyeIcon } from "../../icons";
-
+import logo from "../../../public/images/logo/logo-dark.png"
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import Button from "../ui/button/Button";
@@ -77,9 +77,17 @@ export default function SignInForm() {
     <div className="flex flex-col flex-1">
       <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
         <div>
+          {/* Logo Section - Added at top */}
+          <div className="flex justify-center mb-6 sm:mb-8">
+            <img 
+              src={logo} 
+              alt="Logo" 
+              className="h-16 w-auto sm:h-16" 
+            />
+          </div>
           <div className="mb-5 sm:mb-8">
             <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
-              Sign In
+              Sign Ins
             </h1>
 
             <p className="text-sm text-gray-500 dark:text-gray-400">
