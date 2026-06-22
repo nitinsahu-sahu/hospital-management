@@ -131,6 +131,31 @@ const userSchema = new mongoose.Schema(
         },
         idProofNumber: {
             type: String,
+            validate: {
+                validator: function (value) {
+                    // Skip validation if type is 'other'
+                    if (this.idProofType === 'other') {
+                        return value && value.length >= 3 && value.length <= 50;
+                    }
+
+                    // Validate based on type
+                    switch (this.idProofType) {
+                        case 'aadhaar':
+                            return /^\d{12}$/.test(value);
+                        case 'pancard':
+                            return /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(value);
+                        case 'passport':
+                            return /^[A-Z]{1}[0-9]{7}$/.test(value);
+                        case 'driving_license':
+                            return /^[A-Z]{2}[0-9]{2}[0-9]{4}[0-9]{7}$/.test(value);
+                        case 'voter':
+                            return /^[A-Z]{3}[0-9]{7}$/.test(value);
+                        default:
+                            return true;
+                    }
+                },
+                message: 'Invalid ID proof number format for the selected ID type'
+            }
         },
 
         // ================= DOCTOR FIELDS =================

@@ -12,7 +12,8 @@ import { PatientInfoCard } from "../../components/consultation/PatientInfoCard";
 import { useDispatch } from "react-redux";
 //@ts-ignore
 import { getConsultationByPatientId } from '../../redux/actions/consultation.actions';
-
+import { routeOptions,frequencyOptions,medicineOptions } from "../../utils/prescription";
+routeOptions
 interface Medication {
   drugName: string;
   dosage: string;
@@ -22,32 +23,155 @@ interface Medication {
   instructions: string;
 }
 
-// Options
-const frequencyOptions = [
-  { value: "Once Daily", label: "Once Daily" },
-  { value: "Twice Daily", label: "Twice Daily" },
-  { value: "Thrice Daily", label: "Thrice Daily" },
-  { value: "Four Times Daily", label: "Four Times Daily" },
-  { value: "Every 4 Hours", label: "Every 4 Hours" },
-  { value: "Every 6 Hours", label: "Every 6 Hours" },
-  { value: "Every 8 Hours", label: "Every 8 Hours" },
-  { value: "Every 12 Hours", label: "Every 12 Hours" },
-  { value: "Once Weekly", label: "Once Weekly" },
-  { value: "As Needed", label: "As Needed" },
-];
+// Searchable Select Component for Medicine
+const SearchableMedicineSelect = ({
+  value,
+  onChange,
+  placeholder = "Search medicine..."
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredOptions, setFilteredOptions] = useState(medicineOptions);
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
-const routeOptions = [
-  { value: "Oral", label: "Oral" },
-  { value: "Intravenous (IV)", label: "Intravenous (IV)" },
-  { value: "Intramuscular (IM)", label: "Intramuscular (IM)" },
-  { value: "Subcutaneous (SC)", label: "Subcutaneous (SC)" },
-  { value: "Topical", label: "Topical" },
-  { value: "Sublingual", label: "Sublingual" },
-  { value: "Rectal", label: "Rectal" },
-  { value: "Inhalation", label: "Inhalation" },
-  { value: "Ophthalmic", label: "Ophthalmic" },
-  { value: "Otic", label: "Otic" },
-];
+  // Filter medicines based on search
+  useEffect(() => {
+    if (searchTerm.trim() === "") {
+      setFilteredOptions(medicineOptions);
+    } else {
+      const filtered = medicineOptions.filter(med =>
+        med.label.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredOptions(filtered);
+    }
+  }, [searchTerm]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Set initial search term when value changes
+  useEffect(() => {
+    if (value) {
+      const selectedMedicine = medicineOptions.find(med => med.value === value);
+      setSearchTerm(selectedMedicine?.label || value);
+    } else {
+      setSearchTerm("");
+    }
+  }, [value]);
+
+  const handleSelect = (medicine: { value: string; label: string }) => {
+    onChange(medicine.value);
+    setSearchTerm(medicine.label);
+    setIsOpen(false);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    setSearchTerm(inputValue);
+    setIsOpen(true);
+
+    // If user clears the input, clear the selection
+    if (inputValue === "") {
+      onChange("");
+    }
+  };
+
+  const handleFocus = () => {
+    setIsOpen(true);
+    if (searchTerm === "" || !value) {
+      setFilteredOptions(medicineOptions);
+    }
+  };
+
+  return (
+    <div ref={wrapperRef} className="relative">
+      <div className="relative">
+        <input
+          type="text"
+          placeholder={placeholder}
+          value={searchTerm}
+          onChange={handleInputChange}
+          onFocus={handleFocus}
+          className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
+        />
+        {/* Search Icon */}
+        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </span>
+        {/* Dropdown Arrow */}
+        <button
+          type="button"
+          onClick={() => setIsOpen(!isOpen)}
+          className="absolute right-8 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+        >
+          <svg className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Dropdown List */}
+      {isOpen && (
+        <div className="absolute z-50 mt-1 w-full max-h-60 overflow-auto rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800">
+          {filteredOptions.length > 0 ? (
+            filteredOptions.map((medicine) => (
+              <div
+                key={medicine.value}
+                onClick={() => handleSelect(medicine)}
+                className={`px-4 py-2 text-sm cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-700 flex items-center justify-between ${value === medicine.value
+                    ? 'bg-blue-50 text-blue-600 dark:bg-gray-700 dark:text-blue-400'
+                    : 'text-gray-700 dark:text-gray-300'
+                  }`}
+              >
+                <span>{medicine.label}</span>
+                {value === medicine.value && (
+                  <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                )}
+              </div>
+            ))
+          ) : (
+            <div className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 text-center">
+              No medicine found
+            </div>
+          )}
+
+          {/* Add custom medicine option */}
+          {searchTerm.trim() !== "" && !medicineOptions.some(med => med.value === searchTerm.trim()) && (
+            <div
+              onClick={() => {
+                onChange(searchTerm.trim());
+                setSearchTerm(searchTerm.trim());
+                setIsOpen(false);
+              }}
+              className="px-4 py-2 text-sm cursor-pointer hover:bg-green-50 dark:hover:bg-gray-700 text-green-600 dark:text-green-400 border-t border-gray-200 dark:border-gray-700 flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              <span>Add "{searchTerm.trim()}"</span>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default function Prescription() {
   const navigate = useNavigate();
@@ -134,22 +258,21 @@ export default function Prescription() {
   };
 
   const fetchConsultationForPatient = useCallback(async (patientId: string) => {
-      setIsLoadingConsultation(true);
-      try {
-        const result = await dispatch(getConsultationByPatientId(patientId) as any);
-  
-        if (result?.type === 'GET_CONSULTATION_BY_PATIENT_ID_SUCCESS') {
-          setIsExistingConsultation(true);
-        } else {
-          setIsExistingConsultation(false);
-        }
-      } catch (error) {
+    setIsLoadingConsultation(true);
+    try {
+      const result = await dispatch(getConsultationByPatientId(patientId) as any);
+
+      if (result?.type === 'GET_CONSULTATION_BY_PATIENT_ID_SUCCESS') {
+        setIsExistingConsultation(true);
+      } else {
         setIsExistingConsultation(false);
-      } finally {
+      }
+    } catch (error) {
+      setIsExistingConsultation(false);
+    } finally {
       setIsLoadingConsultation(false);
     }
-    }, [dispatch]);
-
+  }, [dispatch]);
 
   useEffect(() => {
     const getPatientFromSession = () => {
@@ -161,17 +284,11 @@ export default function Prescription() {
         try {
           const patient = JSON.parse(patientData);
 
-          // Check if patient has changed using ref
           if (currentPatientIdRef.current !== patient._id) {
-            // Update ref immediately
             currentPatientIdRef.current = patient._id;
-
-            // Update states
             setSelectedPatient(patient);
             setIsExistingConsultation(false);
             fetchConsultationForPatient(patient._id);
-
-            // Fetch prescription for new patient
             fetchPatientPrescription(patient._id);
           }
         } catch (error) {
@@ -182,7 +299,6 @@ export default function Prescription() {
           }
         }
       } else {
-        // No patient in session
         if (currentPatientIdRef.current !== null) {
           currentPatientIdRef.current = null;
           setSelectedPatient(null);
@@ -192,10 +308,8 @@ export default function Prescription() {
       }
     };
 
-    // Run immediately
     getPatientFromSession();
 
-    // Set up interval and storage listener
     const interval = setInterval(getPatientFromSession, 1000);
     window.addEventListener('storage', getPatientFromSession);
 
@@ -254,7 +368,6 @@ export default function Prescription() {
       return;
     }
 
-    // Validate medications
     const hasEmptyMedication = formData.medications.some(
       (med: Medication) => !med.drugName || !med.dosage || !med.frequency || !med.duration || !med.route
     );
@@ -277,10 +390,8 @@ export default function Prescription() {
       let result;
 
       if (hasExistingPrescription && existingPrescriptionId) {
-        // Update existing prescription
         result = await dispatch(updatePrescription(existingPrescriptionId, prescriptionData) as any);
       } else {
-        // Create new prescription
         result = await dispatch(createPrescription(prescriptionData) as any);
       }
 
@@ -293,7 +404,6 @@ export default function Prescription() {
         setTimeout(() => {
           setSuccess("");
         }, 5000);
-        // Refresh prescription data
         if (selectedPatient?._id) {
           setTimeout(() => {
             fetchPatientPrescription(selectedPatient._id);
@@ -309,7 +419,6 @@ export default function Prescription() {
     }
   };
 
-  // Get submit button text
   const getSubmitButtonText = () => {
     if (loading) {
       return hasExistingPrescription ? "Updating..." : "Creating...";
@@ -317,7 +426,6 @@ export default function Prescription() {
     return hasExistingPrescription ? "Update Prescription" : "Create Prescription";
   };
 
-  // Get page title
   const getPageTitle = () => {
     if (hasExistingPrescription) {
       return "Update Prescription";
@@ -330,7 +438,6 @@ export default function Prescription() {
       <PageMeta title="Prescription | Hospital" description="Prescription Management" />
       <PageBreadcrumb pageTitle={getPageTitle()} />
 
-      {/* Messages */}
       {success && (
         <div className='mb-6'>
           <Alert
@@ -352,7 +459,6 @@ export default function Prescription() {
         </div>
       )}
 
-      {/* Loading State */}
       {isLoadingPrescription && (
         <div className="mb-6 flex items-center justify-center p-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -361,14 +467,11 @@ export default function Prescription() {
       )}
 
       <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
-        {/* Patient Info */}
         <PatientInfoCard
           selectedPatient={selectedPatient}
           isExistingConsultation={isExistingConsultation}
           isLoading={isLoadingConsultation}
         />
-
-
 
         {selectedPatient && !isLoadingPrescription && (
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -408,30 +511,43 @@ export default function Prescription() {
                   </div>
 
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                    <Input
-                      type="text"
-                      placeholder="Drug Name *"
-                      value={med.drugName}
-                      onChange={(e) =>
-                        handleMedicationChange(index, "drugName", e.target.value)
-                      }
-                    />
-                    <Input
-                      type="text"
-                      placeholder="Dosage (e.g., 500mg) *"
-                      value={med.dosage}
-                      onChange={(e) =>
-                        handleMedicationChange(index, "dosage", e.target.value)
-                      }
-                    />
-                    <Select
-                      options={frequencyOptions}
-                      placeholder="Frequency *"
-                      value={med.frequency}
-                      onChange={(val) =>
-                        handleMedicationChange(index, "frequency", val)
-                      }
-                    />
+                    {/* Searchable Medicine Select - REPLACED INPUT WITH SEARCHABLE SELECT */}
+                    <div>
+                      <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
+                        Drug Name *
+                      </label>
+                      <SearchableMedicineSelect
+                        value={med.drugName}
+                        onChange={(val) => handleMedicationChange(index, "drugName", val)}
+                        placeholder="Search medicine..."
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
+                        Dosage *
+                      </label>
+                      <Input
+                        type="text"
+                        placeholder="Dosage (e.g., 500mg) *"
+                        value={med.dosage}
+                        onChange={(e) =>
+                          handleMedicationChange(index, "dosage", e.target.value)
+                        }
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
+                        Frequency *
+                      </label>
+                      <Select
+                        options={frequencyOptions}
+                        placeholder="Frequency *"
+                        value={med.frequency}
+                        onChange={(val) =>
+                          handleMedicationChange(index, "frequency", val)
+                        }
+                      />
+                    </div>
                     <Input
                       type="text"
                       placeholder="Duration (e.g., 5 days) *"
@@ -494,8 +610,8 @@ export default function Prescription() {
                 type="submit"
                 disabled={loading || !selectedPatient}
                 className={`px-6 py-2 text-white rounded-lg transition-colors disabled:opacity-50 ${hasExistingPrescription
-                  ? 'bg-orange-500 hover:bg-orange-600'
-                  : 'bg-blue-600 hover:bg-blue-700'
+                    ? 'bg-orange-500 hover:bg-orange-600'
+                    : 'bg-blue-600 hover:bg-blue-700'
                   }`}
               >
                 {getSubmitButtonText()}

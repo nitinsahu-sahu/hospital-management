@@ -1,5 +1,14 @@
 const Relative = require("../models/Relative");
 const User = require("../models/User.js");
+const BloodInvestigation = require("../models/BloodInvestigation.js");
+const Cosultation = require("../models/Cosultation.js");
+const GeneticInvestigation = require("../models/GeneticInvestigation.js");
+const Investigation = require("../models/Investigation.js");
+const PatientExamination = require("../models/PatientExamination.js");
+const RelativeExamination = require("../models/RelativeExamination.js");
+const PatientHistory = require("../models/PatientHistory.js");
+const Prescription = require("../models/Prescription.js");
+const Procedure = require("../models/Procedure.js");
 const mongoose = require("mongoose");
 const generateUHID = require("../utils/generateUHID.js");
 const { sendResponse } = require("../utils/response.js");
@@ -504,9 +513,9 @@ exports.updatePatient = async (req, res) => {
 
 // ================= DELETE PATIENT =================
 exports.deletePatient = async (req, res) => {
-
   const session = await mongoose.startSession();
   session.startTransaction();
+  
   try {
     const { id } = req.params;
 
@@ -521,61 +530,185 @@ exports.deletePatient = async (req, res) => {
       return sendResponse(res, false, "Patient not found", null, 404);
     }
 
-    // Find all relatives
-    const relatives = await Relative.find({
-      UH_ID: patient.UH_ID
-    }).session(session);
+    const patientId = patient._id;
+    const patientUHID = patient.UH_ID;
 
-    // Delete patient's profile picture from cloudinary
+    // ==================== DELETE ALL RELATED DATA ====================
+    
+    // Delete profile pictures from Cloudinary
+    const cloudinaryDeletePromises = [];
+
+    // Delete patient's profile picture
     if (patient.pic && patient.pic.public_id) {
-      await cloudinaryService.deleteImage(patient.pic.public_id);
+      cloudinaryDeletePromises.push(
+        cloudinaryService.deleteImage(patient.pic.public_id)
+      );
     }
+
+    // Find all relatives for cloudinary cleanup
+    const relatives = await Relative.find({
+      UH_ID: patientUHID
+    }).session(session);
 
     // Delete relatives' profile pictures from cloudinary
     for (const relative of relatives) {
       if (relative.pic && relative.pic.public_id) {
-        await cloudinaryService.deleteImage(relative.pic.public_id);
+        cloudinaryDeletePromises.push(
+          cloudinaryService.deleteImage(relative.pic.public_id)
+        );
       }
     }
 
-    // Delete relatives from database
-    const deletedRelatives = await Relative.deleteMany(
-      { UH_ID: patient.UH_ID }
-    ).session(session);
+    // Delete all cloudinary images concurrently
+    if (cloudinaryDeletePromises.length > 0) {
+      await Promise.allSettled(cloudinaryDeletePromises);
+    }
 
-    // Delete patient from database
+    // ==================== DELETE DATABASE RECORDS ====================
+
+    const deletePromises = [];
+
+    // 1. Delete Relatives
+    deletePromises.push(
+      Relative.deleteMany({ UH_ID: patientUHID }).session(session)
+    );
+
+    // 2. Delete Blood Investigations
+    deletePromises.push(
+      BloodInvestigation.deleteMany({ 
+        $or: [
+          { patientId: patientId },
+          { UH_ID: patientUHID }
+        ]
+      }).session(session)
+    );
+
+    // 3. Delete Consultations
+    deletePromises.push(
+      Cosultation.deleteMany({ 
+        $or: [
+          { patientId: patientId },
+          { UH_ID: patientUHID }
+        ]
+      }).session(session)
+    );
+
+    // 4. Delete Couple Examinations
+    deletePromises.push(
+      RelativeExamination.deleteMany({ 
+        $or: [
+          { patientId: patientId },
+          { UH_ID: patientUHID }
+        ]
+      }).session(session)
+    );
+
+    // 5. Delete Genetic Investigations
+    deletePromises.push(
+      GeneticInvestigation.deleteMany({ 
+        $or: [
+          { patientId: patientId },
+          { UH_ID: patientUHID }
+        ]
+      }).session(session)
+    );
+
+    // 6. Delete Investigations
+    deletePromises.push(
+      Investigation.deleteMany({ 
+        $or: [
+          { patientId: patientId },
+          { UH_ID: patientUHID }
+        ]
+      }).session(session)
+    );
+
+    // 7. Delete Patient Examinations
+    deletePromises.push(
+      PatientExamination.deleteMany({ 
+        $or: [
+          { patientId: patientId },
+          { UH_ID: patientUHID }
+        ]
+      }).session(session)
+    );
+
+    // 8. Delete Patient History
+    deletePromises.push(
+      PatientHistory.deleteMany({ 
+        $or: [
+          { patientId: patientId },
+          { UH_ID: patientUHID }
+        ]
+      }).session(session)
+    );
+
+    // 9. Delete Prescriptions
+    deletePromises.push(
+      Prescription.deleteMany({ 
+        $or: [
+          { patientId: patientId },
+          { UH_ID: patientUHID }
+        ]
+      }).session(session)
+    );
+
+    // 10. Delete Procedures
+    deletePromises.push(
+      Procedure.deleteMany({ 
+        $or: [
+          { patientId: patientId },
+          { UH_ID: patientUHID }
+        ]
+      }).session(session)
+    );
+
+    // Execute all delete operations
+    const results = await Promise.all(deletePromises);
+
+    // Finally, delete the patient
     await User.findByIdAndDelete(id).session(session);
 
     // Commit the transaction
     await session.commitTransaction();
 
-    console.log(`Deleted patient ${patient.name} (${patient.UH_ID}) and ${deletedRelatives.deletedCount} relative(s)`);
+    // Prepare summary of deleted records
+    const summary = {
+      patient: 1,
+      relatives: results[0]?.deletedCount || 0,
+      bloodInvestigations: results[1]?.deletedCount || 0,
+      consultations: results[2]?.deletedCount || 0,
+      coupleExaminations: results[3]?.deletedCount || 0,
+      geneticInvestigations: results[4]?.deletedCount || 0,
+      investigations: results[5]?.deletedCount || 0,
+      patientExaminations: results[6]?.deletedCount || 0,
+      patientHistories: results[7]?.deletedCount || 0,
+      prescriptions: results[8]?.deletedCount || 0,
+      procedures: results[9]?.deletedCount || 0,
+      totalRecordsDeleted: results.reduce((acc, curr) => acc + (curr?.deletedCount || 0), 0) + 1 // +1 for patient
+    };
+
+    console.log('Delete Summary:', summary);
 
     return sendResponse(
       res,
       true,
-      `Patient and ${deletedRelatives.deletedCount} relative(s) deleted successfully`,
-      {
-        patient: {
-          _id: patient._id,
-          name: patient.name,
-          UH_ID: patient.UH_ID
-        },
-        deletedRelativesCount: deletedRelatives.deletedCount
-      },
+      `Patient and all related data deleted successfully. Total records deleted: ${summary.totalRecordsDeleted}`,
+      summary,
       200
     );
 
   } catch (error) {
     // Abort transaction on error
     await session.abortTransaction();
-    console.error("Delete patient error:", error);
+    console.error('Delete Patient Error:', error);
     return sendResponse(res, false, error.message, null, 500);
   } finally {
     // End session
     session.endSession();
   }
 };
+
 
 // ================= GET ALL PATIENTS (Existing) =================
 exports.getPatients = async (req, res) => {
