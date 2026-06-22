@@ -60,28 +60,10 @@ const medicationSchema = new mongoose.Schema({
 
 const prescriptionSchema = new mongoose.Schema(
   {
-    prescriptionId: {
-      type: String,
-      unique: true,
-    },
     patientId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Patient",
+      ref: "User",
       required: [true, "Patient is required"],
-    },
-    doctorId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Patient",
-      required: [true, "Doctor is required"],
-    },
-    diagnosis: {
-      type: String,
-      required: [true, "Diagnosis is required"],
-      trim: true,
-    },
-    symptoms: {
-      type: String,
-      trim: true,
     },
     medications: {
       type: [medicationSchema],
@@ -99,28 +81,18 @@ const prescriptionSchema = new mongoose.Schema(
     followUpDate: {
       type: Date,
     },
-    status: {
-      type: String,
-      enum: ["active", "completed", "cancelled"],
-      default: "active",
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
     },
-    notes: {
-      type: String,
-      trim: true,
-    },
+    updatedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    }
   },
   { timestamps: true }
 );
-
-// Generate Prescription ID
-prescriptionSchema.pre("save", async function () {
-  if (!this.prescriptionId) {
-    const count = await mongoose.model("Prescription").countDocuments();
-    this.prescriptionId = `PRES${new Date().getFullYear()}${(count + 1)
-      .toString()
-      .padStart(4, "0")}`;
-  }
-});
 
 
 module.exports = mongoose.model("Prescription", prescriptionSchema);

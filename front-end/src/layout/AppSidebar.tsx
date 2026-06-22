@@ -66,10 +66,7 @@ const navItems: NavItem[] = [
   {
     icon: <Prescription />,
     name: "Prescription",
-    subItems: [
-      { name: "Add", path: "/prescription/add", pro: false },
-      { name: "View", path: "/prescription/view", pro: false },
-    ],
+    path: "/prescription"
   },
   {
     icon: <DischargeIcon />,

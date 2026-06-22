@@ -8,6 +8,7 @@ import { relativeExaminationReducer } from './relativeExamination.reducer';
 import { investigationReducer } from '../reducers/investigation.reducer';
 import { bloodInvestigationReducer } from '../reducers/bloodInvestigation.reducer';
 import procedureReducer from '../reducers/procedure.reducer';
+import prescriptionReducer from '../reducers/prescription.reducer';
 
 
 const rootReducer = combineReducers({
@@ -19,7 +20,8 @@ const rootReducer = combineReducers({
   relativeExamination: relativeExaminationReducer,
   investigation: investigationReducer,
   bloodInvestigation: bloodInvestigationReducer,
-  procedure: procedureReducer
+  procedure: procedureReducer,
+  prescription: prescriptionReducer,
 })
 
 export default rootReducer
