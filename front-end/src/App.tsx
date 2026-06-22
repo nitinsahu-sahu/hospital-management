@@ -21,7 +21,6 @@ import PatientsListing from "./pages/patients/patients-listing";
 import DoctorConsultation from "./pages/Consultation/DoctorCunsultation";
 
 import Prescription from "./pages/Prescription/Prescription";
-import PrescriptionView from "./pages/Prescription/Prescription-listing";
 
 import Protected from "./redux/helper/HOC";
 import { RootState } from "./redux/store/store";
@@ -83,8 +82,7 @@ export default function App() {
           <Route path="/consultation" element={<DoctorConsultation />} />
           <Route path="/" element={<Patients />} />
           <Route path="/patient/view" element={<PatientsListing />} />
-          <Route path="/prescription/add" element={<Prescription />} />
-          <Route path="/prescription/view" element={<PrescriptionView />} />
+          <Route path="/prescription" element={<Prescription />} />
           <Route path="/discharge" element={<Calendar />} />
           <Route path="/blank" element={<Blank />} />
         </Route>
