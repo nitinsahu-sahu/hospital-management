@@ -116,8 +116,6 @@ const validateIdProof = (type, value) => {
 
 // Verhoeff Algorithm for Aadhaar validation (optional but recommended)
 function validateAadhaarChecksum(aadhaarNumber) {
-    // Basic Aadhaar validation
-    // First digit should not be 0 or 1
     if (aadhaarNumber.startsWith('0') || aadhaarNumber.startsWith('1')) {
         return false;
     }
