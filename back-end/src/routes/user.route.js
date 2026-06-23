@@ -12,11 +12,7 @@ const {
 const isAuth = require('../middlewares/isAuth.middleware');
 const { validate } = require("../middlewares/validate.middleware");
 const {
-  createPatientValidation,
-  createDoctorValidation,
-  createEmployeeValidation,
   loginValidation,
-  createRelativeValidation
 } = require("../validators/user.validator");
 const { uploadImages } = require("../middlewares/upload.middleware");
 const router = express.Router();

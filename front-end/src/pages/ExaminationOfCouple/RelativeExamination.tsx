@@ -277,8 +277,6 @@ export default function RelativeExamination() {
       <PageMeta title="Husband Examination" description="Husband/Relative examination" />
       <PageBreadcrumb pageTitle="Relative / Husband Examination" />
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-6 transition-colors duration-200">
-        <div className="max-w-4xl mx-auto"> 
-
           {/* Success Message */}
           {successMessage && (
             <div className="mb-6">
@@ -364,7 +362,6 @@ export default function RelativeExamination() {
               </div>
             </form>
           )}
-        </div>
       </div>
     </>
   );

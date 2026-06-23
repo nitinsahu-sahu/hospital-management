@@ -3,41 +3,24 @@ const express = require('express');
 const router = express.Router();
 const {
     createPrescription,
-  getPrescriptions,
-  getPrescriptionById,
   getPrescriptionsByPatient,
   updatePrescription,
-  deletePrescription,
-  updatePrescriptionStatus,
-  getPrescriptionStats,
-  getPrescriptionsByDoctor
 } = require('../controllers/prescription.controller');
+const isAuth = require('../middlewares/isAuth.middleware');
+const { validate } = require('../middlewares/validate.middleware');
+const {
+    updatePrescriptionValidation,createPrescriptionValidation
+} = require('../validators/prescription.validation');
+
+router.use(isAuth);
 
 // Create prescription
-router.post("/", createPrescription);
-
-// Get all prescriptions (with filters)
-router.get("/", getPrescriptions);
-
-// Get prescription statistics
-router.get("/stats", getPrescriptionStats);
-
-// Get single prescription
-router.get("/:id", getPrescriptionById);
+router.post("/",createPrescriptionValidation,validate, createPrescription);
 
 // Get prescriptions by patient ID
-router.get("/patient/:patientId", getPrescriptionsByPatient);
-
-// Get prescriptions by doctor ID
-router.get("/doctor/:doctorId", getPrescriptionsByDoctor);
+router.get("/:patientId", getPrescriptionsByPatient);
 
 // Update prescription
-router.put("/:id", updatePrescription);
-
-// Update prescription status
-router.patch("/:id/status", updatePrescriptionStatus);
-
-// Delete prescription
-router.delete("/:id", deletePrescription);
+router.put("/:id",updatePrescriptionValidation, validate, updatePrescription);
 
 module.exports = router;

@@ -339,7 +339,6 @@ export default function Procedure() {
     <>
       <PageMeta title="Procedure | Dr. Yogita Verma" description="Patient Procedure Data" />
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-3 sm:p-4 md:p-6 lg:p-8 transition-colors duration-200">
-        <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="mb-6 sm:mb-8">
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
@@ -774,7 +773,6 @@ export default function Procedure() {
             </div>
           )}
         </div>
-      </div>
     </>
   );
 }

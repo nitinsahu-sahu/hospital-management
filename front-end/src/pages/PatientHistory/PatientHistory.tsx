@@ -54,7 +54,6 @@ export default function PatientHistory() {
     living: '',
     abortion: '',
     ectopic: '',
-
     diabetes: '',
     hypertension: '',
     asthma: '',
