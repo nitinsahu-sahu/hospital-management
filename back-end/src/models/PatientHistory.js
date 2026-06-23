@@ -75,7 +75,7 @@ const patientHistorySchema = new mongoose.Schema({
       required: false
     },
     lmp: {
-      type: String,
+      type: Date,
       required: false
     }
   },

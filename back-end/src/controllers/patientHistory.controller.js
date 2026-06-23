@@ -124,6 +124,8 @@ exports.createPatientHistory = async (req, res) => {
       data: patientHistory
     });
   } catch (error) {
+    console.log(error);
+    
     res.status(500).json({
       success: false,
       message: 'Error creating patient history',
@@ -297,8 +299,6 @@ exports.getPatientHistoryByPatientId = async (req, res) => {
     });
   }
 };
-
-
 
 // Delete Patient History
 exports.deletePatientHistory = async (req, res) => {
