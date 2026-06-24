@@ -8,8 +8,6 @@ import NotFound from "./pages/OtherPage/NotFound";
 
 import UserProfiles from "./pages/UserProfiles";
 
-import Calendar from "./pages/Calendar";
-import Blank from "./pages/Blank";
 import AppLayout from "./layout/AppLayout";
 
 import { ScrollToTop } from "./components/common/ScrollToTop";
@@ -83,8 +81,6 @@ export default function App() {
           <Route path="/" element={<Patients />} />
           <Route path="/patient/view" element={<PatientsListing />} />
           <Route path="/prescription" element={<Prescription />} />
-          <Route path="/discharge" element={<Calendar />} />
-          <Route path="/blank" element={<Blank />} />
         </Route>
         <Route path="*" element={<NotFound />} />
 
