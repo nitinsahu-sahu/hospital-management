@@ -11,6 +11,7 @@ import { SelectedPatient } from '../../types/consultation';
 import Alert from '../../components/ui/alert/Alert';
 import Button from '../../components/ui/button/Button';
 import DatePicker from '../../components/form/date-picker';
+import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 
 export default function Discharge() {
   const dispatch = useDispatch();
@@ -236,164 +237,159 @@ export default function Discharge() {
   return (
     <>
       <PageMeta title="Discharge Summary" description="Create discharge summary for patient" />
+      <PageBreadcrumb pageTitle="Discharge Summary" />
 
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-6 transition-colors duration-200">
-        <div className="max-w-5xl mx-auto">
-          {/* Header */}
-          <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 no-print">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Discharge Summary</h1>
-              <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                {isEditing ? 'Update' : 'Create'} and manage patient discharge summaries
-              </p>
-            </div>
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
 
-            <div className="flex gap-3">
-              <Button
-                variant="outline"
-                onClick={handlePrint}
-                className="bg-white dark:bg-gray-800"
-              >
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                </svg>
-                Print
-              </Button>
+        {/* Header */}
+        <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 no-print">
 
-              <Button
-                variant="primary"
-                onClick={handleDownloadPDF}
-              >
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                Download PDF
-              </Button>
-            </div>
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              onClick={handlePrint}
+              className="bg-white dark:bg-gray-800"
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+              </svg>
+              Print
+            </Button>
+
+            <Button
+              variant="primary"
+              disabled={!isEditing}
+              onClick={handleDownloadPDF}
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Download Report
+            </Button>
           </div>
+        </div>
 
-          {/* Messages */}
-          {showSuccessMessage && (
-            <div className='mb-6 no-print'>
-              <Alert
-                variant="success"
-                title="Success"
-                message={`Discharge summary ${isEditing ? 'updated' : 'saved'} successfully!`}
-                showLink={false}
-              />
-            </div>
-          )}
-
-          {error && (
-            <div className='mb-6 no-print'>
-              <Alert
-                variant="error"
-                title="Error"
-                message={error}
-                showLink={false}
-              />
-            </div>
-          )}
-
-          {/* Patient Info */}
-          <div className="no-print">
-            <PatientInfoCard
-              selectedPatient={selectedPatient}
-              isExistingConsultation={isExistingConsultation}
-              isLoading={isLoadingConsultation}
+        {/* Messages */}
+        {showSuccessMessage && (
+          <div className='mb-6 no-print'>
+            <Alert
+              variant="success"
+              title="Success"
+              message={`Discharge summary ${isEditing ? 'updated' : 'saved'} successfully!`}
+              showLink={false}
             />
           </div>
+        )}
 
-          {selectedPatient && !isLoadingConsultation && isExistingConsultation && (
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="no-print">
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
-                  <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                      Discharge Summary Form
-                    </h2>
-                    {isEditing && (
-                      <span className="px-3 py-1 text-sm font-medium text-blue-700 bg-blue-100 dark:bg-blue-900/30 dark:text-blue-300 rounded-full">
-                        Editing Existing Record
-                      </span>
-                    )}
+        {error && (
+          <div className='mb-6 no-print'>
+            <Alert
+              variant="error"
+              title="Error"
+              message={error}
+              showLink={false}
+            />
+          </div>
+        )}
+
+        {/* Patient Info */}
+        <div className="no-print">
+          <PatientInfoCard
+            selectedPatient={selectedPatient}
+            isExistingConsultation={isExistingConsultation}
+            isLoading={isLoadingConsultation}
+          />
+        </div>
+
+        {selectedPatient && !isLoadingConsultation && isExistingConsultation && (
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="no-print">
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                    Discharge Summary Form
+                  </h2>
+                  {isEditing && (
+                    <span className="px-3 py-1 text-sm font-medium text-blue-700 bg-blue-100 dark:bg-blue-900/30 dark:text-blue-300 rounded-full">
+                      Editing Existing Record
+                    </span>
+                  )}
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Final Diagnosis <span className="text-red-500">*</span>
+                    </label>
+                    <textarea
+                      name="finalDiagnosis"
+                      placeholder="Type your diagnosis..."
+                      value={formData.finalDiagnosis}
+                      onChange={handleInputChange}
+                      rows={3}
+                      className="w-full rounded-lg border border-gray-300 px-4 py-2 dark:border-gray-700 dark:bg-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
                   </div>
 
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Final Diagnosis <span className="text-red-500">*</span>
-                      </label>
-                      <textarea
-                        name="finalDiagnosis"
-                        placeholder="Type your diagnosis..."
-                        value={formData.finalDiagnosis}
-                        onChange={handleInputChange}
-                        rows={3}
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2 dark:border-gray-700 dark:bg-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Treatment Summary <span className="text-red-500">*</span>
-                      </label>
-                      <textarea
-                        name="treatmentSummary"
-                        placeholder="Type your treatment summary..."
-                        value={formData.treatmentSummary}
-                        onChange={handleInputChange}
-                        rows={3}
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2 dark:border-gray-700 dark:bg-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Discharge Advice <span className="text-red-500">*</span>
-                      </label>
-                      <textarea
-                        name="dischargeAdvice"
-                        placeholder="Type your advice"
-                        value={formData.dischargeAdvice}
-                        onChange={handleInputChange}
-                        rows={3}
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2 dark:border-gray-700 dark:bg-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Follow Up Date
-                      </label>
-                      <DatePicker
-                        id="date-picker"
-                        placeholder="Select a date"
-                        value={followUpDate}
-                        onChange={(dates, currentDateString) => {
-                          handleFormChange('followUpDate', currentDateString)
-                          console.log({ dates, currentDateString });
-                        }}
-                      />
-                    </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Treatment Summary <span className="text-red-500">*</span>
+                    </label>
+                    <textarea
+                      name="treatmentSummary"
+                      placeholder="Type your treatment summary..."
+                      value={formData.treatmentSummary}
+                      onChange={handleInputChange}
+                      rows={3}
+                      className="w-full rounded-lg border border-gray-300 px-4 py-2 dark:border-gray-700 dark:bg-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
                   </div>
 
-                  <div className="mt-6 flex justify-end gap-3">
-                    <button
-                      type="submit"
-                      disabled={isSaving}
-                      className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Discharge Advice <span className="text-red-500">*</span>
+                    </label>
+                    <textarea
+                      name="dischargeAdvice"
+                      placeholder="Type your advice"
+                      value={formData.dischargeAdvice}
+                      onChange={handleInputChange}
+                      rows={3}
+                      className="w-full rounded-lg border border-gray-300 px-4 py-2 dark:border-gray-700 dark:bg-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
 
-                    >
-                      {isEditing ? 'Update Discharge Summary' : 'Save Discharge Summary'}
-
-                    </button>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Discharge Date
+                    </label>
+                    <DatePicker
+                      id="date-picker"
+                      placeholder="Select a date"
+                      value={followUpDate}
+                      onChange={(dates, currentDateString) => {
+                        handleFormChange('followUpDate', currentDateString)
+                        console.log({ dates, currentDateString });
+                      }}
+                    />
                   </div>
                 </div>
+
+                <div className="mt-6 flex justify-end gap-3">
+                  <button
+                    type="submit"
+                    disabled={isSaving}
+                    className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+
+                  >
+                    {isEditing ? 'Update Discharge Summary' : 'Save Discharge Summary'}
+
+                  </button>
+                </div>
               </div>
-            </form>
-          )}
-        </div>
+            </div>
+          </form>
+        )}
       </div>
     </>
   );
