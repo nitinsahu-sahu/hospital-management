@@ -5,7 +5,7 @@ import { RootState } from '../../redux/store/store';
 //@ts-ignore
 import { getConsultationByPatientId } from '../../redux/actions/consultation.actions';
 //@ts-ignore
-import { createRelativeExamination, getRelativeExaminationByRelativeId,updateRelativeExamination } from '../../redux/actions/relativeExamination.actions';
+import { createRelativeExamination, getRelativeExaminationByRelativeId, updateRelativeExamination } from '../../redux/actions/relativeExamination.actions';
 import { PatientInfoCard } from '../../components/consultation/PatientInfoCard';
 import { SelectedPatient } from '../../types/consultation';
 import Alert from '../../components/ui/alert/Alert';
@@ -47,7 +47,7 @@ const getInitialExaminationForm = (): ExaminationFormData => ({
 
 export default function RelativeExamination() {
   const dispatch = useDispatch();
-  const { loading} = useSelector(
+  const { loading } = useSelector(
     (state: RootState) => state.relativeExamination
   );
 
@@ -82,13 +82,13 @@ export default function RelativeExamination() {
 
   // Fetch existing examination
   const fetchExistingExamination = useCallback(async (relId: string) => {
-    
+
     try {
-      const result = await dispatch(getRelativeExaminationByRelativeId(relId||selectedPatient?.relative?._id) as any);
+      const result = await dispatch(getRelativeExaminationByRelativeId(relId || selectedPatient?.relative?._id) as any);
       if (result?.type === 'GET_RELATIVE_EXAMINATION_SUCCESS') {
         setIsExistingExamination(true);
         const exam = result.payload;
-        
+
         setFormData({
           vitals: {
             pr: exam.vitals?.pr || '',
@@ -240,15 +240,15 @@ export default function RelativeExamination() {
         result = await dispatch(createRelativeExamination(selectedPatient._id, selectedPatient?.relative?._id, apiData) as any);
       }
 
-      if (result?.type === 'CREATE_RELATIVE_EXAMINATION_SUCCESS' || 
-          result?.type === 'UPDATE_RELATIVE_EXAMINATION_SUCCESS') {
-        setSuccessMessage(isExistingExamination 
-          ? 'Relative examination updated successfully!' 
+      if (result?.type === 'CREATE_RELATIVE_EXAMINATION_SUCCESS' ||
+        result?.type === 'UPDATE_RELATIVE_EXAMINATION_SUCCESS') {
+        setSuccessMessage(isExistingExamination
+          ? 'Relative examination updated successfully!'
           : 'Relative examination saved successfully!'
         );
-        setTimeout(()=>{
+        setTimeout(() => {
           setSuccessMessage("")
-        },5000)
+        }, 5000)
         setIsExistingExamination(true);
       } else {
         setError(result?.payload || 'Failed to save examination');
@@ -276,92 +276,94 @@ export default function RelativeExamination() {
     <>
       <PageMeta title="Husband Examination" description="Husband/Relative examination" />
       <PageBreadcrumb pageTitle="Relative / Husband Examination" />
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-6 transition-colors duration-200">
-          {/* Success Message */}
-          {successMessage && (
-            <div className="mb-6">
-              <Alert
-                variant="success"
-                title="Success"
-                message={successMessage}
-                showLink={false}
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
+
+      {/* <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-6 transition-colors duration-200"> */}
+        {/* Success Message */}
+        {successMessage && (
+          <div className="mb-6">
+            <Alert
+              variant="success"
+              title="Success"
+              message={successMessage}
+              showLink={false}
+            />
+          </div>
+        )}
+
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6">
+            <Alert
+              variant="error"
+              title="Error"
+              message={error}
+              showLink={false}
+            />
+          </div>
+        )}
+
+        {/* Patient Info */}
+        <PatientInfoCard
+          selectedPatient={selectedPatient}
+          isExistingConsultation={isExistingConsultation}
+          isLoading={isLoadingConsultation}
+        />
+
+        {/* Examination Form */}
+        {selectedPatient && (
+          <form onSubmit={handleSubmit} className="mt-6 space-y-6">
+            {/* Vitals Section */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 transition-colors duration-200">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                Vitals & Physical Examination
+              </h2>
+
+              <VitalsSection
+                vitals={formData.vitals}
+                onVitalsChange={handleVitalsChange}
               />
             </div>
-          )}
 
-          {/* Error Message */}
-          {error && (
-            <div className="mb-6">
-              <Alert
-                variant="error"
-                title="Error"
-                message={error}
-                showLink={false}
+            {/* System Examination Section */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 transition-colors duration-200">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                System Examination
+              </h2>
+              <SystemExaminationSection
+                cns={formData.cns}
+                cvs={formData.cvs}
+                respiratorySystem={formData.respiratorySystem}
+                git={formData.git}
+                onSystemExaminationChange={handleSystemExaminationChange}
+                person="husband"
               />
             </div>
-          )}
 
-          {/* Patient Info */}
-          <PatientInfoCard
-            selectedPatient={selectedPatient}
-            isExistingConsultation={isExistingConsultation}
-            isLoading={isLoadingConsultation}
-          />
-
-          {/* Examination Form */}
-          {selectedPatient && (
-            <form onSubmit={handleSubmit} className="mt-6 space-y-6">
-              {/* Vitals Section */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 transition-colors duration-200">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                  Vitals & Physical Examination
-                </h2>
-
-                <VitalsSection
-                  vitals={formData.vitals}
-                  onVitalsChange={handleVitalsChange}
-                />
-              </div>
-
-              {/* System Examination Section */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 transition-colors duration-200">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                  System Examination
-                </h2>
-                <SystemExaminationSection
-                  cns={formData.cns}
-                  cvs={formData.cvs}
-                  respiratorySystem={formData.respiratorySystem}
-                  git={formData.git}
-                  onSystemExaminationChange={handleSystemExaminationChange}
-                  person="husband"
-                />
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex justify-end gap-4">
-                <button
-                  type="button"
-                  onClick={handleReset}
-                  className="px-6 py-2.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200 font-medium"
-                >
-                  Reset
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting || loading}
-                  className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isSubmitting || loading 
-                    ? 'Saving...' 
-                    : isExistingExamination 
-                      ? 'Update Examination' 
-                      : 'Save Examination'
-                  }
-                </button>
-              </div>
-            </form>
-          )}
+            {/* Action Buttons */}
+            <div className="flex justify-end gap-4">
+              <button
+                type="button"
+                onClick={handleReset}
+                className="px-6 py-2.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200 font-medium"
+              >
+                Reset
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmitting || loading}
+                className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSubmitting || loading
+                  ? 'Saving...'
+                  : isExistingExamination
+                    ? 'Update Examination'
+                    : 'Save Examination'
+                }
+              </button>
+            </div>
+          </form>
+        )}
       </div>
     </>
   );

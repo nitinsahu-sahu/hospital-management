@@ -8,6 +8,7 @@ import { PatientInfoCard } from '../../components/consultation/PatientInfoCard';
 import { SelectedPatient } from '../../types/consultation';
 import Alert from '../../components/ui/alert/Alert';
 import { PROCEDURES } from '../../utils/procedure';
+import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 
 // Procedure Types
 interface Procedure {
@@ -338,16 +339,9 @@ export default function Procedure() {
   return (
     <>
       <PageMeta title="Procedure | Dr. Yogita Verma" description="Patient Procedure Data" />
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-3 sm:p-4 md:p-6 lg:p-8 transition-colors duration-200">
-          {/* Header */}
-          <div className="mb-6 sm:mb-8">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
-              Procedure Management
-            </h1>
-            <p className="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-400">
-              Select and manage patient procedures
-            </p>
-          </div>
+      <PageBreadcrumb pageTitle="Procedure Management" />
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
+         
 
           {/* Success Alert */}
           {successMessage && (
