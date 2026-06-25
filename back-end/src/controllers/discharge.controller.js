@@ -374,7 +374,7 @@ const generateDischargePDF = async (data, res) => {
       .font('Helvetica-Bold')
       .text('#', tableX + 5, yPos, { width: 20, align: 'center' })
       .text('Fee Type', tableX + 30, yPos)
-      .text('Amount (₹)', doc.page.width - 150, yPos, { align: 'center' });
+      .text('Amount (Rs.)', doc.page.width - 150, yPos, { align: 'center' });
 
     yPos = doc.y + 2;
 
@@ -419,7 +419,7 @@ const generateDischargePDF = async (data, res) => {
         .fontSize(10)
         .text(`${idx + 1}`, tableX + 2, yPos, { width: 20, align: 'center' })
         .text(item.label, tableX + 30, yPos)
-        .text(`₹${item.amount}`, doc.page.width - 150, yPos, { align: 'center' });
+        .text(`${item.amount}/-`, doc.page.width - 150, yPos, { align: 'center' });
 
       yPos += 15;
     });
@@ -796,7 +796,7 @@ const generateDischargePDF = async (data, res) => {
         .font('Helvetica-Bold')
         .text('#', col1, yPos, { width: 12, align: 'center' })
         .text('Test Name', col2, yPos)
-        .text('Amount (₹)', doc.page.width - 150, yPos, { align: 'center' });
+        .text('Amount (Rs.)', doc.page.width - 150, yPos, { align: 'center' });
 
       yPos = doc.y + 2;
 
@@ -824,7 +824,7 @@ const generateDischargePDF = async (data, res) => {
           .fontSize(10)
           .text(`${idx + 1}`, col1, yPos, { width: 12, align: 'center' })
           .text(testName, col2, yPos, { width: 335 })
-          .text(`₹${item.price || 0}`, doc.page.width - 150, yPos, { align: 'center' });
+          .text(`${item.price || 0}/-`, doc.page.width - 150, yPos, { align: 'center' });
 
         yPos += 15;
       });
@@ -1124,7 +1124,7 @@ const generateDischargePDF = async (data, res) => {
       .font('Helvetica-Bold')
       .text('#', col1, yPos, { width: 20, align: 'center' })
       .text('Category', col2, yPos)
-      .text('Amount (₹)', doc.page.width - 150, yPos, { align: 'center' });
+      .text('Amount (Rs.)', doc.page.width - 150, yPos, { align: 'center' });
 
         yPos = doc.y + 2;
 
@@ -1147,7 +1147,7 @@ const generateDischargePDF = async (data, res) => {
         .fontSize(10)
         .text(`${idx + 1}`, col1, yPos, { width: 20, align: 'center' })
         .text(item.label, col2, yPos, { width: 65 })
-        .text(`₹${item.amount}`, doc.page.width - 150, yPos, { align: 'center' });
+        .text(`${item.amount}/-`, doc.page.width - 150, yPos, { align: 'center' });
 
       yPos += 15;
     });
@@ -1168,7 +1168,7 @@ const generateDischargePDF = async (data, res) => {
       .fontSize(10)
       .font('Helvetica-Bold')
       .text('GRAND TOTAL', col2, yPos)
-      .text(`₹${grandTotal}/-`, doc.page.width - 150, yPos, { align: 'center' });
+      .text(`${grandTotal}/-`, doc.page.width - 150, yPos, { align: 'center' });
 
   }
   yPos += 15;
