@@ -94,6 +94,7 @@ export default function SignInForm() {
               Enter your email and password to sign in!
             </p>
           </div>
+          <div className="mb-4">
           {
             success && (
               <Alert
@@ -114,6 +115,7 @@ export default function SignInForm() {
               />
             )
           }
+          </div>
           <div>
             <form onSubmit={handleSubmit}>
               <div className="space-y-6">
