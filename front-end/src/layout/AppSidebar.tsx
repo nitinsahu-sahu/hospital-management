@@ -67,11 +67,6 @@ const navItems: NavItem[] = [
   {
     icon: <ProcedureIcon />,
     name: "Procedure",
-    path: "/procedure",
-  },
-  {
-    icon: <ProcedureIcon />,
-    name: "Procedure",
     subItems: [
       { name: "Add", path: "/procedure/add", pro: false },
       { name: "View", path: "/procedure/view", pro: false },
@@ -83,10 +78,28 @@ const navItems: NavItem[] = [
     path: "/prescription"
   },
   {
+    icon: <Prescription />,
+    name: "Prescription",
+    subItems: [
+      { name: "Add", path: "/prescription/add", pro: false },
+      { name: "View", path: "/prescription/view", pro: false },
+    ],
+  },
+  {
     icon: <DischargeIcon />,
     name: "Discharge",
     path: "/discharge",
   },
+  {
+    icon: <DischargeIcon />,
+    name: "Discharge",
+    subItems: [
+      { name: "Add", path: "/discharge/add", pro: false },
+      { name: "View", path: "/discharge/view", pro: false },
+    ],
+  },
+  
+  
 ];
 
 // REMOVED: othersItems array - Delete this entire section

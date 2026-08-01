@@ -2,8 +2,7 @@ import { procedureConstants } from "../actions/constants";
 
 const initialState = {
   procedures: [],
-  patientProcedures: [],
-  procedure: null,
+  pagination:{},
   loading: false,
   creating: false,
   updating: false,
@@ -47,35 +46,15 @@ const procedureReducer = (state = initialState, action) => {
     case procedureConstants.GET_PROCEDURES_BY_PATIENT_REQUEST:
       return { ...state, loading: true, error: null };
     case procedureConstants.GET_PROCEDURES_BY_PATIENT_SUCCESS:
-      return { ...state, loading: false, patientProcedures: action.payload.procedures };
+      return { 
+        ...state, 
+        loading: false, 
+        procedures: action.payload.procedures,
+        pagination: action.payload.pagination
+       };
     case procedureConstants.GET_PROCEDURES_BY_PATIENT_FAILURE:
       return { ...state, loading: false, error: action.payload.message };
 
-    // Update
-    case procedureConstants.UPDATE_PROCEDURE_REQUEST:
-      return { ...state, updating: true, error: null };
-    case procedureConstants.UPDATE_PROCEDURE_SUCCESS:
-      return {
-        ...state,
-        updating: false,
-        procedure: action.payload,
-        message: 'Procedure updated successfully',
-      };
-    case procedureConstants.UPDATE_PROCEDURE_FAILURE:
-      return { ...state, updating: false, error: action.payload.message };
-
-    // Delete
-    case procedureConstants.DELETE_PROCEDURE_REQUEST:
-      return { ...state, error: null };
-    case procedureConstants.DELETE_PROCEDURE_SUCCESS:
-      return {
-        ...state,
-        procedures: state.procedures.filter(p => p._id !== action.payload),
-        patientProcedures: state.patientProcedures.filter(p => p._id !== action.payload),
-        message: 'Procedure deleted successfully',
-      };
-    case procedureConstants.DELETE_PROCEDURE_FAILURE:
-      return { ...state, error: action.payload.message };
 
     default:
       return state;

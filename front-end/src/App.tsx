@@ -20,6 +20,8 @@ import ConsultationView from "./pages/Consultation/view";
 import ConsultationAdd from "./pages/Consultation/add";
 
 import Prescription from "./pages/Prescription/Prescription";
+import PrescriptionAdd from "./pages/Prescription/Add";
+import PrescriptionView from "./pages/Prescription/View";
 
 import Protected from "./redux/helper/HOC";
 import { RootState } from "./redux/store/store";
@@ -27,10 +29,13 @@ import { RootState } from "./redux/store/store";
 import { isUserLoggedIn } from "./redux/actions/auth.actions";
 import PatientHistoryAdd from "./pages/PatientHistory/add";
 import PatientHistoryView from "./pages/PatientHistory/view";
-import Procedure from "./pages/Procedure/Procedure";
 import ProcedureView from "./pages/Procedure/View";
 import ProcedureAdd from "./pages/Procedure/Add";
+
 import Discharge from "./pages/Discharge/Discharge";
+import DischargeAdd from "./pages/Discharge/Add";
+import DischargeView from "./pages/Discharge/View";
+
 import UltraSound from "./pages/Investigation/Ultrasound";
 import RoutineBlood from "./pages/Investigation/RoutineBlood";
 import GeneticBlood from "./pages/Investigation/GeneticBlood";
@@ -81,15 +86,21 @@ export default function App() {
           <Route path="/investigation/ultrasound" element={<UltraSound />} />
           <Route path="/investigation/routine-blood-test" element={<RoutineBlood />} />
           <Route path="/investigation/genetic-blood-test" element={<GeneticBlood />} />
-          <Route path="/procedure" element={<Procedure />} />
+
           <Route path="/procedure/add" element={<ProcedureAdd />} />
           <Route path="/procedure/view" element={<ProcedureView />} />
+
           <Route path="/discharge" element={<Discharge />} />
+          <Route path="/discharge/view" element={<DischargeView />} />
+          <Route path="/discharge/add" element={<DischargeAdd />} />
+
           <Route path="/consultation/view" element={<ConsultationView />} />
           <Route path="/consultation/add" element={<ConsultationAdd />} />
           <Route path="/" element={<Patients />} />
           <Route path="/patient/view" element={<PatientsListing />} />
           <Route path="/prescription" element={<Prescription />} />
+          <Route path="/prescription/add" element={<PrescriptionAdd />} />
+          <Route path="/prescription/view" element={<PrescriptionView />} />
         </Route>
         <Route path="*" element={<NotFound />} />
 

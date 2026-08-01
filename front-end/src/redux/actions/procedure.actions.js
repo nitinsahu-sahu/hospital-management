@@ -1,6 +1,29 @@
 import APIs from "../helper/api";
 import { procedureConstants } from "./constants";
 
+// Download Patient History PDF
+export const downloadProcedurePDF = (procedureId) => async (dispatch) => {
+  try {
+    const config = {
+      responseType: 'blob'
+    };
+    const response = await APIs.get(`/procedure/download/${procedureId}`, config);
+    // Create download link
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `procedure_summary_${procedureId}.pdf`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    return true;
+  } catch (error) {
+    console.error('Error downloading PDF:', error);
+    throw error;
+  }
+};
+
 export const createProcedure = (procedureData) => async (dispatch) => {
   dispatch({ type: procedureConstants.CREATE_PROCEDURE_REQUEST });
 
@@ -12,19 +35,19 @@ export const createProcedure = (procedureData) => async (dispatch) => {
       type: procedureConstants.CREATE_PROCEDURE_SUCCESS,
       payload: data,
     });
-    return { 
-      status: response.status, 
+    return {
+      status: response.status,
       message: response.data.message,
-      data: data 
+      data: data
     };
   } catch (error) {
     dispatch({
       type: procedureConstants.CREATE_PROCEDURE_FAILURE,
       payload: { message: error?.response?.data?.message || "Server error" },
     });
-    return { 
-      status: error.response?.status, 
-      message: error?.response?.data?.message || "Server error" 
+    return {
+      status: error.response?.status,
+      message: error?.response?.data?.message || "Server error"
     };
   }
 };
@@ -78,13 +101,13 @@ export const getProceduresByPatientId = (patientId) => async (dispatch) => {
 
   try {
     const response = await APIs.get(`/procedure/patient/${patientId}`);
-    const { data } = response.data;
+    const { data, pagination } = response.data;
 
     dispatch({
       type: procedureConstants.GET_PROCEDURES_BY_PATIENT_SUCCESS,
-      payload: { 
-        patientId, 
-        procedures: data
+      payload: {
+        procedures: data,
+        pagination: pagination
       },
     });
     return { status: response.status, data: data };

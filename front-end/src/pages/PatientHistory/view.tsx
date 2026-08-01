@@ -198,7 +198,6 @@ const formatBooleanValue = (value:any) => {
 
                             >
                                 <div className="flex items-center justify-between w-full">
-                                    {/* Left side - Grid content */}
                                     <div className="flex-1 grid grid-cols-5 gap-4">
                                         <div className="col-span-1">
                                             <div className="text-sm font-medium text-gray-900 dark:text-white">
