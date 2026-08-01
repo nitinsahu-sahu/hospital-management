@@ -1,7 +1,7 @@
 const Discharge = require('../models/Discharge');
 const User = require('../models/User');
 const PatientHistory = require('../models/PatientHistory');
-const Consultation = require('../models/Cosultation');
+const Consultation = require('../models/Consultation');
 const Investigation = require('../models/Investigation');
 const BloodInvestigation = require('../models/BloodInvestigation');
 const GeneticInvestigation = require('../models/GeneticInvestigation');
@@ -66,7 +66,7 @@ const generateDischargePDF = async (data, res) => {
 
     if (data.doctor) {
       doc.fontSize(9)
-        .text(`${data.doctor.name} | ${data.doctor.qualification || ''} | Reg. No: ${data.doctor.registrationNumber || 'N/A'}`, { align: 'center' });
+        .text(`${data.doctor.name} | ${data.doctor.qualification || ''} | MPMC REG. NO: ${data.doctor.registrationNumber || 'N/A'}`, { align: 'center' });
     }
 
     doc.fillColor(colors.text);
@@ -113,8 +113,8 @@ const generateDischargePDF = async (data, res) => {
     doc.fillColor(colors.lightText)
       .fontSize(8)
       .font('Helvetica')
-      .text('IVF & Infertility Specialist | 123, Healthcare Road, Near City Hospital', 18, footerY + 18)
-      .text('Mumbai - 400001, Maharashtra, India | Tel: +91 98765 43210 | Email: info@womenfetalcare.com', 18, footerY + 26);
+      .text('IVF & Infertility Specialist | 17-B, Ground Floor, Anupam Nagar', 18, footerY + 18)
+      .text('Infront of Park, Near Mehra Hospital, City Center, Gwalior, 474011 | Tel: +91-9243053461', 18, footerY + 26);
 
     const sigX = doc.page.width - 170;
     doc.fillColor(colors.lightText)

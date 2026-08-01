@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import PageMeta from '../../components/common/PageMeta';
 //@ts-ignore
-import { getConsultationByPatientId } from '../../redux/actions/consultation.actions';
+// import { getConsultationByPatientId } from '../../redux/actions/consultation.actions';
 //@ts-ignore
 import { getDischargeData, createDischarge, downloadDischargePDF, updateDischarge } from '../../redux/actions/discharge.actions';
 import { PatientInfoCard } from '../../components/consultation/PatientInfoCard';

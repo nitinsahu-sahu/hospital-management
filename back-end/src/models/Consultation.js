@@ -6,6 +6,18 @@ const consultationSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
+  consultationDate: {
+    type: Date,
+    default: Date.now
+  },
+  doctorNotes: {
+    type: String,
+    default: ''
+  },
+  diagnosis: {
+    type: String,
+    default: ''
+  },
   fees: {
     freeOfCost: {
       type: Number,
@@ -42,6 +54,11 @@ const consultationSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  status: {
+    type: String,
+    enum: ['pending', 'completed', 'cancelled'],
+    default: 'completed'
+  },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -58,14 +75,14 @@ const consultationSchema = new mongoose.Schema({
 // Calculate total before saving
 consultationSchema.pre('save', function() {
   let total = 0;
-  total += this.fees.freeOfCost;
-  total += this.fees.emergencyConsultationFee;
-  total += this.fees.geneticConsultationFee;
-  total += this.fees.opdConsultationFee;
+  total += this.fees.freeOfCost || 0;
+  total += this.fees.emergencyConsultationFee || 0;
+  total += this.fees.geneticConsultationFee || 0;
+  total += this.fees.opdConsultationFee || 0;
   
   if (this.fees.additionalFees && this.fees.additionalFees.length > 0) {
     this.fees.additionalFees.forEach(fee => {
-      total += fee.amount;
+      total += fee.amount || 0;
     });
   }
   

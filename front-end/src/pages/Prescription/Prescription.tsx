@@ -11,7 +11,7 @@ import Alert from "../../components/ui/alert/Alert";
 import { PatientInfoCard } from "../../components/consultation/PatientInfoCard";
 import { useDispatch } from "react-redux";
 //@ts-ignore
-import { getConsultationByPatientId } from '../../redux/actions/consultation.actions';
+// import { getConsultationByPatientId } from '../../redux/actions/consultation.actions';
 import { routeOptions,frequencyOptions,medicineOptions } from "../../utils/prescription";
 routeOptions
 interface Medication {

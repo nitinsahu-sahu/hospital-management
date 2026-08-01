@@ -1,7 +1,7 @@
 const RelativeExamination = require('../models/RelativeExamination');
 const Patient = require('../models/User');
 const Relative = require('../models/Relative');
-const Consultation = require('../models/Cosultation');
+const Consultation = require('../models/Consultation');
 
 // Create Relative Examination
 exports.createRelativeExamination = async (req, res) => {

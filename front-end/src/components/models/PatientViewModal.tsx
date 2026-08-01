@@ -123,7 +123,7 @@ export default function PatientViewModal({ patient, onClose }: PatientViewModalP
                 badge={patient.isActive ? "success" : "error"}
               />
               <InfoItem
-                label="Created At"
+                label="Registration At"
                 value={
                   patient.createdAt
                     ? new Date(patient.createdAt).toLocaleString("en-IN", {

@@ -3,8 +3,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PageMeta from '../../components/common/PageMeta';
 import { RootState } from '../../redux/store/store';
-//@ts-ignore
-import { getConsultationByPatientId } from '../../redux/actions/consultation.actions';
 
 import { PatientInfoCard } from '../../components/consultation/PatientInfoCard';
 import { SelectedPatient } from '../../types/consultation';

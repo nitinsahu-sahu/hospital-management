@@ -5,7 +5,7 @@ const { sendResponse } = require('../utils/response');
 exports.createProcedure = async (req, res) => {
     try {
         const userId = req.user.id;
-        const { patientId, consultationId, procedures, notes } = req.body;
+        const { patientId, consultationId, procedures, procedureDate } = req.body;
 
         // Validate required fields
         if (!patientId || !procedures || procedures.length === 0) {
@@ -16,6 +16,7 @@ exports.createProcedure = async (req, res) => {
         const totalAmount = procedures.reduce((sum, proc) => sum + (proc.price || 0), 0);
 
         const procedure = new Procedure({
+            procedureDate,
             patientId,
             consultationId: consultationId || null,
             procedures: procedures.map(proc => ({
@@ -27,7 +28,6 @@ exports.createProcedure = async (req, res) => {
                 description: proc.description || ''
             })),
             totalAmount,
-            notes: notes || '',
             createdBy: userId,
             updatedBy: userId
         });

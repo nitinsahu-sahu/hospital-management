@@ -34,12 +34,18 @@ const navItems: NavItem[] = [
   {
     icon: <Consultation />,
     name: "Doctor Consultation",
-    path: "/consultation",
+    subItems: [
+      { name: "Add", path: "/consultation/add", pro: false },
+      { name: "View", path: "/consultation/view", pro: false },
+    ],
   },
   {
     icon: <PatientHistory />,
     name: "Patient History",
-    path: "/patient-history",
+    subItems: [
+      { name: "Add", path: "/patient-history/add", pro: false },
+      { name: "View", path: "/patient-history/view", pro: false },
+    ],
   },
   {
     icon: <Couple />,
@@ -62,6 +68,14 @@ const navItems: NavItem[] = [
     icon: <ProcedureIcon />,
     name: "Procedure",
     path: "/procedure",
+  },
+  {
+    icon: <ProcedureIcon />,
+    name: "Procedure",
+    subItems: [
+      { name: "Add", path: "/procedure/add", pro: false },
+      { name: "View", path: "/procedure/view", pro: false },
+    ],
   },
   {
     icon: <Prescription />,

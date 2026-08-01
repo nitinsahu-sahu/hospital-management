@@ -1,7 +1,7 @@
 // controllers/patientExamination.controller.js
 const PatientExamination = require('../models/PatientExamination');
 const Patient = require('../models/User');
-const Consultation = require('../models/Cosultation');
+const Consultation = require('../models/Consultation');
 
 // Create Patient Examination
 exports.createPatientExamination = async (req, res) => {

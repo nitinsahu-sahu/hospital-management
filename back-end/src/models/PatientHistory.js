@@ -15,15 +15,14 @@ const durationItemSchema = new mongoose.Schema({
 }, { _id: false });
 
 const patientHistorySchema = new mongoose.Schema({
+  patientHistoryDate: {
+    type: Date,
+    default: Date.now
+  },
   patientId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
-  },
-  consultationId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Consultation',
-    required: false
   },
   // Chief Complaints
   chiefComplaints: {

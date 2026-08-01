@@ -7,7 +7,8 @@ const {
     getPatientHistoryByPatientId,
     updatePatientHistory,
     deletePatientHistory,
-    getAllPatientHistories
+    getAllPatientHistories,
+    patientHistoryPdf
 } = require('../controllers/patientHistory.controller');
 const {
     createPatientHistoryValidation,
@@ -32,5 +33,7 @@ router.put('/patient/:patientId', updatePatientHistoryValidation, validate, upda
 
 // Delete patient history
 router.delete('/patient/:patientId', deletePatientHistory);
+
+router.get('/download/:patientHistoryId', patientHistoryPdf);
 
 module.exports = router;

@@ -1,6 +1,29 @@
 import APIs from "../helper/api";
 import { patientHistoryConstants } from "./constants";
 
+// Download Patient History PDF
+export const downloadPationtHistoryPDF = (patientHistoryId) => async (dispatch) => {
+    try {
+        const config = {
+            responseType: 'blob'
+        };
+        const response = await APIs.get(`/patient-history/download/${patientHistoryId}`, config);
+        // Create download link
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `patient_history_summary_${patientHistoryId}.pdf`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        return true;
+    } catch (error) {
+        console.error('Error downloading PDF:', error);
+        throw error;
+    }
+};
+
 // Create Patient History
 export const createPatientHistory = (patientHistoryData) => async (dispatch, getState) => {
     try {
@@ -36,10 +59,12 @@ export const getPatientHistoryByPatientId = (patientId) => async (dispatch, getS
         const { data } = await APIs.get(
             `/patient-history/patient/${patientId}`,
         );
-
         dispatch({
             type: patientHistoryConstants.PATIENT_HISTORY_GET_SUCCESS,
-            payload: data.data,
+            payload: {
+                patientHistories:data.data,
+                pagination:data.pagination
+            },
         });
 
         return {

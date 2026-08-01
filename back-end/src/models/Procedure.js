@@ -6,10 +6,9 @@ const procedureSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
-  consultationId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Consultation',
-    default: null
+  procedureDate: {
+    type: Date,
+    default: Date.now
   },
   procedures: [{
     procedureId: {
@@ -47,10 +46,6 @@ const procedureSchema = new mongoose.Schema({
   procedureDate: {
     type: Date,
     default: Date.now
-  },
-  notes: {
-    type: String,
-    default: ''
   },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
