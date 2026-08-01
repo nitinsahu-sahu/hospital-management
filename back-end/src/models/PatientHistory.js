@@ -33,16 +33,6 @@ const patientHistorySchema = new mongoose.Schema({
     type: String,
     required: false
   },
-  // Amenorrhoea
-  // amenorrhoea: {
-  //   type: String,
-  //   required: false
-  // },
-  // Complaint
-  // complaint: {
-  //   type: String,
-  //   required: false
-  // },
   // History of Patient Illness
   historyOfIllness: {
     onset: {

@@ -446,7 +446,7 @@ const getHistoryData = async (patientHistoryId) => {
     const patientId = patientHistory.patientId;
 
     const patient = await Patient.findById(patientId).select('-password -__v');
-    
+
     const relative = await Relative.findOne({ UH_ID: patient?.UH_ID });
 
     const doctor = patientHistory.createdBy || null;
@@ -465,11 +465,11 @@ const getHistoryData = async (patientHistoryId) => {
 
 // Download pdf
 exports.patientHistoryPdf = async (req, res) => {
-   try {
+  try {
     const { patientHistoryId } = req.params;
 
     const data = await getHistoryData(patientHistoryId);
-    
+
     if (!data.patientHistory) {
       return res.status(404).json({
         success: false,
@@ -603,7 +603,7 @@ exports.createPatientHistory = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    
+
     res.status(500).json({
       success: false,
       message: 'Error creating patient history',
@@ -749,16 +749,16 @@ exports.updatePatientHistory = async (req, res) => {
 
 // Get Patient History by Patient ID
 exports.getPatientHistoryByPatientId = async (req, res) => {
+  
   try {
     const { page = 1, limit = 10 } = req.query;
     const { patientId } = req.params;
-    
+
     const patientHistory = await PatientHistory.find({ patientId })
       .populate('patientId', 'name UHID age gender')
-      .populate('consultationId')
       .populate('createdBy', 'name email')
       .populate('updatedBy', 'name email')
-      .sort({ consultationDate: -1, createdAt: -1 })
+      .sort({ createdAt: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit);
 
@@ -787,8 +787,6 @@ exports.getPatientHistoryByPatientId = async (req, res) => {
       }
     });
   } catch (error) {
-    console.log("eror",error);
-    
     res.status(500).json({
       success: false,
       message: 'Error fetching consultations',

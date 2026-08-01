@@ -316,11 +316,11 @@ const AddHistory = () => {
                     {/* Consultation Date */}
                     <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 transition-colors duration-200">
                         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                            Consultation Details
+                            Patient History Details
                         </h2>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Consultation Date <span className="text-red-500">*</span>
+                                Patient History Date <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="date"
