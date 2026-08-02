@@ -19,7 +19,6 @@ import PatientsListing from "./pages/patients/patients-listing";
 import ConsultationView from "./pages/Consultation/view";
 import ConsultationAdd from "./pages/Consultation/add";
 
-import Prescription from "./pages/Prescription/Prescription";
 import PrescriptionAdd from "./pages/Prescription/Add";
 import PrescriptionView from "./pages/Prescription/View";
 
@@ -98,7 +97,6 @@ export default function App() {
           <Route path="/consultation/add" element={<ConsultationAdd />} />
           <Route path="/" element={<Patients />} />
           <Route path="/patient/view" element={<PatientsListing />} />
-          <Route path="/prescription" element={<Prescription />} />
           <Route path="/prescription/add" element={<PrescriptionAdd />} />
           <Route path="/prescription/view" element={<PrescriptionView />} />
         </Route>

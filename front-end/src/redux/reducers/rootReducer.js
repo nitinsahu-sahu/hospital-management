@@ -22,7 +22,7 @@ const rootReducer = combineReducers({
   investigation: investigationReducer,
   bloodInvestigation: bloodInvestigationReducer,
   procedure: procedureReducer,
-  prescription: prescriptionReducer,
+  prescriptions: prescriptionReducer,
   discharge: dischargeReducer,
 })
 

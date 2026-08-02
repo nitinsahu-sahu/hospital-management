@@ -6,16 +6,16 @@ export const createDischarge = (dischargeData) => async (dispatch) => {
     try {
         dispatch({ type: dischargeConstants.DISCHARGE_CREATE_REQUEST });
 
-        const response = await APIs.post("/discharge/create", dischargeData);
-        const { data } = response.data;
-
-
+        const {data} = await APIs.post("/discharge/create", dischargeData);
         dispatch({
             type: dischargeConstants.DISCHARGE_CREATE_SUCCESS,
             payload: data
         });
 
-        return data;
+        return {
+            type: dischargeConstants.DISCHARGE_CREATE_SUCCESS,
+            status: 200
+        };
     } catch (error) {
         dispatch({
             type: dischargeConstants.DISCHARGE_CREATE_FAILURE,

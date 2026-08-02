@@ -1247,13 +1247,10 @@ const formatExamValue = (value, details) => {
   return value;
 };
 
-
-
 exports.createDischarge = async (req, res) => {
   try {
     const {
       patientId,
-      consultationId,
       finalDiagnosis,
       treatmentSummary,
       dischargeAdvice,
@@ -1263,7 +1260,6 @@ exports.createDischarge = async (req, res) => {
 
     discharge = new Discharge({
       patientId,
-      consultationId,
       finalDiagnosis,
       treatmentSummary,
       dischargeAdvice,

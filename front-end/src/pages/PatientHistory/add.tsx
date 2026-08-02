@@ -29,7 +29,7 @@ const AddHistory = () => {
     const [successMessage, setSuccessMessage] = useState<string>('');
     const [error, setError] = useState<string>('');
     const [isSubmitting, setIsSubmitting] = useState(false);
-  const currentPatientIdRef = useRef<string | null>(null);
+    const currentPatientIdRef = useRef<string | null>(null);
 
     // Initial form data with today's date
     const [formData, setFormData] = useState<PatientHistoryForm>({
@@ -74,50 +74,50 @@ const AddHistory = () => {
     });
 
     // Handle patient selection from session storage
-   useEffect(() => {
-    const getPatientFromSession = () => {
-      const patientId = sessionStorage.getItem('selectedPatientId');
-      const patientUHID = sessionStorage.getItem('selectedPatientUHID');
-      const patientData = sessionStorage.getItem('selectedPatient');
+    useEffect(() => {
+        const getPatientFromSession = () => {
+            const patientId = sessionStorage.getItem('selectedPatientId');
+            const patientUHID = sessionStorage.getItem('selectedPatientUHID');
+            const patientData = sessionStorage.getItem('selectedPatient');
 
-      if (patientId && patientUHID && patientData) {
-        try {
-          const patient = JSON.parse(patientData);
+            if (patientId && patientUHID && patientData) {
+                try {
+                    const patient = JSON.parse(patientData);
 
-          // Check if patient has changed using ref
-          if (currentPatientIdRef.current !== patient._id) {
-            // Update ref immediately
-            currentPatientIdRef.current = patient._id;
+                    // Check if patient has changed using ref
+                    if (currentPatientIdRef.current !== patient._id) {
+                        // Update ref immediately
+                        currentPatientIdRef.current = patient._id;
 
-            setSelectedPatient(patient);
-          }
-        } catch (error) {
-          if (currentPatientIdRef.current !== null) {
-            currentPatientIdRef.current = null;
-            setSelectedPatient(null);
-          }
-        }
-      } else {
-        // No patient in session
-        if (currentPatientIdRef.current !== null) {
-          currentPatientIdRef.current = null;
-          setSelectedPatient(null);
-        }
-      }
-    };
+                        setSelectedPatient(patient);
+                    }
+                } catch (error) {
+                    if (currentPatientIdRef.current !== null) {
+                        currentPatientIdRef.current = null;
+                        setSelectedPatient(null);
+                    }
+                }
+            } else {
+                // No patient in session
+                if (currentPatientIdRef.current !== null) {
+                    currentPatientIdRef.current = null;
+                    setSelectedPatient(null);
+                }
+            }
+        };
 
-    // Run immediately
-    getPatientFromSession();
+        // Run immediately
+        getPatientFromSession();
 
-    // Set up interval and storage listener
-    const interval = setInterval(getPatientFromSession, 1000);
-    window.addEventListener('storage', getPatientFromSession);
+        // Set up interval and storage listener
+        const interval = setInterval(getPatientFromSession, 1000);
+        window.addEventListener('storage', getPatientFromSession);
 
-    return () => {
-      clearInterval(interval);
-      window.removeEventListener('storage', getPatientFromSession);
-    };
-  }, []);
+        return () => {
+            clearInterval(interval);
+            window.removeEventListener('storage', getPatientFromSession);
+        };
+    }, []);
 
 
     // Handle form input changes

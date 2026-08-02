@@ -116,49 +116,49 @@ const ViewHistory = () => {
     };
 
     // First, let's add a helper function to handle "other" cases
-const formatChiefComplaint = (history:any) => {
-    if (history.chiefComplaints === "other") {
-        return history.chiefComplaintsDetails || "Other (No details provided)";
-    }
-    return history.chiefComplaints || "N/A";
-};
-
-// Helper function to format display labels
-const formatLabel = (key:any) => {
-    const labels = {
-        onset: "Onset",
-        duration: "Duration",
-        associatedSymptoms: "Associated Symptoms",
-        cycleLength: "Cycle Length",
-        daysOfFlow: "Days of Flow",
-        lmp: "Last Menstrual Period",
-        gravida: "Gravida",
-        para: "Para",
-        living: "Living",
-        abortion: "Abortion",
-        sb_iod_dead: "Still Birth/IOD/Dead",
-        ectopic: "Ectopic",
-        diabetes: "Diabetes",
-        hypertension: "Hypertension",
-        asthma: "Asthma",
-        thyroid: "Thyroid",
-        drugAllergy: "Drug Allergy",
-        drugAllergyDetails: "Drug Allergy Details",
-        geneticDiseaseSelf: "Genetic Disease (Self)",
-        geneticDiseaseFamily: "Genetic Disease (Family)",
-        downSyndrome: "Down Syndrome",
-        smoking: "Smoking",
-        drugAddiction: "Drug Addiction"
+    const formatChiefComplaint = (history: any) => {
+        if (history.chiefComplaints === "other") {
+            return history.chiefComplaintsDetails || "Other (No details provided)";
+        }
+        return history.chiefComplaints || "N/A";
     };
-    return labels[key] || key;
-};
 
-// Helper function to format boolean values
-const formatBooleanValue = (value:any) => {
-    if (value === true || value === "true" || value === "yes") return "Yes";
-    if (value === false || value === "false" || value === "no") return "No";
-    return value || "N/A";
-};
+    // Helper function to format display labels
+    const formatLabel = (key: any) => {
+        const labels = {
+            onset: "Onset",
+            duration: "Duration",
+            associatedSymptoms: "Associated Symptoms",
+            cycleLength: "Cycle Length",
+            daysOfFlow: "Days of Flow",
+            lmp: "Last Menstrual Period",
+            gravida: "Gravida",
+            para: "Para",
+            living: "Living",
+            abortion: "Abortion",
+            sb_iod_dead: "Still Birth/IOD/Dead",
+            ectopic: "Ectopic",
+            diabetes: "Diabetes",
+            hypertension: "Hypertension",
+            asthma: "Asthma",
+            thyroid: "Thyroid",
+            drugAllergy: "Drug Allergy",
+            drugAllergyDetails: "Drug Allergy Details",
+            geneticDiseaseSelf: "Genetic Disease (Self)",
+            geneticDiseaseFamily: "Genetic Disease (Family)",
+            downSyndrome: "Down Syndrome",
+            smoking: "Smoking",
+            drugAddiction: "Drug Addiction"
+        };
+        return labels[key] || key;
+    };
+
+    // Helper function to format boolean values
+    const formatBooleanValue = (value: any) => {
+        if (value === true || value === "true" || value === "yes") return "Yes";
+        if (value === false || value === "false" || value === "no") return "No";
+        return value || "N/A";
+    };
 
     return (
         <div>
@@ -289,7 +289,7 @@ const formatBooleanValue = (value:any) => {
                                                         <div>
                                                             <label className="text-xs text-gray-500 dark:text-gray-400">{formatLabel('duration')}</label>
                                                             <p className="text-sm text-gray-900 dark:text-white">
-                                                                {history.historyOfIllness.duration.map((d:any) => `${d.number} ${d.unit}`).join(', ')}
+                                                                {history.historyOfIllness.duration.map((d: any) => `${d.number} ${d.unit}`).join(', ')}
                                                             </p>
                                                         </div>
                                                     )}
