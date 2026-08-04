@@ -1,6 +1,28 @@
 import APIs from "../helper/api";
 import { examinationConstants } from "./constants";
 
+// Download Patient History PDF
+export const downloadPatientExaminationPDF = (patientExaminationId) => async (dispatch) => {
+    try {
+        const config = {
+            responseType: 'blob'
+        };
+        const response = await APIs.get(`/patient_examination/download/${patientExaminationId}`, config);
+        // Create download link
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `patient-examination_summary_${patientExaminationId}.pdf`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        return true;
+    } catch (error) {
+        console.error('Error downloading PDF:', error);
+        throw error;
+    }
+};
 
 // Create Patient Examination
 export const createPatientExamination = (examinationData) => async (dispatch) => {
@@ -36,11 +58,14 @@ export const getPatientExaminationByPatientId = (patientId) => async (dispatch) 
     try {
         dispatch({ type: examinationConstants.GET_PATIENT_EXAMINATION_REQUEST });
 
-        const {data} = await APIs.get(`/patient-examination/patient/${patientId}`)
+        const { data } = await APIs.get(`/patient-examination/patient/${patientId}`)
 
         dispatch({
             type: examinationConstants.GET_PATIENT_EXAMINATION_SUCCESS,
-            payload: data.data
+            payload: {
+                patientExaminations: data.data,
+                pagination: data.pagination
+            },
         });
 
         return {

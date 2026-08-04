@@ -51,8 +51,10 @@ const navItems: NavItem[] = [
     icon: <Couple />,
     name: "Examination of Couple",
     subItems: [
-      { name: "Wife / Patient", path: "/examination-of-couple/patient", pro: false },
-      { name: "Husband / Relative", path: "/examination-of-couple/relative", pro: false },
+      { name: "Wife / Patient Add", path: "/examination-of-couple/patient/add", pro: false },
+      { name: "Wife / Patient View", path: "/examination-of-couple/patient/view", pro: false },
+      { name: "Husband / Relative Add", path: "/examination-of-couple/relative/add", pro: false },
+      { name: "Husband / Relative View", path: "/examination-of-couple/relative/view", pro: false },
     ],
   },
   {

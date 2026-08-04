@@ -24,6 +24,7 @@ export interface VitalsFormData {
 }
 
 export interface ExaminationFormData {
+  patientExaminationDate:any;
   vitals: VitalsFormData;
   cns: SystemExamination;
   cvs: SystemExamination;

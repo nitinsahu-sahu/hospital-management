@@ -38,8 +38,11 @@ import DischargeView from "./pages/Discharge/View";
 import UltraSound from "./pages/Investigation/Ultrasound";
 import RoutineBlood from "./pages/Investigation/RoutineBlood";
 import GeneticBlood from "./pages/Investigation/GeneticBlood";
-import PatientExamination from "./pages/ExaminationOfCouple/PatientExamination";
-import RelativeExamination from "./pages/ExaminationOfCouple/RelativeExamination";
+
+import PatientExaminationAdd from "./pages/ExaminationOfCouple/PatientExaminationAdd";
+import PatientExaminationView from "./pages/ExaminationOfCouple/PatientExaminationView";
+import RelativeExaminationAdd from "./pages/ExaminationOfCouple/RelativeExaminationAdd";
+import RelativeExaminationView from "./pages/ExaminationOfCouple/RelativeExaminationView";
 
 export default function App() {
   
@@ -80,8 +83,11 @@ export default function App() {
           <Route path="/patient-history/add" element={<PatientHistoryAdd />} />
           <Route path="/patient-history/view" element={<PatientHistoryView />} />
 
-          <Route path="/examination-of-couple/patient" element={<PatientExamination />} />
-          <Route path="/examination-of-couple/relative" element={<RelativeExamination />} />
+          <Route path="/examination-of-couple/patient/add" element={<PatientExaminationAdd />} />
+          <Route path="/examination-of-couple/patient/view" element={<PatientExaminationView />} />
+          <Route path="/examination-of-couple/relative/add" element={<RelativeExaminationAdd />} />
+          <Route path="/examination-of-couple/relative/view" element={<RelativeExaminationView />} />
+
           <Route path="/investigation/ultrasound" element={<UltraSound />} />
           <Route path="/investigation/routine-blood-test" element={<RoutineBlood />} />
           <Route path="/investigation/genetic-blood-test" element={<GeneticBlood />} />
