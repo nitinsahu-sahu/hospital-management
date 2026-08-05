@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 // Create new blood investigation
 exports.createBloodInvestigation = async (req, res) => {
     try {
-        const { patientId, consultationId, category, investigations, totalAmount } = req.body;
+        const { patientId, category, investigations, totalAmount } = req.body;
         const userId = req.user?.id;
 
         // Check if investigation already exists for this patient and category
@@ -13,16 +13,8 @@ exports.createBloodInvestigation = async (req, res) => {
             category
         });
 
-        if (existingInvestigation) {
-            return res.status(400).json({
-                success: false,
-                message: `${category} investigation already exists for this patient. Use update instead.`
-            });
-        }
-
         const investigation = new BloodInvestigation({
             patientId,
-            consultationId,
             category,
             investigations,
             totalAmount,
@@ -52,28 +44,45 @@ exports.getBloodInvestigationByPatientId = async (req, res) => {
     try {
         const { patientId } = req.params;
         const { category } = req.query;
+        const { page = 1, limit = 10 } = req.query;
 
         const query = { patientId };
         if (category && ['routine', 'genetic'].includes(category)) {
             query.category = category;
         }
 
-        const investigation = await BloodInvestigation.findOne(query)
+        const routinInvestigation = await BloodInvestigation.find(query)
             .populate('patientId', 'name uhid age mobile')
-            .populate('consultationId', 'date consultationType')
             .populate('createdBy', 'name email')
-            .populate('updatedBy', 'name email');
+            .populate('updatedBy', 'name email')
+            .sort({ createdAt: -1 })
+            .limit(limit * 1)
+            .skip((page - 1) * limit);
 
-        if (!investigation) {
-            return res.status(404).json({
-                success: false,
-                message: 'No blood investigation found for this patient'
+        const total = await BloodInvestigation.countDocuments({ patientId: req.params.patientId });
+
+
+        if (!routinInvestigation || routinInvestigation.length === 0) {
+            return res.status(200).json({
+                success: true,
+                data: [],
+                message: 'No routine investigation found for this patient',
+                pagination: {
+                    total: 0,
+                    page: Number(page),
+                    pages: 0
+                }
             });
         }
 
         res.status(200).json({
             success: true,
-            data: investigation
+            data: routinInvestigation,
+            pagination: {
+                total,
+                page: Number(page),
+                pages: Math.ceil(total / limit)
+            }
         });
     } catch (error) {
         console.error('Error fetching blood investigation:', error);

@@ -34,11 +34,6 @@ const bloodInvestigationSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
-  consultationId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Consultation',
-    required: true
-  },
   category: {
     type: String,
     enum: ['routine'],

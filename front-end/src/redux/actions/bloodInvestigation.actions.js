@@ -2,6 +2,28 @@ import APIs from "../helper/api";
 import { investigationConstants } from "./constants";
 
 
+export const downloadRoutinePDF = (routineId) => async (dispatch) => {
+    try {
+        const config = {
+            responseType: 'blob'
+        };
+        const response = await APIs.get(`/blood-investigations/download/${routineId}`, config);
+        // Create download link
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `routine_summary_${routineId}.pdf`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        return true;
+    } catch (error) {
+        console.error('Error downloading PDF:', error);
+        throw error;
+    }
+};
+
 // Create Blood Investigation
 export const createBloodInvestigation = (investigationData) => async (dispatch) => {
     try {
@@ -11,7 +33,10 @@ export const createBloodInvestigation = (investigationData) => async (dispatch) 
 
         dispatch({
             type: investigationConstants.CREATE_BLOOD_INVESTIGATION_SUCCESS,
-            payload: data.data
+             payload: {
+                routines:data.data,
+                pagination:data.pagination
+            },
         });
 
         return { type: investigationConstants.CREATE_BLOOD_INVESTIGATION_SUCCESS, payload: data.data };
@@ -37,19 +62,14 @@ export const getBloodInvestigationByPatientId = (patientId, category) => async (
 
         dispatch({
             type: investigationConstants.GET_BLOOD_INVESTIGATION_SUCCESS,
-            payload: data.data
+             payload: {
+                routinesBlood:data.data,
+                pagination:data.pagination
+            },
         });
 
         return { type: investigationConstants.GET_BLOOD_INVESTIGATION_SUCCESS, payload: data.data };
     } catch (error) {
-        if (error.response?.status === 404) {
-            dispatch({
-                type: investigationConstants.GET_BLOOD_INVESTIGATION_SUCCESS,
-                payload: null
-            });
-            return { type: investigationConstants.GET_BLOOD_INVESTIGATION_SUCCESS, payload: null };
-        }
-
         dispatch({
             type: investigationConstants.GET_BLOOD_INVESTIGATION_FAILURE,
             payload: error.response?.data?.message || error.message

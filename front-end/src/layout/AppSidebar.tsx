@@ -61,9 +61,12 @@ const navItems: NavItem[] = [
     icon: <InvestigationIcon />,
     name: "Investigation",
     subItems: [
-      { name: "Ultrasound", path: "/investigation/ultrasound", pro: false },
-      { name: "Routine Blood Test", path: "/investigation/routine-blood-test", pro: false },
-      { name: "Genetic Blood Test", path: "/investigation/genetic-blood-test", pro: false },
+      { name: "Ultrasound Add", path: "/investigation/ultrasound-add", pro: false },
+      { name: "Ultrasound View", path: "/investigation/ultrasound-view", pro: false },
+      { name: "Routine Blood Add", path: "/investigation/routine-blood-add", pro: false },
+      { name: "Routine Blood View", path: "/investigation/routine-blood-view", pro: false },
+      { name: "Genetic Blood Add", path: "/investigation/genetic-blood-add", pro: false },
+      { name: "Genetic Blood View", path: "/investigation/genetic-blood-view", pro: false },
     ],
   },
   {

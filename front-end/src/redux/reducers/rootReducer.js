@@ -7,6 +7,7 @@ import { patientExaminationReducer } from './patientExamination.reducer';
 import { relativeExaminationReducer } from './relativeExamination.reducer';
 import { investigationReducer } from '../reducers/investigation.reducer';
 import { bloodInvestigationReducer } from '../reducers/bloodInvestigation.reducer';
+import { geneticInvestigationReducer } from '../reducers/geneticInvestigation.reducer';
 import procedureReducer from '../reducers/procedure.reducer';
 import prescriptionReducer from '../reducers/prescription.reducer';
 import dischargeReducer from '../reducers/discharge.reducer';
@@ -21,6 +22,7 @@ const rootReducer = combineReducers({
   reoc: relativeExaminationReducer,
   investigation: investigationReducer,
   bloodInvestigation: bloodInvestigationReducer,
+  geneticInvestigation: geneticInvestigationReducer,
   procedure: procedureReducer,
   prescriptions: prescriptionReducer,
   discharge: dischargeReducer,

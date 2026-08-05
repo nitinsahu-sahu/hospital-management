@@ -35,9 +35,12 @@ import Discharge from "./pages/Discharge/Discharge";
 import DischargeAdd from "./pages/Discharge/Add";
 import DischargeView from "./pages/Discharge/View";
 
-import UltraSound from "./pages/Investigation/Ultrasound";
-import RoutineBlood from "./pages/Investigation/RoutineBlood";
-import GeneticBlood from "./pages/Investigation/GeneticBlood";
+import UltraSoundAdd from "./pages/Investigation/UltrasoundAdd";
+import UltraSoundView from "./pages/Investigation/UltrasoundView";
+import RoutineBloodAdd from "./pages/Investigation/RoutineBloodAdd";
+import RoutineBloodView from "./pages/Investigation/RoutineBloodView";
+import GeneticBloodAdd from "./pages/Investigation/GeneticBloodAdd";
+import GeneticBloodView from "./pages/Investigation/GeneticBloodView";
 
 import PatientExaminationAdd from "./pages/ExaminationOfCouple/PatientExaminationAdd";
 import PatientExaminationView from "./pages/ExaminationOfCouple/PatientExaminationView";
@@ -88,9 +91,12 @@ export default function App() {
           <Route path="/examination-of-couple/relative/add" element={<RelativeExaminationAdd />} />
           <Route path="/examination-of-couple/relative/view" element={<RelativeExaminationView />} />
 
-          <Route path="/investigation/ultrasound" element={<UltraSound />} />
-          <Route path="/investigation/routine-blood-test" element={<RoutineBlood />} />
-          <Route path="/investigation/genetic-blood-test" element={<GeneticBlood />} />
+          <Route path="/investigation/ultrasound-add" element={<UltraSoundAdd />} />
+          <Route path="/investigation/ultrasound-view" element={<UltraSoundView />} />
+          <Route path="/investigation/routine-blood-add" element={<RoutineBloodAdd />} />
+          <Route path="/investigation/routine-blood-view" element={<RoutineBloodView />} />
+          <Route path="/investigation/genetic-blood-add" element={<GeneticBloodAdd />} />
+          <Route path="/investigation/genetic-blood-view" element={<GeneticBloodView />} />
 
           <Route path="/procedure/add" element={<ProcedureAdd />} />
           <Route path="/procedure/view" element={<ProcedureView />} />

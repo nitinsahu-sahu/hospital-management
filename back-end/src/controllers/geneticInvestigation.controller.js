@@ -4,25 +4,17 @@ const mongoose = require('mongoose');
 // Create new blood investigation
 exports.createBloodInvestigation = async (req, res) => {
   try {
-    const { patientId, consultationId, category, investigations, totalAmount } = req.body;
+    const { patientId, category, investigations, totalAmount } = req.body;
     const userId = req.user?.id;
 
     // Check if investigation already exists for this patient and category
-    const existingInvestigation = await BloodInvestigation.findOne({ 
-      patientId, 
-      category 
+    const existingInvestigation = await BloodInvestigation.findOne({
+      patientId,
+      category
     });
-    
-    if (existingInvestigation) {
-      return res.status(400).json({
-        success: false,
-        message: `${category} investigation already exists for this patient. Use update instead.`
-      });
-    }
 
     const investigation = new BloodInvestigation({
       patientId,
-      consultationId,
       category,
       investigations,
       totalAmount,
@@ -34,11 +26,10 @@ exports.createBloodInvestigation = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: `${category} investigation created successfully`,
+      message: 'Created successfully',
       data: investigation
     });
   } catch (error) {
-    console.error('Error creating blood investigation:', error);
     res.status(500).json({
       success: false,
       message: 'Error creating blood investigation',
@@ -52,28 +43,44 @@ exports.getBloodInvestigationByPatientId = async (req, res) => {
   try {
     const { patientId } = req.params;
     const { category } = req.query;
+    const { page = 1, limit = 10 } = req.query;
 
     const query = { patientId };
     if (category && ['routine', 'genetic'].includes(category)) {
       query.category = category;
     }
 
-    const investigation = await BloodInvestigation.findOne(query)
+    const geneticsInvestigation = await BloodInvestigation.find(query)
       .populate('patientId', 'name uhid age mobile')
-      .populate('consultationId', 'date consultationType')
       .populate('createdBy', 'name email')
-      .populate('updatedBy', 'name email');
+      .populate('updatedBy', 'name email')
+      .sort({ createdAt: -1 })
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
 
-    if (!investigation) {
-      return res.status(404).json({
-        success: false,
-        message: 'No blood investigation found for this patient'
+    const total = await BloodInvestigation.countDocuments({ patientId: req.params.patientId });
+
+     if (!geneticsInvestigation || geneticsInvestigation.length === 0) {
+      return res.status(200).json({
+        success: true,
+        data: [],
+        message: 'No patient history found for this patient',
+        pagination: {
+          total: 0,
+          page: Number(page),
+          pages: 0
+        }
       });
     }
 
     res.status(200).json({
       success: true,
-      data: investigation
+      data: geneticsInvestigation,
+      pagination: {
+        total,
+        page: Number(page),
+        pages: Math.ceil(total / limit)
+      }
     });
   } catch (error) {
     console.error('Error fetching blood investigation:', error);

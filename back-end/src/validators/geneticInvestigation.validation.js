@@ -2,7 +2,6 @@ const { body } = require('express-validator');
 
 exports.createGeneticInvestigationValidation = [
   body('patientId').notEmpty().withMessage('Patient ID is required'),
-  body('consultationId').notEmpty().withMessage('Consultation ID is required'),
   body('category').isIn(['genetic']).withMessage('Invalid category'),
   body('investigations').isArray().withMessage('Investigations must be an array'),
   body('investigations.*.id').notEmpty().withMessage('Investigation ID is required'),

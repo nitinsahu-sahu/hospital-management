@@ -3,24 +3,14 @@ const mongoose = require('mongoose');
 
 // Create new investigation
 exports.createInvestigation = async (req, res) => {
-  
-  try {
-    const { patientId, consultationId,category,subCategory, investigations, totalAmount, status } = req.body;
-    const userId = req.user?.id;
 
-    // Check if investigation already exists for this patient
-    const existingInvestigation = await Investigation.findOne({ patientId });
-    if (existingInvestigation) {
-      return res.status(400).json({
-        success: false,
-        message: 'Investigation already exists for this patient. Use update instead.'
-      });
-    }
+  try {
+    const { patientId, category, subCategory, investigations, totalAmount, status } = req.body;
+    const userId = req.user?.id;
 
     const investigation = new Investigation({
       patientId,
-      consultationId,
-      category,subCategory,
+      category, subCategory,
       investigations,
       totalAmount,
       status: status || 'pending',
@@ -49,22 +39,38 @@ exports.createInvestigation = async (req, res) => {
 exports.getInvestigationByPatientId = async (req, res) => {
   try {
     const { patientId } = req.params;
+    const { page = 1, limit = 10 } = req.query;
 
-    const investigation = await Investigation.findOne({ patientId })
+    const investigation = await Investigation.find({ patientId })
       .populate('patientId', 'name uhid age')
-      .populate('consultationId', 'date')
-      .populate('createdBy', 'name email');
+      .populate('createdBy', 'name email')
+      .sort({ createdAt: -1 })
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
 
-    if (!investigation) {
-      return res.status(404).json({
-        success: false,
-        message: 'No investigation found for this patient'
+    const total = await Investigation.countDocuments({ patientId: req.params.patientId });
+
+    if (!investigation || investigation.length === 0) {
+      return res.status(200).json({
+        success: true,
+        data: [],
+        message: 'No patient history found for this patient',
+        pagination: {
+          total: 0,
+          page: Number(page),
+          pages: 0
+        }
       });
     }
 
     res.status(200).json({
       success: true,
-      data: investigation
+      data: investigation,
+      pagination: {
+        total,
+        page: Number(page),
+        pages: Math.ceil(total / limit)
+      }
     });
   } catch (error) {
     console.error('Error fetching investigation:', error);
@@ -112,7 +118,7 @@ exports.getInvestigationById = async (req, res) => {
 exports.updateInvestigation = async (req, res) => {
   try {
     const { id } = req.params;
-    const { investigations, totalAmount, status,category,subCategory } = req.body;
+    const { investigations, totalAmount, status, category, subCategory } = req.body;
     const userId = req.user?._id || req.body.updatedBy;
     const investigation = await Investigation.findById(id);
     if (!investigation) {
