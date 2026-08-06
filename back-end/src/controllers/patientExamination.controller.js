@@ -5,10 +5,9 @@ const Relative = require('../models/Relative');
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
+const { formatDateTime } = require('../utils/timeFormate');
 
 const generatePatientExaminationPDF = async (data, res) => {
-  console.log("EP", data.patientExamination);
-
   const colors = {
     primary: '#1a5276',
     secondary: '#2e86c1',
@@ -121,22 +120,39 @@ const generatePatientExaminationPDF = async (data, res) => {
   let yPos = doc.y;
 
   // ===== 1. PATIENT DEMOGRAPHICS =====
-  doc.fillColor(colors.primary)
-    .fontSize(12)
-    .font('Helvetica-Bold')
-    .text('Patient Demographics', 18, yPos);
-
-  doc.strokeColor(colors.border)
-    .lineWidth(0.4)
-    .moveTo(18, doc.y + 1.5)
-    .lineTo(doc.page.width - 18, doc.y + 1.5)
-    .stroke();
-
-  doc.fillColor(colors.text)
-    .fontSize(10)
-    .font('Helvetica');
-
-  yPos = doc.y + 8;
+    const titleY = yPos;
+  
+    // Left side - Patient Demographics
+    doc.fillColor(colors.primary)
+      .fontSize(12)
+      .font('Helvetica-Bold')
+      .text('Patient Demographics', 18, titleY);
+  
+    doc.fillColor(colors.lightText)
+      .fontSize(10)
+      .font('Helvetica')
+      .text('Patient Examination Date & Time:', doc.page.width / 2 + 20, titleY, {
+        continued: true,
+        width: doc.page.width / 2 - 38,
+        align: 'left'
+      })
+      .fillColor(colors.text)
+      .font('Helvetica-Bold')
+      .text(` ${formatDateTime(data.patientExamination?.createdAt)}`, {
+        continued: false
+      });
+  
+    doc.strokeColor(colors.border)
+      .lineWidth(0.4)
+      .moveTo(18, doc.y + 1.5)
+      .lineTo(doc.page.width - 18, doc.y + 1.5)
+      .stroke();
+  
+    doc.fillColor(colors.text)
+      .fontSize(10)
+      .font('Helvetica');
+  
+    yPos = doc.y + 8;
 
   const getPatientField = (field, detailsField) => {
     if (field === 'other' && detailsField) {
@@ -508,8 +524,6 @@ exports.patientExaminationPdf = async (req, res) => {
     });
   }
 };
-
-
 
 // Create Patient Examination
 exports.createPatientExamination = async (req, res) => {

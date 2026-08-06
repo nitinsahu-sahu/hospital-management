@@ -4,9 +4,9 @@ const Relative = require('../models/Relative');
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
+const { formatDateTime } = require('../utils/timeFormate');
 
 const generatePrescriptionPDF = async (data, res) => {
-console.log('data',data);
 
   const colors = {
     primary: '#1a5276',
@@ -120,10 +120,28 @@ console.log('data',data);
   let yPos = doc.y;
 
   // ===== 1. PATIENT DEMOGRAPHICS =====
+  const titleY = yPos;
+
+  // Left side - Patient Demographics
   doc.fillColor(colors.primary)
     .fontSize(12)
     .font('Helvetica-Bold')
-    .text('Patient Demographics', 18, yPos);
+    .text('Patient Demographics', 18, titleY);
+
+  // Right side - Consultation Date & Time (on the same line)
+  doc.fillColor(colors.lightText)
+    .fontSize(10)
+    .font('Helvetica')
+    .text('Prescription Date & Time:', doc.page.width / 2 + 20, titleY, {
+      continued: true,
+      width: doc.page.width / 2 - 38,
+      align: 'left'
+    })
+    .fillColor(colors.text)
+    .font('Helvetica-Bold')
+    .text(` ${formatDateTime(data.prescription?.createdAt)}`, {
+      continued: false
+    });
 
   doc.strokeColor(colors.border)
     .lineWidth(0.4)
@@ -136,6 +154,7 @@ console.log('data',data);
     .font('Helvetica');
 
   yPos = doc.y + 8;
+
 
   const getPatientField = (field, detailsField) => {
     if (field === 'other' && detailsField) {
@@ -329,26 +348,36 @@ console.log('data',data);
     yPos = doc.y + 10;
 
     const tableX = 22;
-    const col1 = 22;
-    const col2 = 40;
-    const col3 = 210;
-    const col4 = 270;
-    const col5 = 380;
-    const col6 = 440;
+    const col1 = 22;      // # - 18px
+    const col2 = 42;      // Drug Name - 170px
+    const col3 = 200;     // Dosage - 60px
+    const col4 = 260;     // Frequency - 85px
+    const col5 = 340;     // Duration - 60px
+    const col6 = 400;     // Route - 60px
+    const col7 = 493;     // Instructions - remaining space
+    // const tableX = 22;
+    // const col1 = 22;
+    // const col2 = 40;
+    // const col3 = 210;
+    // const col4 = 270;
+    // const col5 = 380;
+    // const col6 = 440;
 
     doc.rect(tableX, yPos - 5, doc.page.width - 44, 18)
       .fill(colors.lightBg)
       .stroke(colors.border);
 
+    // Header
     doc.fillColor(colors.primary)
       .fontSize(11)
       .font('Helvetica-Bold')
       .text('#', col1, yPos, { width: 18, align: 'center' })
-      .text('Drug Name', col2, yPos)
-      .text('Dosage', col3, yPos)
-      .text('Frequency', col4, yPos)
-      .text('Duration', col5, yPos)
-      .text('Route', col6, yPos);
+      .text('Drug Name', col2, yPos, { width: 170 })
+      .text('Dosage', col3, yPos, { width: 60 })
+      .text('Frequency', col4, yPos, { width: 85 })
+      .text('Duration', col5, yPos, { width: 60 })
+      .text('Route', col6, yPos, { width: 60 })
+      .text('Instructions', col7, yPos, { width: 90 }); // Naya column
 
     yPos = doc.y + 2;
 
@@ -374,13 +403,14 @@ console.log('data',data);
       }
 
       doc.fillColor(colors.text)
-        .fontSize(10)
+        .fontSize(7)
         .text(`${idx + 1}`, col1, yPos, { width: 18, align: 'center' })
         .text(drugName, col2, yPos, { width: 165 })
-        .text(med.dosage || 'N/A', col3, yPos)
+        .text(med.dosage ? `${med.dosage} mg` : 'N/A', col3, yPos)
         .text(med.frequency || 'N/A', col4, yPos, { width: 105 })
         .text(med.duration ? `${med.duration} days` : 'N/A', col5, yPos)
-        .text(med.route || 'N/A', col6, yPos, { width: 90 });
+        .text(med.route || 'N/A', col6, yPos, { width: 90 })
+        .text(med.instructions || 'N/A', col7, yPos, { width: 90 });
 
       yPos += 15;
     });

@@ -4,8 +4,6 @@ const initialState = {
   procedures: [],
   pagination:{},
   loading: false,
-  creating: false,
-  updating: false,
   error: null,
   message: '',
 };
@@ -14,31 +12,30 @@ const procedureReducer = (state = initialState, action) => {
   switch (action.type) {
     // Create
     case procedureConstants.CREATE_PROCEDURE_REQUEST:
-      return { ...state, creating: true, error: null };
+      return { ...state, loading: true, error: null };
     case procedureConstants.CREATE_PROCEDURE_SUCCESS:
       return {
         ...state,
-        creating: false,
+        loading: false,
         procedures: [action.payload, ...state.procedures],
-        patientProcedures: [action.payload, ...state.patientProcedures],
         message: 'Procedure created successfully',
       };
     case procedureConstants.CREATE_PROCEDURE_FAILURE:
-      return { ...state, creating: false, error: action.payload.message };
+      return { ...state, loading: true, error: action.payload.message };
 
     // Get All
     case procedureConstants.GET_ALL_PROCEDURES_REQUEST:
       return { ...state, loading: true, error: null };
     case procedureConstants.GET_ALL_PROCEDURES_SUCCESS:
-      return { ...state, loading: false, procedures: action.payload };
+      return { ...state, loading: false };
     case procedureConstants.GET_ALL_PROCEDURES_FAILURE:
-      return { ...state, loading: false, error: action.payload.message };
+      return { ...state, loading: true, error: action.payload.message };
 
     // Get By ID
     case procedureConstants.GET_PROCEDURE_BY_ID_REQUEST:
       return { ...state, loading: true, error: null };
     case procedureConstants.GET_PROCEDURE_BY_ID_SUCCESS:
-      return { ...state, loading: false, procedure: action.payload };
+      return { ...state, loading: false };
     case procedureConstants.GET_PROCEDURE_BY_ID_FAILURE:
       return { ...state, loading: false, error: action.payload.message };
 

@@ -24,6 +24,7 @@ const ProcedureView = () => {
     const currentPatientIdRef = useRef<string | null>(null);
     const { procedures, loading } = useSelector((state: RootState) => state.procedure);
     const [expandedProcedureId, setExpandedProcedureId] = useState<string | null>(null);
+    const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
     const dispatch = useDispatch();
     const previousPatientId = useRef<string | null>(null);
@@ -34,15 +35,6 @@ const ProcedureView = () => {
             dispatch(getProceduresByPatientId(patientId) as any);
         }
     }, [dispatch]);
-
-    const formatDate = (dateString: string) => {
-        if (!dateString) return 'N/A';
-        return new Date(dateString).toLocaleDateString('en-IN', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-    };
 
     const formatDateTime = (dateString: string) => {
         if (!dateString) return 'N/A';
@@ -123,14 +115,17 @@ const ProcedureView = () => {
             clearInterval(interval);
             window.removeEventListener('storage', getPatientFromSession);
         };
-    }, []);
+    }, [fetchPatientHistory]);
 
     const handleDownloadPDF = async (procedureId: any) => {
         try {
+            setDownloadingId(procedureId);
             await dispatch(downloadProcedurePDF(procedureId) as any);
         } catch (error) {
             console.error('Error downloading PDF:', error);
             alert('Failed to download PDF. Please try again.');
+        } finally {
+            setDownloadingId(null);
         }
     };
 
@@ -139,7 +134,8 @@ const ProcedureView = () => {
     };
 
     return (
-        <div>
+            <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
+
             <PatientInfoCard
                 selectedPatient={selectedPatient}
                 isExistingConsultation={false}
@@ -163,163 +159,205 @@ const ProcedureView = () => {
                     <p className="text-sm mt-2">This patient has no procedures recorded yet</p>
                 </div>
             ) : (
-                <div className="space-y-4">
-                    {procedures?.map((procedure: any) => (
-                        <div
-                            key={procedure._id}
-                            className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden hover:shadow-md transition-all duration-300 ease-in-out"
-                        >
-                            {/* Main Row */}
-                           <div
-    className="p-4 bg-white dark:bg-gray-800 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors duration-200"
-    onClick={() => toggleProcedureDetails(procedure._id)}
->
-    <div className="flex items-center gap-4 flex-wrap justify-between">
-        {/* Procedure Date */}
-        <div className="min-w-[120px]">
-            <div className="text-sm font-medium text-gray-900 dark:text-white">
-                {formatDate(procedure.procedureDate || procedure.createdAt)}
-            </div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">
-                {formatDateTime(procedure.createdAt)}
-            </div>
-        </div>
-
-        {/* Procedure Count */}
-        <div className="min-w-[80px]">
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
-                {procedure.procedures?.length || 0} Procedure{procedure.procedures?.length !== 1 ? 's' : ''}
-            </span>
-        </div>
-
-        {/* Total Amount */}
-        <div className="min-w-[120px]">
-            <span className="text-sm font-semibold text-green-600 dark:text-green-400">
-                ₹{toNumber(procedure.totalAmount).toLocaleString()}
-            </span>
-        </div>
-
-        {/* Created By */}
-        <div className="min-w-[120px]">
-            <span className="text-sm text-gray-600 dark:text-gray-300">
-                {procedure.createdBy?.name || 'N/A'}
-            </span>
-        </div>
-
-        {/* PDF Button */}
-        <div className="flex items-center gap-2 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
-            <button
-                onClick={() => handleDownloadPDF(procedure._id)}
-                className="p-1.5 rounded-lg text-green-400 hover:text-green-600 hover:bg-green-50 dark:hover:text-green-400 dark:hover:bg-green-900/20 transition-all duration-200 transform hover:scale-110"
-                title="Download PDF"
-            >
-                <PdfIcon className="fill-green-500 dark:fill-gray-400 size-5" />
-            </button>
-        </div>
-    </div>
-</div>
-
-                            {/* Expandable Details Section */}
-                            <div
-                                className={`transition-all duration-300 ease-in-out ${expandedProcedureId === procedure._id
-                                    ? 'max-h-[5000px] opacity-100'
-                                    : 'max-h-0 opacity-0'
-                                    } overflow-hidden`}
-                            >
-                                <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
-                                    <div className="p-6 space-y-6">
-                                        {/* Procedure List */}
-                                        <div>
-                                            <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
-                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                                                </svg>
-                                                Procedures Performed
-                                            </h4>
-                                            <div className="overflow-x-auto">
-                                                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                                    <thead className="bg-gray-100 dark:bg-gray-800">
-                                                        <tr>
-                                                            <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                                                Procedure Name
-                                                            </th>
-                                                            <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                                                Category
-                                                            </th>
-                                                            <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                                                Sub Type
-                                                            </th>
-                                                            <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                                                Price
-                                                            </th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-                                                        {procedure.procedures?.map((proc: any, index: number) => (
-                                                            <tr key={proc._id || index} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200">
-                                                                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                                                                    {proc.name}
-                                                                </td>
-                                                                <td className="px-4 py-3 whitespace-nowrap">
-                                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getCategoryColor(proc.category)}`}>
-                                                                        {formatCategory(proc.category)}
-                                                                    </span>
-                                                                </td>
-                                                                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                                                    {proc.subType || 'N/A'}
-                                                                </td>
-                                                                <td className="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-gray-900 dark:text-white">
-                                                                    ₹{toNumber(proc.price).toLocaleString()}
-                                                                </td>
-                                                            </tr>
-                                                        ))}
-                                                    </tbody>
-                                                    <tfoot className="bg-gray-50 dark:bg-gray-800">
-                                                        <tr>
-                                                            <td colSpan={3} className="px-4 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
-                                                                Total Amount
-                                                            </td>
-                                                            <td className="px-4 py-3 text-right text-sm font-bold text-green-600 dark:text-green-400">
-                                                                ₹{toNumber(procedure.totalAmount).toLocaleString()}
-                                                            </td>
-                                                        </tr>
-                                                    </tfoot>
-                                                </table>
-                                            </div>
-                                        </div>
-
-                                        {/* Additional Info */}
-                                        <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                                            <div>
-                                                <label className="text-xs font-medium text-gray-500 dark:text-gray-400">Procedure Date</label>
-                                                <p className="text-sm text-gray-900 dark:text-white mt-1">
-                                                    {formatDate(procedure.procedureDate || procedure.createdAt)}
-                                                </p>
-                                            </div>
-                                            <div>
-                                                <label className="text-xs font-medium text-gray-500 dark:text-gray-400">Created By</label>
-                                                <p className="text-sm text-gray-900 dark:text-white mt-1">
-                                                    {procedure.createdBy?.name || 'N/A'}
-                                                </p>
-                                            </div>
-                                            <div>
-                                                <label className="text-xs font-medium text-gray-500 dark:text-gray-400">Created At</label>
-                                                <p className="text-sm text-gray-900 dark:text-white mt-1">
+                <div className="mt-4">
+                    {/* Table View */}
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <thead className="bg-gray-50 dark:bg-gray-800">
+                                <tr>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        Date
+                                    </th>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        Procedures
+                                    </th>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        Categories
+                                    </th>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        Total Amount
+                                    </th>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        Created By
+                                    </th>
+                                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        Actions
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                                {procedures?.map((procedure: any) => (
+                                    <>
+                                        <tr
+                                            key={procedure._id}
+                                            className="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors duration-150"
+                                            onClick={() => toggleProcedureDetails(procedure._id)}
+                                        >
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm font-medium text-gray-900 dark:text-white">
                                                     {formatDateTime(procedure.createdAt)}
-                                                </p>
-                                            </div>
-                                            <div>
-                                                <label className="text-xs font-medium text-gray-500 dark:text-gray-400">Last Updated</label>
-                                                <p className="text-sm text-gray-900 dark:text-white mt-1">
-                                                    {formatDateTime(procedure.updatedAt)}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+                                                    {procedure.procedures?.length || 0} Procedure{procedure.procedures?.length !== 1 ? 's' : ''}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex flex-wrap gap-1">
+                                                    {[...new Set(procedure.procedures?.map((p: any) => p.category))]?.map((category: any, index: number) => (
+                                                        <span
+                                                            key={index}
+                                                            className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getCategoryColor(category)}`}
+                                                        >
+                                                            {formatCategory(category)}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <span className="text-sm font-semibold text-green-600 dark:text-green-400">
+                                                    ₹{toNumber(procedure.totalAmount).toLocaleString()}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm text-gray-900 dark:text-white">
+                                                    {procedure.createdBy?.name || 'N/A'}
+                                                </div>
+                                                <div className="text-xs text-gray-500 dark:text-gray-400">
+                                                    {procedure.createdBy?.email || ''}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-right">
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleDownloadPDF(procedure._id);
+                                                        }}
+                                                        disabled={downloadingId === procedure._id}
+                                                        className="p-2 rounded-lg text-green-500 hover:text-green-600 hover:bg-green-50 dark:hover:text-green-400 dark:hover:bg-green-900/20 transition-all duration-200 transform hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                        title="Download PDF"
+                                                    >
+                                                        {downloadingId === procedure._id ? (
+                                                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-green-500"></div>
+                                                        ) : (
+                                                            <PdfIcon className="fill-green-500 dark:fill-gray-400 size-5" />
+                                                        )}
+                                                    </button>
+
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        {/* Expandable Details Row */}
+                                        <tr key={`${procedure._id}-details`}>
+                                            <td colSpan={6} className="px-0 py-0">
+                                                <div
+                                                    className={`transition-all duration-300 ease-in-out ${expandedProcedureId === procedure._id
+                                                            ? 'max-h-[5000px] opacity-100'
+                                                            : 'max-h-0 opacity-0'
+                                                        } overflow-hidden`}
+                                                >
+                                                    <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+                                                        <div className="p-6 space-y-6">
+                                                            {/* Procedure List */}
+                                                            <div>
+                                                                <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+                                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                                                    </svg>
+                                                                    Procedures Performed
+                                                                </h4>
+                                                                <div className="overflow-x-auto">
+                                                                    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                                                        <thead className="bg-gray-100 dark:bg-gray-700">
+                                                                            <tr>
+                                                                                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                                                                    Procedure Name
+                                                                                </th>
+                                                                                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                                                                    Category
+                                                                                </th>
+                                                                                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                                                                    Sub Type
+                                                                                </th>
+                                                                                <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                                                                    Price
+                                                                                </th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                                                                            {procedure.procedures?.map((proc: any, index: number) => (
+                                                                                <tr key={proc._id || index} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200">
+                                                                                    <td className="px-4 py-3 whitespace-nowrap">
+                                                                                        <div className="text-sm font-medium text-gray-900 dark:text-white">
+                                                                                            {proc.name}
+                                                                                        </div>
+                                                                                    </td>
+                                                                                    <td className="px-4 py-3 whitespace-nowrap">
+                                                                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getCategoryColor(proc.category)}`}>
+                                                                                            {formatCategory(proc.category)}
+                                                                                        </span>
+                                                                                    </td>
+                                                                                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                                                                        {proc.subType || 'N/A'}
+                                                                                    </td>
+                                                                                    <td className="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-gray-900 dark:text-white">
+                                                                                        ₹{toNumber(proc.price).toLocaleString()}
+                                                                                    </td>
+                                                                                </tr>
+                                                                            ))}
+                                                                        </tbody>
+                                                                        <tfoot className="bg-gray-50 dark:bg-gray-700/50">
+                                                                            <tr>
+                                                                                <td colSpan={3} className="px-4 py-3 text-right">
+                                                                                    <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Total Amount:</span>
+                                                                                </td>
+                                                                                <td className="px-4 py-3 text-right">
+                                                                                    <span className="text-sm font-bold text-green-600 dark:text-green-400">
+                                                                                        ₹{toNumber(procedure.totalAmount).toLocaleString()}
+                                                                                    </span>
+                                                                                </td>
+                                                                            </tr>
+                                                                        </tfoot>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Meta Information */}
+                                                            <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                                                    <div className="space-y-2">
+                                                                        
+                                                                        <div className="flex items-center gap-2">
+                                                                            <span className="text-gray-500 dark:text-gray-400">Created by:</span>
+                                                                            <span className="font-medium text-gray-900 dark:text-white">
+                                                                                {procedure.createdBy?.name || 'N/A'}
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div className="space-y-2">
+                                                                        <div className="flex items-center gap-2">
+                                                                            <span className="text-gray-500 dark:text-gray-400">Procedure Date:</span>
+                                                                            <span className="font-medium text-gray-900 dark:text-white">
+                                                                                {formatDateTime( procedure.createdAt)}
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             )}
         </div>

@@ -30,6 +30,7 @@ export const createProcedure = (procedureData) => async (dispatch) => {
   try {
     const response = await APIs.post("/procedure/create", procedureData);
     const { data } = response.data;
+console.log("pro",response.status);
 
     dispatch({
       type: procedureConstants.CREATE_PROCEDURE_SUCCESS,
@@ -37,10 +38,12 @@ export const createProcedure = (procedureData) => async (dispatch) => {
     });
     return {
       status: response.status,
-      message: response.data.message,
+      message: "Procedure Created Succssfully.",
       data: data
     };
   } catch (error) {
+    console.log(error);
+    
     dispatch({
       type: procedureConstants.CREATE_PROCEDURE_FAILURE,
       payload: { message: error?.response?.data?.message || "Server error" },

@@ -5,6 +5,9 @@ const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
 const { sendResponse } = require('../utils/response');
+const { formatDateTime } = require('../utils/timeFormate');
+
+
 
 const generateConsultantPDF = async (data, res) => {
   const colors = {
@@ -119,10 +122,28 @@ const generateConsultantPDF = async (data, res) => {
   let yPos = doc.y;
 
   // ===== 1. PATIENT DEMOGRAPHICS =====
+  const titleY = yPos;
+
+  // Left side - Patient Demographics
   doc.fillColor(colors.primary)
     .fontSize(12)
     .font('Helvetica-Bold')
-    .text('Patient Demographics', 18, yPos);
+    .text('Patient Demographics', 18, titleY);
+
+  // Right side - Consultation Date & Time (on the same line)
+  doc.fillColor(colors.lightText)
+    .fontSize(10)
+    .font('Helvetica')
+    .text('Consultation Date & Time:', doc.page.width / 2 + 20, titleY, {
+      continued: true,
+      width: doc.page.width / 2 - 38,
+      align: 'left'
+    })
+    .fillColor(colors.text)
+    .font('Helvetica-Bold')
+    .text(` ${formatDateTime(data.consultation?.createdAt)}`, {
+      continued: false
+    });
 
   doc.strokeColor(colors.border)
     .lineWidth(0.4)
@@ -135,6 +156,8 @@ const generateConsultantPDF = async (data, res) => {
     .font('Helvetica');
 
   yPos = doc.y + 8;
+
+// ========New============
 
   const getPatientField = (field, detailsField) => {
     if (field === 'other' && detailsField) {
@@ -533,7 +556,7 @@ const getConsultationData = async (consultationId) => {
     const patientId = consultation.patientId;
 
     const patient = await User.findById(patientId).select('-password -__v');
-    
+
     const relative = await Relative.findOne({ UH_ID: patient?.UH_ID });
 
     const doctor = consultation.createdBy || null;
@@ -552,7 +575,7 @@ const getConsultationData = async (consultationId) => {
 
 // Download pdf
 exports.consultationPdf = async (req, res) => {
-   try {
+  try {
     const { consultantaionId } = req.params;
 
     const data = await getConsultationData(consultantaionId);
@@ -609,7 +632,7 @@ exports.getAllConsultations = async (req, res) => {
   try {
     const { page = 1, limit = 10, status } = req.query;
     const query = {};
-    
+
     if (status) {
       query.status = status;
     }
@@ -646,7 +669,7 @@ exports.getAllConsultations = async (req, res) => {
 exports.getConsultationsByPatientId = async (req, res) => {
   try {
     const { page = 1, limit = 10 } = req.query;
-    
+
     const consultations = await Consultation.find({ patientId: req.params.patientId })
       .populate('patientId', 'name email UH_ID phone')
       .populate('createdBy', 'name email')
@@ -680,8 +703,8 @@ exports.getConsultationsByPatientId = async (req, res) => {
       }
     });
   } catch (error) {
-    console.log("eror",error);
-    
+    console.log("eror", error);
+
     res.status(500).json({
       success: false,
       message: 'Error fetching consultations',

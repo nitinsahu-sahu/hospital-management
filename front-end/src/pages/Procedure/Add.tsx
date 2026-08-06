@@ -219,6 +219,7 @@ export default function ProcedureAdd() {
         try {
             // Always create new procedure (no update functionality)
             const result = await dispatch(createProcedure(procedureData) as any);
+console.log("pro cret",result);
 
             if (result?.status === 201 || result?.status === 200) {
                 setSuccessMessage('Procedures saved successfully!');

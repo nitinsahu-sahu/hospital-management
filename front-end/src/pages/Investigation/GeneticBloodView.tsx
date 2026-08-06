@@ -28,8 +28,6 @@ const GeneticBloodView = () => {
     const [expandedGeneticId, setExpandedGeneticId] = useState<string | null>(null);
     const [downloadingId, setDownloadingId] = useState<string | null>(null);
     
-    console.log("geneticsBlood", geneticsBlood);
-
     const fetchGenetics = useCallback((patientId: string) => {
         if (patientId && patientId !== previousPatientId.current) {
             previousPatientId.current = patientId;
@@ -181,18 +179,11 @@ const GeneticBloodView = () => {
                                                 <div className="text-sm font-medium text-gray-900 dark:text-white">
                                                     {formatDateTime(genetic.createdAt)}
                                                 </div>
-                                                <div className="text-xs text-gray-500 dark:text-gray-400">
-                                                    Date: {new Date(genetic.date).toLocaleDateString('en-IN')}
-                                                </div>
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center">
                                                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                                                         {getInvestigationCount(genetic.investigations)} test{getInvestigationCount(genetic.investigations) !== 1 ? 's' : ''}
-                                                    </span>
-                                                    <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
-                                                        {genetic.investigations?.slice(0, 2).map((inv: any) => inv.name).join(', ')}
-                                                        {genetic.investigations?.length > 2 && '...'}
                                                     </span>
                                                 </div>
                                             </td>

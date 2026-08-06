@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const bloodInvestigationController = require('../controllers/geneticInvestigation.controller');
+const geneticInvestigationController = require('../controllers/geneticInvestigation.controller');
 const { 
   createGeneticInvestigationValidation, 
   updateGeneticInvestigationValidation 
@@ -17,34 +17,37 @@ router.post(
   '/', 
   createGeneticInvestigationValidation, 
   validate, 
-  bloodInvestigationController.createBloodInvestigation
+  geneticInvestigationController.createBloodInvestigation
 );
 
 router.get(
   '/', 
-  bloodInvestigationController.getAllBloodInvestigations
+  geneticInvestigationController.getAllBloodInvestigations
 );
 
 router.get(
   '/patient/:patientId', 
-  bloodInvestigationController.getBloodInvestigationByPatientId
+  geneticInvestigationController.getBloodInvestigationByPatientId
 );
 
 router.get(
   '/:id', 
-  bloodInvestigationController.getBloodInvestigationById
+  geneticInvestigationController.getBloodInvestigationById
 );
 
 router.put(
   '/:id', 
   updateGeneticInvestigationValidation, 
   validate, 
-  bloodInvestigationController.updateBloodInvestigation
+  geneticInvestigationController.updateBloodInvestigation
 );
 
 router.delete(
   '/:id', 
-  bloodInvestigationController.deleteBloodInvestigation
+  geneticInvestigationController.deleteBloodInvestigation
 );
+
+router.get('/download/:geneticId', geneticInvestigationController.geneticPdf);
+
 
 module.exports = router;

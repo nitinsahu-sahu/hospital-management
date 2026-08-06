@@ -194,9 +194,6 @@ const UltrasoundView = () => {
                                                 <div className="text-sm font-medium text-gray-900 dark:text-white">
                                                     {formatDateTime(ultrasound.createdAt)}
                                                 </div>
-                                                <div className="text-xs text-gray-500 dark:text-gray-400">
-                                                    Date: {new Date(ultrasound.date).toLocaleDateString('en-IN')}
-                                                </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex flex-col gap-1">
@@ -322,13 +319,6 @@ const UltrasoundView = () => {
                                                                                 {ultrasound.createdBy?.name || 'N/A'}
                                                                             </span>
                                                                         </div>
-                                                                        <div className="flex items-center gap-2">
-                                                                            <span className="text-gray-500 dark:text-gray-400">Email:</span>
-                                                                            <span className="text-gray-600 dark:text-gray-300 text-sm">
-                                                                                {ultrasound.createdBy?.email || 'N/A'}
-                                                                            </span>
-                                                                        </div>
-                                                                       
                                                                     </div>
 
                                                                     <div className="space-y-2">

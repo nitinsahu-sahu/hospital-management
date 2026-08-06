@@ -181,9 +181,6 @@ const RoutineBloodView = () => {
                                                 <div className="text-sm font-medium text-gray-900 dark:text-white">
                                                     {formatDateTime(routine.createdAt)}
                                                 </div>
-                                                <div className="text-xs text-gray-500 dark:text-gray-400">
-                                                    Date: {new Date(routine.date).toLocaleDateString('en-IN')}
-                                                </div>
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center">

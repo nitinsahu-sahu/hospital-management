@@ -5,8 +5,11 @@ const Relative = require('../models/Relative');
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
+const { formatDateTime } = require('../utils/timeFormate');
 
 const generatePatientHistoryPDF = async (data, res) => {
+  console.log("ph", data.patientHistory.historyOfIllness);
+
   const colors = {
     primary: '#1a5276',
     secondary: '#2e86c1',
@@ -119,10 +122,27 @@ const generatePatientHistoryPDF = async (data, res) => {
   let yPos = doc.y;
 
   // ===== 1. PATIENT DEMOGRAPHICS =====
+  const titleY = yPos;
+
+  // Left side - Patient Demographics
   doc.fillColor(colors.primary)
     .fontSize(12)
     .font('Helvetica-Bold')
-    .text('Patient Demographics', 18, yPos);
+    .text('Patient Demographics', 18, titleY);
+
+  doc.fillColor(colors.lightText)
+    .fontSize(10)
+    .font('Helvetica')
+    .text('History Date & Time:', doc.page.width / 2 + 20, titleY, {
+      continued: true,
+      width: doc.page.width / 2 - 38,
+      align: 'left'
+    })
+    .fillColor(colors.text)
+    .font('Helvetica-Bold')
+    .text(` ${formatDateTime(data.patientHistory?.createdAt)}`, {
+      continued: false
+    });
 
   doc.strokeColor(colors.border)
     .lineWidth(0.4)
@@ -135,6 +155,7 @@ const generatePatientHistoryPDF = async (data, res) => {
     .font('Helvetica');
 
   yPos = doc.y + 8;
+
 
   const getPatientField = (field, detailsField) => {
     if (field === 'other' && detailsField) {
@@ -308,13 +329,13 @@ const generatePatientHistoryPDF = async (data, res) => {
 
   // ===== CLINICAL HISTORY =====
   if (data?.patientHistory) {
+    const history = data.patientHistory;
+    let sectionY = yPos;
 
     doc.fillColor(colors.primary)
       .fontSize(12)
       .font('Helvetica-Bold')
-      .text('Patient History', 18, yPos)
-      .font('Helvetica')
-      .fontSize(10);
+      .text('Clinical History', 18, sectionY);
 
     doc.strokeColor(colors.border)
       .lineWidth(0.4)
@@ -322,108 +343,405 @@ const generatePatientHistoryPDF = async (data, res) => {
       .lineTo(doc.page.width - 18, doc.y + 1.5)
       .stroke();
 
-    doc.fillColor(colors.text)
-      .fontSize(10)
-      .font('Helvetica');
-
     yPos = doc.y + 10;
 
-    const history = data.patientHistory;
+    const sectionWidth = doc.page.width - 36;
+    const leftCol = 22;
+    const rightCol = doc.page.width / 2 + 10;
+    const labelWidth = 100;
+    const valueX = leftCol + labelWidth;
 
+    // ===== CHIEF COMPLAINTS =====
     if (history.chiefComplaints) {
-      const complaintText = history.chiefComplaints.replace(/_/g, ' ').toUpperCase();
-      doc.fillColor(colors.lightText)
-        .text('Chief:', 25, yPos, { continued: true })
-        .fillColor(colors.text)
-        .text(` ${complaintText}${history.chiefComplaintsDetails ? ` - ${history.chiefComplaintsDetails}` : ''}`);
+      const complaintText = history.chiefComplaints.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
+
+      doc.rect(leftCol, yPos - 2, sectionWidth, 20)
+        .fill(colors.lightBg)
+        .stroke(colors.border);
+
+      doc.fillColor(colors.primary)
+        .fontSize(10)
+        .font('Helvetica-Bold')
+        .text('Chief Complaints', leftCol + 5, yPos + 3);
+
+      yPos += 22;
+
+      doc.fillColor(colors.text)
+        .fontSize(10)
+        .font('Helvetica')
+        .text(`${complaintText}${history.chiefComplaintsDetails ? ` - ${history.chiefComplaintsDetails}` : ''}`, leftCol + 10, yPos, {
+          width: sectionWidth - 20
+        });
+
+      yPos = doc.y + 8;
     }
 
-    yPos += 13;
+    // ===== HISTORY OF ILLNESS =====
+    if (history.historyOfIllness) {
+      const illness = history.historyOfIllness;
 
+      doc.rect(leftCol, yPos - 2, sectionWidth, 20)
+        .fill(colors.lightBg)
+        .stroke(colors.border);
+
+      doc.fillColor(colors.primary)
+        .fontSize(10)
+        .font('Helvetica-Bold')
+        .text('History of Illness', leftCol + 5, yPos + 3);
+
+      yPos += 22;
+
+      const illnessLeftX = leftCol + 10;
+
+      // Onset
+      if (illness.onset) {
+        const onsetDate = new Date(illness.onset).toLocaleDateString('en-IN', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        });
+
+        doc.fillColor(colors.lightText)
+          .fontSize(9)
+          .font('Helvetica')
+          .text('Onset:', illnessLeftX, yPos, { continued: true, width: 80 })
+          .fillColor(colors.text)
+          .font('Helvetica-Bold')
+          .text(` ${onsetDate}`);
+
+        yPos += 14;
+      }
+
+      // Duration
+      if (illness.duration && illness.duration.length > 0) {
+        const durationText = illness.duration.map(d => `${d.number} ${d.unit}`).join(', ');
+
+        doc.fillColor(colors.lightText)
+          .fontSize(9)
+          .font('Helvetica')
+          .text('Duration:', illnessLeftX, yPos, { continued: true, width: 250 })
+          .fillColor(colors.text)
+          .font('Helvetica-Bold')
+          .text(` ${durationText}`);
+
+        yPos += 14;
+      }
+
+      // Associated Symptoms
+      if (illness.associatedSymptoms) {
+        doc.fillColor(colors.lightText)
+          .fontSize(9)
+          .font('Helvetica')
+          .text('Symptoms:', illnessLeftX, yPos, { continued: true, width: sectionWidth })
+          .fillColor(colors.text)
+          .font('Helvetica')
+          .text(` ${illness.associatedSymptoms}`, {
+            width: sectionWidth - 90
+          });
+
+        yPos = doc.y + 6;
+      }
+
+      yPos += 4;
+    }
+
+    // ===== MENSTRUAL HISTORY =====
     if (history.menstrualHistory) {
       const menstrual = history.menstrualHistory;
-      let menstrualText = '';
+
+      doc.rect(leftCol, yPos - 2, sectionWidth, 20)
+        .fill(colors.lightBg)
+        .stroke(colors.border);
+
+      doc.fillColor(colors.primary)
+        .fontSize(10)
+        .font('Helvetica-Bold')
+        .text('Menstrual History', leftCol + 5, yPos + 3);
+
+      yPos += 22;
+
+      const menstLeftX = leftCol + 10;
+
+      // LMP
       if (menstrual.lmp) {
         const lmpDate = new Date(menstrual.lmp).toLocaleDateString('en-IN', {
           day: '2-digit',
           month: '2-digit',
           year: 'numeric'
         });
-        menstrualText += `LMP: ${lmpDate} | `;
+
+        doc.fillColor(colors.lightText)
+          .fontSize(9)
+          .font('Helvetica')
+          .text('LMP:', menstLeftX, yPos, { continued: true, width: 100 })
+          .fillColor(colors.text)
+          .font('Helvetica-Bold')
+          .text(` ${lmpDate}`);
+
+        // Cycle Length and Days of Flow on same line
+        doc.fillColor(colors.lightText)
+          .text('Cycle Length:', menstLeftX + 200, yPos, { continued: true, width: 100 })
+          .fillColor(colors.text)
+          .font('Helvetica-Bold')
+          .text(` ${menstrual.cycleLength || 'N/A'} days`);
+
+        doc.fillColor(colors.lightText)
+          .text('Days of Flow:', menstLeftX + 380, yPos, { continued: true, width: 100 })
+          .fillColor(colors.text)
+          .font('Helvetica-Bold')
+          .text(` ${menstrual.daysOfFlow || 'N/A'} days`);
+
+        yPos += 14;
       }
-      menstrualText += `Cycle: ${menstrual.cycleLength || 'N/A'} days | Flow: ${menstrual.daysOfFlow || 'N/A'} days`;
+
+      // Associated Symptoms
       if (menstrual.associatedSymptoms) {
-        menstrualText += ` | Symptoms: ${menstrual.associatedSymptoms.substring(0, 30)}${menstrual.associatedSymptoms.length > 30 ? '...' : ''}`;
+        doc.fillColor(colors.lightText)
+          .fontSize(9)
+          .font('Helvetica')
+          .text('Symptoms:', menstLeftX, yPos, { continued: true, width: sectionWidth })
+          .fillColor(colors.text)
+          .font('Helvetica')
+          .text(` ${menstrual.associatedSymptoms}`, {
+            width: sectionWidth - 90
+          });
+
+        yPos = doc.y + 6;
       }
-      doc.fillColor(colors.lightText)
-        .text('Menstrual:', 25, yPos, { continued: true })
-        .fillColor(colors.text)
-        .text(` ${menstrualText}`);
+
+      yPos += 4;
     }
 
-    yPos += 13;
-
+    // ===== OBSTETRIC HISTORY =====
     if (history.obstetricHistory) {
       const obst = history.obstetricHistory;
-      const obstParts = [];
-      if (obst.gravida) obstParts.push(`Gravida: ${obst.gravida}`);
-      if (obst.para) obstParts.push(`Para: ${obst.para}`);
-      if (obst.living) obstParts.push(`Living:${obst.living}`);
-      if (obst.abortion) obstParts.push(`Abortion: ${obst.abortion}`);
-      if (obst.sb_iod_dead) obstParts.push(`SB / IUD / DEAD: ${obst.sb_iod_dead}`);
-      if (obst.ectopic) obstParts.push(`Ectopic: ${obst.ectopic}`);
 
-      if (obstParts.length > 0) {
-        doc.fillColor(colors.lightText)
-          .text('Obstetric:', 25, yPos, { continued: true })
-          .fillColor(colors.text)
-          .text(` ${obstParts.join(' | ')}`);
-      }
+      doc.rect(leftCol, yPos - 2, sectionWidth, 20)
+        .fill(colors.lightBg)
+        .stroke(colors.border);
+
+      doc.fillColor(colors.primary)
+        .fontSize(10)
+        .font('Helvetica-Bold')
+        .text('Obstetric History', leftCol + 5, yPos + 3);
+
+      yPos += 22;
+
+      // Create a table-like layout for obstetric history
+      const obstFields = [
+        { key: 'gravida', label: 'Gravida', value: obst.gravida },
+        { key: 'para', label: 'Para', value: obst.para },
+        { key: 'living', label: 'Living', value: obst.living },
+        { key: 'abortion', label: 'Abortion', value: obst.abortion },
+        { key: 'sb_iod_dead', label: 'SB/IUD/Dead', value: obst.sb_iod_dead },
+        { key: 'ectopic', label: 'Ectopic', value: obst.ectopic }
+      ];
+
+      const obstStartX = leftCol + 10;
+      const obstColWidth = (sectionWidth - 20) / 3;
+
+      obstFields.forEach((field, index) => {
+        const colIndex = index % 3;
+        const rowIndex = Math.floor(index / 3);
+        const xPos = obstStartX + (colIndex * obstColWidth);
+        const currentY = yPos + (rowIndex * 18);
+
+        if (field.value) {
+          doc.fillColor(colors.lightText)
+            .fontSize(9)
+            .font('Helvetica')
+            .text(`${field.label}:`, xPos, currentY, { continued: true, width: 100 })
+            .fillColor(colors.text)
+            .font('Helvetica-Bold')
+            .text(` ${field.value}`);
+        }
+      });
+
+      yPos += Math.ceil(obstFields.filter(f => f.value).length / 3) * 18 + 8;
     }
 
-    yPos += 13;
-
+    // ===== WIFE MEDICAL HISTORY =====
     if (history.wifeMedicalHistory) {
       const wifeMed = history.wifeMedicalHistory;
-      const wifeParts = [];
-      if (wifeMed.diabetes && wifeMed.diabetes !== 'no') wifeParts.push(`DM: ${wifeMed.diabetes}`);
-      if (wifeMed.hypertension && wifeMed.hypertension !== 'no') wifeParts.push(`HTN: ${wifeMed.hypertension}`);
-      if (wifeMed.thyroid && wifeMed.thyroid !== 'no') wifeParts.push(`Thyroid: ${wifeMed.thyroid}`);
-      if (wifeMed.drugAllergy && wifeMed.drugAllergy !== 'no') {
-        wifeParts.push(`Allergy: ${wifeMed.drugAllergy}${wifeMed.drugAllergyDetails ? `(${wifeMed.drugAllergyDetails})` : ''}`);
-      }
 
-      if (wifeParts.length > 0) {
+      doc.rect(leftCol, yPos - 2, sectionWidth, 20)
+        .fill(colors.lightBg)
+        .stroke(colors.border);
+
+      doc.fillColor(colors.primary)
+        .fontSize(10)
+        .font('Helvetica-Bold')
+        .text('Wife Medical History', leftCol + 5, yPos + 3);
+
+      yPos += 22;
+
+      const wifeFields = [
+        { key: 'diabetes', label: 'Diabetes', value: wifeMed.diabetes },
+        { key: 'hypertension', label: 'Hypertension', value: wifeMed.hypertension },
+        { key: 'asthma', label: 'Asthma', value: wifeMed.asthma },
+        { key: 'thyroid', label: 'Thyroid', value: wifeMed.thyroid },
+        { key: 'drugAllergy', label: 'Drug Allergy', value: wifeMed.drugAllergy },
+        { key: 'geneticDiseaseSelf', label: 'Genetic Disease (Self)', value: wifeMed.geneticDiseaseSelf },
+        { key: 'geneticDiseaseFamily', label: 'Genetic Disease (Family)', value: wifeMed.geneticDiseaseFamily },
+        { key: 'downSyndrome', label: 'Down Syndrome', value: wifeMed.downSyndrome },
+        { key: 'smoking', label: 'Smoking', value: wifeMed.smoking },
+        { key: 'drugAddiction', label: 'Drug Addiction', value: wifeMed.drugAddiction }
+      ];
+
+      const wifeStartX = leftCol + 10;
+      const wifeColWidth = sectionWidth / 2;
+
+      wifeFields.forEach((field, index) => {
+        if (field.key === 'drugAllergyDetails' && wifeMed.drugAllergy?.toLowerCase() !== 'yes') return;
+        if (field.key === 'geneticDiseaseFamily' && !field.value) return;
+        if (!field.value && field.key !== 'drugAllergyDetails') return;
+
+        const colIndex = index % 2;
+        const rowIndex = Math.floor(index / 2);
+        const xPos = wifeStartX + (colIndex * wifeColWidth);
+        const currentY = yPos + (rowIndex * 16);
+
+        let displayValue = field.value;
+        if (field.key !== 'drugAllergyDetails') {
+          displayValue = field.value?.toLowerCase() === 'yes' ? 'Yes' :
+            field.value?.toLowerCase() === 'no' ? 'No' :
+              field.value || 'N/A';
+        }
+
+        // Draw alternating row backgrounds
+        if (rowIndex % 2 === 0) {
+          doc.rect(xPos - 5, currentY - 1, wifeColWidth - 5, 14)
+            .fill('#f8f9fa')
+            .stroke(colors.border);
+        }
+
         doc.fillColor(colors.lightText)
-          .text('Wife Med:', 25, yPos, { continued: true })
+          .fontSize(8)
+          .font('Helvetica')
+          .text(`${field.label}:`, xPos, currentY + 1, { continued: true, width: 120 })
           .fillColor(colors.text)
-          .text(` ${wifeParts.join(' | ')}`);
+          .font('Helvetica-Bold')
+          .text(` ${displayValue}`);
+      });
+
+      // Drug Allergy Details
+      if (wifeMed.drugAllergy?.toLowerCase() === 'yes' && wifeMed.drugAllergyDetails) {
+        yPos += Math.ceil(wifeFields.filter(f => {
+          if (f.key === 'drugAllergyDetails' && wifeMed.drugAllergy?.toLowerCase() !== 'yes') return false;
+          if (f.key === 'geneticDiseaseFamily' && !f.value) return false;
+          return f.value || f.key === 'drugAllergyDetails';
+        }).length / 2) * 16 + 4;
+
+        doc.fillColor(colors.lightText)
+          .fontSize(9)
+          .font('Helvetica')
+          .text('Drug Allergy Details:', wifeStartX, yPos, { continued: true, width: 120 })
+          .fillColor(colors.text)
+          .font('Helvetica')
+          .text(` ${wifeMed.drugAllergyDetails}`);
+
+        yPos += 14;
+      } else {
+        yPos += Math.ceil(wifeFields.filter(f => {
+          if (f.key === 'drugAllergyDetails' && wifeMed.drugAllergy?.toLowerCase() !== 'yes') return false;
+          if (f.key === 'geneticDiseaseFamily' && !f.value) return false;
+          return f.value || f.key === 'drugAllergyDetails';
+        }).length / 2) * 16 + 8;
       }
     }
-    yPos += 13;
 
+    // ===== HUSBAND MEDICAL HISTORY =====
     if (history.husbandMedicalHistory) {
       const husbandMed = history.husbandMedicalHistory;
-      const husbandParts = [];
-      if (husbandMed.diabetes && husbandMed.diabetes !== 'no') husbandParts.push(`DM: ${husbandMed.diabetes}`);
-      if (husbandMed.hypertension && husbandMed.hypertension !== 'no') husbandParts.push(`HTN: ${husbandMed.hypertension}`);
-      if (husbandMed.thyroid && husbandMed.thyroid !== 'no') husbandParts.push(`Thyroid: ${husbandMed.thyroid}`);
-      if (husbandMed.drugAllergy && husbandMed.drugAllergy !== 'no') {
-        husbandParts.push(`Allergy: ${husbandMed.drugAllergy}${husbandMed.drugAllergyDetails ? `(${husbandMed.drugAllergyDetails})` : ''}`);
-      }
-      if (husbandMed.smoking && husbandMed.smoking !== 'no') husbandParts.push(`Smoking: ${husbandMed.smoking}`);
 
-      if (husbandParts.length > 0) {
+      doc.rect(leftCol, yPos - 2, sectionWidth, 20)
+        .fill(colors.lightBg)
+        .stroke(colors.border);
+
+      doc.fillColor(colors.primary)
+        .fontSize(10)
+        .font('Helvetica-Bold')
+        .text('Husband Medical History', leftCol + 5, yPos + 3);
+
+      yPos += 22;
+
+      const husbandFields = [
+        { key: 'diabetes', label: 'Diabetes', value: husbandMed.diabetes },
+        { key: 'hypertension', label: 'Hypertension', value: husbandMed.hypertension },
+        { key: 'asthma', label: 'Asthma', value: husbandMed.asthma },
+        { key: 'thyroid', label: 'Thyroid', value: husbandMed.thyroid },
+        { key: 'drugAllergy', label: 'Drug Allergy', value: husbandMed.drugAllergy },
+        { key: 'geneticDiseaseSelf', label: 'Genetic Disease (Self)', value: husbandMed.geneticDiseaseSelf },
+        { key: 'geneticDiseaseFamily', label: 'Genetic Disease (Family)', value: husbandMed.geneticDiseaseFamily },
+        { key: 'downSyndrome', label: 'Down Syndrome', value: husbandMed.downSyndrome },
+        { key: 'smoking', label: 'Smoking', value: husbandMed.smoking },
+        { key: 'drugAddiction', label: 'Drug Addiction', value: husbandMed.drugAddiction }
+      ];
+
+      const husbandStartX = leftCol + 10;
+      const husbandColWidth = sectionWidth / 2;
+
+      husbandFields.forEach((field, index) => {
+        if (field.key === 'drugAllergyDetails' && husbandMed.drugAllergy?.toLowerCase() !== 'yes') return;
+        if (field.key === 'geneticDiseaseFamily' && !field.value) return;
+        if (!field.value && field.key !== 'drugAllergyDetails') return;
+
+        const colIndex = index % 2;
+        const rowIndex = Math.floor(index / 2);
+        const xPos = husbandStartX + (colIndex * husbandColWidth);
+        const currentY = yPos + (rowIndex * 16);
+
+        let displayValue = field.value;
+        if (field.key !== 'drugAllergyDetails') {
+          displayValue = field.value?.toLowerCase() === 'yes' ? 'Yes' :
+            field.value?.toLowerCase() === 'no' ? 'No' :
+              field.value || 'N/A';
+        }
+
+        // Draw alternating row backgrounds
+        if (rowIndex % 2 === 0) {
+          doc.rect(xPos - 5, currentY - 1, husbandColWidth - 5, 14)
+            .fill('#f8f9fa')
+            .stroke(colors.border);
+        }
+
         doc.fillColor(colors.lightText)
-          .text('Husband Med:', 25, yPos, { continued: true })
+          .fontSize(8)
+          .font('Helvetica')
+          .text(`${field.label}:`, xPos, currentY + 1, { continued: true, width: 120 })
           .fillColor(colors.text)
-          .text(` ${husbandParts.join(' | ')}`, 22, yPos, {
-            width: doc.page.width - 40
-          });
-        yPos += 7;
+          .font('Helvetica-Bold')
+          .text(` ${displayValue}`);
+      });
+
+      // Drug Allergy Details
+      if (husbandMed.drugAllergy?.toLowerCase() === 'yes' && husbandMed.drugAllergyDetails) {
+        yPos += Math.ceil(husbandFields.filter(f => {
+          if (f.key === 'drugAllergyDetails' && husbandMed.drugAllergy?.toLowerCase() !== 'yes') return false;
+          if (f.key === 'geneticDiseaseFamily' && !f.value) return false;
+          return f.value || f.key === 'drugAllergyDetails';
+        }).length / 2) * 16 + 4;
+
+        doc.fillColor(colors.lightText)
+          .fontSize(9)
+          .font('Helvetica')
+          .text('Drug Allergy Details:', husbandStartX, yPos, { continued: true, width: 120 })
+          .fillColor(colors.text)
+          .font('Helvetica')
+          .text(` ${husbandMed.drugAllergyDetails}`);
+
+        yPos += 14;
+      } else {
+        yPos += Math.ceil(husbandFields.filter(f => {
+          if (f.key === 'drugAllergyDetails' && husbandMed.drugAllergy?.toLowerCase() !== 'yes') return false;
+          if (f.key === 'geneticDiseaseFamily' && !f.value) return false;
+          return f.value || f.key === 'drugAllergyDetails';
+        }).length / 2) * 16 + 8;
       }
     }
   }
+
+  yPos += 10;
 
   yPos += 15;
 
@@ -749,7 +1067,7 @@ exports.updatePatientHistory = async (req, res) => {
 
 // Get Patient History by Patient ID
 exports.getPatientHistoryByPatientId = async (req, res) => {
-  
+
   try {
     const { page = 1, limit = 10 } = req.query;
     const { patientId } = req.params;

@@ -7,12 +7,12 @@ export const downloadPatientExaminationPDF = (patientExaminationId) => async (di
         const config = {
             responseType: 'blob'
         };
-        const response = await APIs.get(`/patient_examination/download/${patientExaminationId}`, config);
+        const response = await APIs.get(`/patient-examination/download/${patientExaminationId}`, config);
         // Create download link
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', `patient-examination_summary_${patientExaminationId}.pdf`);
+        link.setAttribute('download', `patient_examination_summary_${patientExaminationId}.pdf`);
         document.body.appendChild(link);
         link.click();
         link.remove();

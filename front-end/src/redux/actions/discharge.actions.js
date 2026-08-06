@@ -30,12 +30,14 @@ export const getDischargeData = (patientId) => async (dispatch) => {
     try {
         dispatch({ type: dischargeConstants.DISCHARGE_DATA_REQUEST });
 
-        const response = await APIs.get(`/discharge/patient/${patientId}`);
-        const { data } = response.data;
+        const {data} = await APIs.get(`/discharge/patient/${patientId}`);
 
         dispatch({
             type: dischargeConstants.DISCHARGE_DATA_SUCCESS,
-            payload: data
+            payload: {
+                discharesRecord:data.data,
+                pagination:data.pagination
+            },
         });
         return ({
             type: dischargeConstants.DISCHARGE_DATA_SUCCESS,

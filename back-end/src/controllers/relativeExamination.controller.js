@@ -6,6 +6,7 @@ const Consultation = require('../models/Consultation');
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
+const { formatDateTime } = require('../utils/timeFormate');
 
 const generateRelativeExaminationPDF = async (data, res) => {
   const colors = {
@@ -120,10 +121,25 @@ const generateRelativeExaminationPDF = async (data, res) => {
   let yPos = doc.y;
 
   // ===== 1. PATIENT DEMOGRAPHICS =====
+  const titleY = yPos;
   doc.fillColor(colors.primary)
     .fontSize(12)
     .font('Helvetica-Bold')
-    .text('Patient Demographics', 18, yPos);
+    .text('Patient Demographics', 18, titleY);
+
+  doc.fillColor(colors.lightText)
+    .fontSize(10)
+    .font('Helvetica')
+    .text('Retative Examination Date & Time:', doc.page.width / 2 + 20, titleY, {
+      continued: true,
+      width: doc.page.width / 2 - 38,
+      align: 'left'
+    })
+    .fillColor(colors.text)
+    .font('Helvetica-Bold')
+    .text(` ${formatDateTime(data.relativeExamination?.createdAt)}`, {
+      continued: false
+    });
 
   doc.strokeColor(colors.border)
     .lineWidth(0.4)
@@ -136,6 +152,7 @@ const generateRelativeExaminationPDF = async (data, res) => {
     .font('Helvetica');
 
   yPos = doc.y + 8;
+
 
   const getPatientField = (field, detailsField) => {
     if (field === 'other' && detailsField) {
@@ -456,7 +473,7 @@ exports.relativeExaminationPdf = async (req, res) => {
     const { relativeExaminationId } = req.params;
 
     const data = await getRelativeExaminationData(relativeExaminationId);
-    
+
     if (!data.relativeExamination) {
       return res.status(404).json({
         success: false,
@@ -629,7 +646,7 @@ exports.getRelativeExaminationByRelativeId = async (req, res) => {
     const total = await RelativeExamination.countDocuments({ patientId: req.params.patientId });
 
 
-     if (!examinations || examinations.length === 0) {
+    if (!examinations || examinations.length === 0) {
       return res.status(200).json({
         success: true,
         data: [],

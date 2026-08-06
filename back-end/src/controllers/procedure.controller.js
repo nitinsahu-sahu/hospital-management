@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const Patient = require('../models/User');
 const Relative = require('../models/Relative');
+const { formatDateTime } = require('../utils/timeFormate');
 
 const generateProcedurePDF = async (data, res) => {
 
@@ -120,10 +121,28 @@ const generateProcedurePDF = async (data, res) => {
     let yPos = doc.y;
 
     // ===== 1. PATIENT DEMOGRAPHICS =====
+    const titleY = yPos;
+
+    // Left side - Patient Demographics
     doc.fillColor(colors.primary)
         .fontSize(12)
         .font('Helvetica-Bold')
-        .text('Patient Demographics', 18, yPos);
+        .text('Patient Demographics', 18, titleY);
+
+    // Right side - Consultation Date & Time (on the same line)
+    doc.fillColor(colors.lightText)
+        .fontSize(10)
+        .font('Helvetica')
+        .text('Procedure Date & Time:', doc.page.width / 2 + 20, titleY, {
+            continued: true,
+            width: doc.page.width / 2 - 38,
+            align: 'left'
+        })
+        .fillColor(colors.text)
+        .font('Helvetica-Bold')
+        .text(` ${formatDateTime(data.procedure?.createdAt)}`, {
+            continued: false
+        });
 
     doc.strokeColor(colors.border)
         .lineWidth(0.4)
@@ -419,7 +438,7 @@ const generateProcedurePDF = async (data, res) => {
         .font('Helvetica-Bold');
 
     // GRAND TOTAL label - LEFT side
-    doc.text('GRAND TOTAL', tableX + col1Width + 5, yPos + 6, {
+    doc.text('TOTAL', tableX + col1Width + 5, yPos + 6, {
         width: col2Width - 5,
         align: 'left'
     });
