@@ -16,22 +16,35 @@ import { ScrollToTop } from "./components/common/ScrollToTop";
 
 import Patients from "./pages/patients/patients";
 import PatientsListing from "./pages/patients/patients-listing";
-import DoctorConsultation from "./pages/Consultation/DoctorCunsultation";
+import ConsultationView from "./pages/Consultation/view";
+import ConsultationAdd from "./pages/Consultation/add";
 
-import Prescription from "./pages/Prescription/Prescription";
+import PrescriptionAdd from "./pages/Prescription/Add";
+import PrescriptionView from "./pages/Prescription/View";
 
 import Protected from "./redux/helper/HOC";
 import { RootState } from "./redux/store/store";
 //@ts-ignore
 import { isUserLoggedIn } from "./redux/actions/auth.actions";
-import PatientHistory from "./pages/PatientHistory/PatientHistory";
-import Procedure from "./pages/Procedure/Procedure";
-import Discharge from "./pages/Discharge/Discharge";
-import UltraSound from "./pages/Investigation/Ultrasound";
-import RoutineBlood from "./pages/Investigation/RoutineBlood";
-import GeneticBlood from "./pages/Investigation/GeneticBlood";
-import PatientExamination from "./pages/ExaminationOfCouple/PatientExamination";
-import RelativeExamination from "./pages/ExaminationOfCouple/RelativeExamination";
+import PatientHistoryAdd from "./pages/PatientHistory/add";
+import PatientHistoryView from "./pages/PatientHistory/view";
+import ProcedureView from "./pages/Procedure/View";
+import ProcedureAdd from "./pages/Procedure/Add";
+
+import DischargeAdd from "./pages/Discharge/Add";
+import DischargeView from "./pages/Discharge/View";
+
+import UltraSoundAdd from "./pages/Investigation/UltrasoundAdd";
+import UltraSoundView from "./pages/Investigation/UltrasoundView";
+import RoutineBloodAdd from "./pages/Investigation/RoutineBloodAdd";
+import RoutineBloodView from "./pages/Investigation/RoutineBloodView";
+import GeneticBloodAdd from "./pages/Investigation/GeneticBloodAdd";
+import GeneticBloodView from "./pages/Investigation/GeneticBloodView";
+
+import PatientExaminationAdd from "./pages/ExaminationOfCouple/PatientExaminationAdd";
+import PatientExaminationView from "./pages/ExaminationOfCouple/PatientExaminationView";
+import RelativeExaminationAdd from "./pages/ExaminationOfCouple/RelativeExaminationAdd";
+import RelativeExaminationView from "./pages/ExaminationOfCouple/RelativeExaminationView";
 
 export default function App() {
   
@@ -69,18 +82,33 @@ export default function App() {
 
           {/* Others Page */}
           <Route path="/profile" element={<UserProfiles />} />
-          <Route path="/patient-history" element={<PatientHistory />} />
-          <Route path="/examination-of-couple/patient" element={<PatientExamination />} />
-          <Route path="/examination-of-couple/relative" element={<RelativeExamination />} />
-          <Route path="/investigation/ultrasound" element={<UltraSound />} />
-          <Route path="/investigation/routine-blood-test" element={<RoutineBlood />} />
-          <Route path="/investigation/genetic-blood-test" element={<GeneticBlood />} />
-          <Route path="/procedure" element={<Procedure />} />
-          <Route path="/discharge" element={<Discharge />} />
-          <Route path="/consultation" element={<DoctorConsultation />} />
+          <Route path="/patient-history/add" element={<PatientHistoryAdd />} />
+          <Route path="/patient-history/view" element={<PatientHistoryView />} />
+
+          <Route path="/examination-of-couple/patient/add" element={<PatientExaminationAdd />} />
+          <Route path="/examination-of-couple/patient/view" element={<PatientExaminationView />} />
+          <Route path="/examination-of-couple/relative/add" element={<RelativeExaminationAdd />} />
+          <Route path="/examination-of-couple/relative/view" element={<RelativeExaminationView />} />
+
+          <Route path="/investigation/ultrasound-add" element={<UltraSoundAdd />} />
+          <Route path="/investigation/ultrasound-view" element={<UltraSoundView />} />
+          <Route path="/investigation/routine-blood-add" element={<RoutineBloodAdd />} />
+          <Route path="/investigation/routine-blood-view" element={<RoutineBloodView />} />
+          <Route path="/investigation/genetic-blood-add" element={<GeneticBloodAdd />} />
+          <Route path="/investigation/genetic-blood-view" element={<GeneticBloodView />} />
+
+          <Route path="/procedure/add" element={<ProcedureAdd />} />
+          <Route path="/procedure/view" element={<ProcedureView />} />
+
+          <Route path="/discharge/view" element={<DischargeView />} />
+          <Route path="/discharge/add" element={<DischargeAdd />} />
+
+          <Route path="/consultation/view" element={<ConsultationView />} />
+          <Route path="/consultation/add" element={<ConsultationAdd />} />
           <Route path="/" element={<Patients />} />
           <Route path="/patient/view" element={<PatientsListing />} />
-          <Route path="/prescription" element={<Prescription />} />
+          <Route path="/prescription/add" element={<PrescriptionAdd />} />
+          <Route path="/prescription/view" element={<PrescriptionView />} />
         </Route>
         <Route path="*" element={<NotFound />} />
 

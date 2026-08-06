@@ -1,12 +1,13 @@
 import { combineReducers } from '@reduxjs/toolkit'
 import authReducer from './auth.reducer'
 import patientReducer from './patient.reducer'
-import consultationReducer from './consultation.reducer'
+import consultationNewReducer from './consultationNew.reducer'
 import patientHistoryReducer from './patientHistory.reducer'
 import { patientExaminationReducer } from './patientExamination.reducer';
 import { relativeExaminationReducer } from './relativeExamination.reducer';
 import { investigationReducer } from '../reducers/investigation.reducer';
 import { bloodInvestigationReducer } from '../reducers/bloodInvestigation.reducer';
+import { geneticInvestigationReducer } from '../reducers/geneticInvestigation.reducer';
 import procedureReducer from '../reducers/procedure.reducer';
 import prescriptionReducer from '../reducers/prescription.reducer';
 import dischargeReducer from '../reducers/discharge.reducer';
@@ -15,14 +16,15 @@ import dischargeReducer from '../reducers/discharge.reducer';
 const rootReducer = combineReducers({
   auth: authReducer,
   patients: patientReducer,
-  consultation: consultationReducer,
+  consultation: consultationNewReducer,
   patientHistory: patientHistoryReducer,
-  patientExamination: patientExaminationReducer,
-  relativeExamination: relativeExaminationReducer,
+  eoc: patientExaminationReducer,
+  reoc: relativeExaminationReducer,
   investigation: investigationReducer,
   bloodInvestigation: bloodInvestigationReducer,
+  geneticInvestigation: geneticInvestigationReducer,
   procedure: procedureReducer,
-  prescription: prescriptionReducer,
+  prescriptions: prescriptionReducer,
   discharge: dischargeReducer,
 })
 

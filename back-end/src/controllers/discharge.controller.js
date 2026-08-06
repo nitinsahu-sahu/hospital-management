@@ -1,7 +1,7 @@
 const Discharge = require('../models/Discharge');
 const User = require('../models/User');
 const PatientHistory = require('../models/PatientHistory');
-const Consultation = require('../models/Cosultation');
+const Consultation = require('../models/Consultation');
 const Investigation = require('../models/Investigation');
 const BloodInvestigation = require('../models/BloodInvestigation');
 const GeneticInvestigation = require('../models/GeneticInvestigation');
@@ -13,6 +13,7 @@ const RelativeExamination = require('../models/RelativeExamination');
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
+const { formatDateTime } = require('../utils/timeFormate');
 
 // Helper function to get doctor details
 const getDoctorDetails = async () => {
@@ -26,7 +27,7 @@ const getDoctorDetails = async () => {
   }
 };
 
-const generateDischargePDF = async (data, res) => {
+const generateDischargePDFOld = async (data, res) => {
   const colors = {
     primary: '#1a5276',
     secondary: '#2e86c1',
@@ -66,7 +67,7 @@ const generateDischargePDF = async (data, res) => {
 
     if (data.doctor) {
       doc.fontSize(9)
-        .text(`${data.doctor.name} | ${data.doctor.qualification || ''} | Reg. No: ${data.doctor.registrationNumber || 'N/A'}`, { align: 'center' });
+        .text(`${data.doctor.name} | ${data.doctor.qualification || ''} | MPMC REG. NO: ${data.doctor.registrationNumber || 'N/A'}`, { align: 'center' });
     }
 
     doc.fillColor(colors.text);
@@ -113,8 +114,8 @@ const generateDischargePDF = async (data, res) => {
     doc.fillColor(colors.lightText)
       .fontSize(8)
       .font('Helvetica')
-      .text('IVF & Infertility Specialist | 123, Healthcare Road, Near City Hospital', 18, footerY + 18)
-      .text('Mumbai - 400001, Maharashtra, India | Tel: +91 98765 43210 | Email: info@womenfetalcare.com', 18, footerY + 26);
+      .text('IVF & Infertility Specialist | 17-B, Ground Floor, Anupam Nagar', 18, footerY + 18)
+      .text('Infront of Park, Near Mehra Hospital, City Center, Gwalior, 474011 | Tel: +91-9243053461', 18, footerY + 26);
 
     const sigX = doc.page.width - 170;
     doc.fillColor(colors.lightText)
@@ -1126,7 +1127,7 @@ const generateDischargePDF = async (data, res) => {
       .text('Category', col2, yPos)
       .text('Amount (Rs.)', doc.page.width - 150, yPos, { align: 'center' });
 
-        yPos = doc.y + 2;
+    yPos = doc.y + 2;
 
     doc.fillColor(colors.text)
       .fontSize(11)
@@ -1179,8 +1180,400 @@ const generateDischargePDF = async (data, res) => {
   doc.end();
 };
 
+const generateDischargePDF = async (data, res) => {
+  console.log("DISCHARE",data);
+  
+  const colors = {
+    primary: '#1a5276',
+    secondary: '#2e86c1',
+    accent: '#1abc9c',
+    lightBg: '#ebf5fb',
+    border: '#aed6f1',
+    text: '#2c3e50',
+    lightText: '#5d6d7e',
+    highlight: '#d4efdf',
+    white: '#ffffff'
+  };
+
+  const doc = new PDFDocument({
+    size: 'A4',
+    margin: 14,
+    bufferPages: true
+  });
+
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', `attachment; filename=discharge_summary_${data.patient?.UH_ID || 'patient'}.pdf`);
+
+  doc.pipe(res);
+
+  // ===== HEADER FUNCTION =====
+  const addHeader = () => {
+    doc.rect(0, 0, doc.page.width, 45).fill(colors.primary);
+    doc.rect(0, 75, doc.page.width, 1.5).fill(colors.accent);
+
+    doc.fillColor(colors.white)
+      .fontSize(12)
+      .font('Helvetica-Bold')
+      .text('Women Fetal Care Clinic', 18, 8, { align: 'center' });
+
+    doc.fontSize(10)
+      .font('Helvetica')
+      .text('IVF & Infertility Specialist', { align: 'center' });
+
+    if (data.doctor) {
+      doc.fontSize(9)
+        .text(`${data.doctor.name} | ${data.doctor.qualification || ''} | MPMC REG. NO: ${data.doctor.registrationNumber || 'N/A'}`, { align: 'center' });
+    }
+
+    doc.fillColor(colors.text);
+
+    // Title
+    const titleY = doc.y + 8;
+    const boxHeight = 20;
+
+    doc.rect(18, titleY - 2, doc.page.width - 36, boxHeight)
+      .fill(colors.lightBg)
+      .stroke(colors.border);
+
+    doc.fillColor(colors.primary)
+      .fontSize(12)
+      .font('Helvetica-Bold')
+      .text(
+        'DISCHARGE SUMMARY',
+        18,
+        titleY + ((boxHeight - 12) / 2) - 2,
+        {
+          width: doc.page.width - 36,
+          align: 'center'
+        }
+      );
+
+    doc.y = titleY + boxHeight + 15;
+  };
+
+  // ===== FOOTER FUNCTION =====
+  const addFooter = () => {
+    const footerY = doc.page.height - 55;
+
+    doc.strokeColor(colors.border)
+      .lineWidth(0.4)
+      .moveTo(18, footerY)
+      .lineTo(doc.page.width - 18, footerY)
+      .stroke();
+
+    doc.fillColor(colors.primary)
+      .fontSize(12)
+      .font('Helvetica-Bold')
+      .text('Women Fetal Care Clinic', 18, footerY + 5);
+
+    doc.fillColor(colors.lightText)
+      .fontSize(8)
+      .font('Helvetica')
+      .text('IVF & Infertility Specialist | 17-B, Ground Floor, Anupam Nagar', 18, footerY + 18)
+      .text('Infront of Park, Near Mehra Hospital, City Center, Gwalior, 474011 | Tel: +91-9243053461', 18, footerY + 26);
+
+    const sigX = doc.page.width - 170;
+    doc.fillColor(colors.lightText)
+      .fontSize(10)
+      .text('_________________________', sigX, footerY + 5)
+      .font('Helvetica-Bold')
+      .fillColor(colors.primary)
+      .text(`Dr. ${data.doctor?.name || 'Doctor'}`, sigX, footerY + 18)
+      .font('Helvetica')
+      .fontSize(9)
+      .fillColor(colors.lightText)
+      .text(`Date: ${new Date().toLocaleDateString('en-IN', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      })}`, sigX, footerY + 29);
+  };
+
+  // ===== PAGE 1 (Single Page) =====
+  addHeader();
+
+  let yPos = doc.y;
+
+  // ===== 1. PATIENT DEMOGRAPHICS =====
+  const titleY = yPos;
+
+  // Left side - Patient Demographics
+  doc.fillColor(colors.primary)
+    .fontSize(12)
+    .font('Helvetica-Bold')
+    .text('Patient Demographics', 18, titleY);
+
+  // Right side - Consultation Date & Time (on the same line)
+  doc.fillColor(colors.lightText)
+    .fontSize(10)
+    .font('Helvetica')
+    .text('Dischare Date & Time:', doc.page.width / 2 + 20, titleY, {
+      continued: true,
+      width: doc.page.width / 2 - 38,
+      align: 'left'
+    })
+    .fillColor(colors.text)
+    .font('Helvetica-Bold')
+    .text(` ${formatDateTime(data.dischargeRecord?.createdAt)}`, {
+      continued: false
+    });
+
+  doc.strokeColor(colors.border)
+    .lineWidth(0.4)
+    .moveTo(18, doc.y + 1.5)
+    .lineTo(doc.page.width - 18, doc.y + 1.5)
+    .stroke();
+
+  doc.fillColor(colors.text)
+    .fontSize(10)
+    .font('Helvetica');
+
+  yPos = doc.y + 8;
+
+// ========New============
+
+  const getPatientField = (field, detailsField) => {
+    if (field === 'other' && detailsField) {
+      return `Other (${detailsField})`;
+    }
+    return field || 'N/A';
+  };
+
+  const col1 = 22;
+  const col2 = doc.page.width / 3 + 10;
+  const col3 = (doc.page.width / 3) * 2 + 20;
+
+  // Row 1
+  doc.fillColor(colors.lightText)
+    .text('Name:', col1, yPos, { continued: true })
+    .fillColor(colors.text)
+    .text(` ${data.patient?.name || 'N/A'}`);
+
+  doc.fillColor(colors.lightText)
+    .text('UHID:', col2, yPos, { continued: true })
+    .fillColor(colors.text)
+    .text(` ${data.patient?.UH_ID || 'N/A'}`);
+
+  doc.fillColor(colors.lightText)
+    .text('Age:', col3, yPos, { continued: true })
+    .fillColor(colors.text)
+    .text(` ${data.patient?.age ? `${data.patient.age} yrs` : 'N/A'}`);
+  yPos += 11;
+
+  // Row 2
+  doc.fillColor(colors.lightText)
+    .text('Sex:', col1, yPos, { continued: true })
+    .fillColor(colors.text)
+    .text(` ${getPatientField(data.patient?.sex, data.patient?.sexDetails)}`);
+
+  doc.fillColor(colors.lightText)
+    .text('Marital:', col2, yPos, { continued: true })
+    .fillColor(colors.text)
+    .text(` ${getPatientField(data.patient?.maritalStatus, data.patient?.maritalStatusDetails)}`);
+
+  doc.fillColor(colors.lightText)
+    .text('Marriage Duration:', col3, yPos, { continued: true })
+    .fillColor(colors.text)
+    .text(` ${data.patient?.durationOfMarriage ? `${data.patient.durationOfMarriage} yrs` : 'N/A'}`);
+  yPos += 11;
+
+  // Row 3
+  doc.fillColor(colors.lightText)
+    .text('Mobile:', col1, yPos, { continued: true })
+    .fillColor(colors.text)
+    .text(` ${data.patient?.mobileNumber || 'N/A'}`);
+
+  const regDate = data.patient?.createdAt ? new Date(data.patient.createdAt).toLocaleDateString('en-IN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  }) : 'N/A';
+  doc.fillColor(colors.lightText)
+    .text('Reg. Date:', col2, yPos, { continued: true })
+    .fillColor(colors.text)
+    .text(` ${regDate}`);
+
+  doc.fillColor(colors.lightText)
+    .text('Address:', col3, yPos, { continued: true })
+    .fillColor(colors.text)
+    .text(` ${data.patient?.address?.substring(0, 20) || 'N/A'}`);
+  yPos += 11;
+
+  // Row 4
+  doc.fillColor(colors.lightText)
+    .text('ID Proof:', col1, yPos, { continued: true })
+    .fillColor(colors.text)
+    .text(` ${getPatientField(data.patient?.idProofType, data.patient?.idProofTypeDetails)}`);
+
+  doc.fillColor(colors.lightText)
+    .text('ID Number:', col2, yPos, { continued: true })
+    .fillColor(colors.text)
+    .text(` ${data.patient?.idProofNumber || 'N/A'}`);
+
+  doc.fillColor(colors.lightText)
+    .text('How Found:', col3, yPos, { continued: true })
+    .fillColor(colors.text)
+    .text(` ${getPatientField(data.patient?.howToFindClinic, data.patient?.howToFindClinicDetails)}`);
+  yPos += 11;
+
+  // Row 5
+  doc.fillColor(colors.lightText)
+    .text('Referred By:', col1, yPos, { continued: true })
+    .fillColor(colors.text)
+    .text(` ${data.patient?.referredByDoctorName || 'N/A'}`);
+
+  doc.fillColor(colors.lightText)
+    .text('Infertility:', col2, yPos, { continued: true })
+    .fillColor(colors.text)
+    .text(` ${getPatientField(data.patient?.infertiliyType, data.patient?.infertiliyTypeDetails)}`);
+  yPos += 11;
+
+  yPos += 15;
+
+  // ===== 2. HUSBAND/RELATIVE DETAILS =====
+  if (data.relative) {
+    doc.fillColor(colors.primary)
+      .fontSize(12)
+      .font('Helvetica-Bold')
+      .text('Husband/Relative', 18, yPos)
+      .font('Helvetica')
+      .fontSize(10);
+
+    doc.strokeColor(colors.border)
+      .lineWidth(0.4)
+      .moveTo(18, doc.y + 1.5)
+      .lineTo(doc.page.width - 18, doc.y + 1.5)
+      .stroke();
+
+    doc.fillColor(colors.text)
+      .fontSize(10)
+      .font('Helvetica');
+
+    yPos = doc.y + 8;
+
+    const relative = data.relative;
+
+    // Row 1
+    doc.fillColor(colors.lightText)
+      .text('Name:', col1, yPos, { continued: true })
+      .fillColor(colors.text)
+      .text(` ${relative?.name || 'N/A'}`);
+
+    doc.fillColor(colors.lightText)
+      .text('Sex:', col2, yPos, { continued: true })
+      .fillColor(colors.text)
+      .text(` ${relative?.sex || 'N/A'}`);
+
+    doc.fillColor(colors.lightText)
+      .text('Age:', col3, yPos, { continued: true })
+      .fillColor(colors.text)
+      .text(` ${relative?.age ? `${relative.age} yrs` : 'N/A'}`);
+    yPos += 11;
+
+    // Row 2
+    doc.fillColor(colors.lightText)
+      .text('Relative:', col1, yPos, { continued: true })
+      .fillColor(colors.text)
+      .text(` ${relative?.role || 'N/A'}`);
+
+    doc.fillColor(colors.lightText)
+      .text('Number:', col2, yPos, { continued: true })
+      .fillColor(colors.text)
+      .text(` ${relative?.mobileNumber || 'N/A'}`);
+
+    doc.fillColor(colors.lightText)
+      .text('Address:', col3, yPos, { continued: true })
+      .fillColor(colors.text)
+      .text(`${relative?.address?.substring(0, 20) || 'N/A'}`);
+    yPos += 11;
+
+    // Row 3
+    doc.fillColor(colors.lightText)
+      .text('ID Proof:', col1, yPos, { continued: true })
+      .fillColor(colors.text)
+      .text(` ${getPatientField(relative?.idProofType, relative?.idProofTypeDetails)}`);
+
+    doc.fillColor(colors.lightText)
+      .text('ID Number:', col2, yPos, { continued: true })
+      .fillColor(colors.text)
+      .text(` ${relative?.idProofNumber || 'N/A'}`);
+    yPos += 11;
+  }
+
+  yPos += 15;
+
+  // ===== DISCHARGE RECORD =====
+  if (data.dischargeRecord) {
+    doc.fillColor(colors.primary)
+      .fontSize(12)
+      .font('Helvetica-Bold')
+      .text('Discharge', 18, yPos)
+      .font('Helvetica')
+      .fontSize(10);
+
+    doc.strokeColor(colors.border)
+      .lineWidth(0.4)
+      .moveTo(18, doc.y + 1.5)
+      .lineTo(doc.page.width - 18, doc.y + 1.5)
+      .stroke();
+
+    doc.fillColor(colors.text)
+      .fontSize(10)
+      .font('Helvetica');
+
+    yPos = doc.y + 10;
+    const discharge = data.dischargeRecord;
+
+    if (discharge.finalDiagnosis) {
+      doc.fillColor(colors.lightText)
+        .fontSize(10)
+        .text('  Final Diagnosis', 18, yPos, { continued: true })
+        .fillColor(colors.text)
+        .text(` ${discharge.finalDiagnosis.substring(0, 100)}${discharge.finalDiagnosis.length > 100 ? '...' : ''}`);
+    }
+    yPos += 15;
+
+    if (discharge.treatmentSummary) {
+      doc.fillColor(colors.lightText)
+        .fontSize(10)
+        .text('  Treatment Summary', 18, yPos, { continued: true })
+        .fillColor(colors.text)
+        .text(` ${discharge.treatmentSummary.substring(0, 100)}${discharge.treatmentSummary.length > 100 ? '...' : ''}`);
+    }
+    yPos += 15;
+
+    if (discharge.dischargeAdvice) {
+      doc.fillColor(colors.lightText)
+        .fontSize(10)
+        .text('  Discharge Advice', 18, yPos, { continued: true })
+        .fillColor(colors.text)
+        .text(` ${discharge.dischargeAdvice.substring(0, 100)}${discharge.dischargeAdvice.length > 100 ? '...' : ''}`);
+    }
+    yPos += 15;
+
+    if (discharge.followUpDate) {
+      const followUp = new Date(discharge.followUpDate).toLocaleDateString('en-IN', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+      doc.fillColor(colors.lightText)
+        .fontSize(10)
+        .text('  Follow Up Date:', 18, yPos, { continued: true })
+        .fillColor(colors.text)
+        .text(` ${formatDateTime(discharge.followUpDate)}`);
+    }
+  }
+  
+
+  // ===== FOOTER =====
+  addFooter();
+
+  doc.end();
+};
+
 // Helper function to get all discharge data
-const getDischargeData = async (patientId) => {
+const getDischargeDataOld = async (patientId) => {
   try {
     const [
       patient,
@@ -1233,6 +1626,36 @@ const getDischargeData = async (patientId) => {
   }
 };
 
+// Helper function to get all discharge data
+const getDischargeData = async (dischareId) => {
+  try {
+    const dischargeRecord = await Discharge.findById(dischareId)
+      .populate('createdBy', '-password -__v')
+
+    if (!dischargeRecord) {
+      throw new Error('Dischare card not found');
+    }
+
+    const patientId = dischargeRecord.patientId;
+
+    const patient = await User.findById(patientId).select('-password -__v');
+
+    const relative = await Relative.findOne({ UH_ID: patient?.UH_ID });
+
+    const doctor = dischargeRecord.createdBy || null;
+
+    return {
+      patient,
+      doctor,
+      dischargeRecord,
+      relative,
+    };
+  } catch (error) {
+    console.error('Error fetching patient History data:', error);
+    throw error;
+  }
+};
+
 const formatExamValue = (value, details) => {
   if (!value) return null;
   if (value.toLowerCase() === 'normal' && !details) {
@@ -1247,13 +1670,10 @@ const formatExamValue = (value, details) => {
   return value;
 };
 
-
-
 exports.createDischarge = async (req, res) => {
   try {
     const {
       patientId,
-      consultationId,
       finalDiagnosis,
       treatmentSummary,
       dischargeAdvice,
@@ -1263,7 +1683,6 @@ exports.createDischarge = async (req, res) => {
 
     discharge = new Discharge({
       patientId,
-      consultationId,
       finalDiagnosis,
       treatmentSummary,
       dischargeAdvice,
@@ -1290,22 +1709,41 @@ exports.createDischarge = async (req, res) => {
 // Get consultation by patient id
 exports.getDischargeByPatientId = async (req, res) => {
   try {
-    // Use findOne instead of findById to search by patientId
-    const discharge = await Discharge.findOne({ patientId: req.params.id })
+    const { patientId } = req.params;
+    const { page = 1, limit = 10 } = req.query;
+
+    const discharge = await Discharge.find({ patientId })
       .populate('patientId')
       .populate('createdBy', 'name email')
-      .populate('updatedBy', 'name email');
+      .populate('updatedBy', 'name email')
+      .sort({ createdAt: -1 })
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
 
-    if (!discharge) {
-      return res.status(404).json({
-        success: false,
-        message: 'Discharge not found'
+
+    const total = await Discharge.countDocuments({ patientId: req.params.patientId });
+
+    if (!discharge || discharge.length === 0) {
+      return res.status(200).json({
+        success: true,
+        data: [],
+        message: 'This patient discharge card has not been prepared yet.',
+        pagination: {
+          total: 0,
+          page: Number(page),
+          pages: 0
+        }
       });
     }
 
     res.status(200).json({
       success: true,
-      data: discharge
+      data: discharge,
+      pagination: {
+        total,
+        page: Number(page),
+        pages: Math.ceil(total / limit)
+      }
     });
   } catch (error) {
     res.status(500).json({
@@ -1322,7 +1760,6 @@ exports.downloadDischargePDF = async (req, res) => {
     const { patientId } = req.params;
 
     const data = await getDischargeData(patientId);
-
     if (!data.dischargeRecord) {
       return res.status(404).json({
         success: false,
@@ -1332,7 +1769,7 @@ exports.downloadDischargePDF = async (req, res) => {
 
     await generateDischargePDF(data, res);
   } catch (error) {
-    console.error('Error generating PDF:', error);
+    console.log('Error generating PDF:', error);
     res.status(500).json({
       success: false,
       message: 'Error generating PDF',

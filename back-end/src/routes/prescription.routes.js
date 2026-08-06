@@ -4,7 +4,7 @@ const router = express.Router();
 const {
     createPrescription,
   getPrescriptionsByPatient,
-  updatePrescription,
+  updatePrescription,prescriptionPdf
 } = require('../controllers/prescription.controller');
 const isAuth = require('../middlewares/isAuth.middleware');
 const { validate } = require('../middlewares/validate.middleware');
@@ -22,5 +22,7 @@ router.get("/:patientId", getPrescriptionsByPatient);
 
 // Update prescription
 router.put("/:id",updatePrescriptionValidation, validate, updatePrescription);
+
+router.get('/download/:prescriptionId', prescriptionPdf);
 
 module.exports = router;

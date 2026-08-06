@@ -47,4 +47,6 @@ router.delete(
   bloodInvestigationController.deleteBloodInvestigation
 );
 
+router.get('/download/:routineId', bloodInvestigationController.routinesPdf);
+
 module.exports = router;

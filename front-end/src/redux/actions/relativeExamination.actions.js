@@ -1,6 +1,29 @@
 import APIs from "../helper/api";
 import { examinationConstants } from "./constants";
 
+// Download Patient History PDF
+export const downloadRelativeExaminationPDF = (relativeExaminationId) => async (dispatch) => {
+    try {
+        const config = {
+            responseType: 'blob'
+        };
+        const response = await APIs.get(`/relative-examination/download/${relativeExaminationId}`, config);
+        // Create download link
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `relative_examination_summary_${relativeExaminationId}.pdf`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        return true;
+    } catch (error) {
+        console.error('Error downloading PDF:', error);
+        throw error;
+    }
+};
+
 // Create Relative Examination
 export const createRelativeExamination = (patientId, relativeId, examinationData) => async (dispatch) => {
     try {
@@ -19,6 +42,8 @@ export const createRelativeExamination = (patientId, relativeId, examinationData
             payload: data.data
         };
     } catch (error) {
+        console.log(error);
+        
         dispatch({
             type: examinationConstants.CREATE_RELATIVE_EXAMINATION_FAILURE,
             payload: error.response?.data?.message || 'Error creating relative examination'
@@ -40,7 +65,10 @@ export const getRelativeExaminationByPatientId = (patientId) => async (dispatch)
 
         dispatch({
             type: examinationConstants.GET_RELATIVE_EXAMINATION_SUCCESS,
-            payload: data.data
+             payload: {
+                relativeExaminations: data.data,
+                pagination: data.pagination
+            },
         });
 
         return {

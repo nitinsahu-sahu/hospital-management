@@ -1,8 +1,8 @@
 import { investigationConstants } from "../actions/constants";
 
 const initialState = {
-  investigation: null,
-  investigations: [],
+  routinesBlood: [],
+  pagination: {},
   loading: false,
   error: null,
   success: false
@@ -23,7 +23,6 @@ export const bloodInvestigationReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        investigation: action.payload,
         success: true,
         error: null
       };
@@ -32,7 +31,8 @@ export const bloodInvestigationReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        investigation: action.payload,
+         routinesBlood: action.payload.routinesBlood,
+        pagination: action.payload.pagination,
         error: null
       };
 
@@ -40,7 +40,6 @@ export const bloodInvestigationReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        investigation: action.payload,
         success: true,
         error: null
       };

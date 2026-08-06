@@ -2,13 +2,11 @@ import { dischargeConstants } from "../actions/constants";
 
 
 const initialState = {
-  dischargeRecord: null,
-  dischargeData: null,
-  dischargeList: [],
+  pagination: {},
+  dischargesRecord: [],
   loading: false,
   error: null,
   success: false,
-  pagination: null
 };
 
 const dischargeReducer = (state = initialState, action) => {
@@ -27,7 +25,6 @@ const dischargeReducer = (state = initialState, action) => {
         ...state,
         loading: false,
         success: true,
-        dischargeRecord: action.payload.data,
         error: null
       };
 
@@ -35,7 +32,8 @@ const dischargeReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        dischargeData: action.payload.data,
+        dischargesRecord: action.payload.discharesRecord,
+        pagination: action.payload.pagination,
         error: null
       };
 
@@ -43,8 +41,6 @@ const dischargeReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        dischargeList: action.payload.data,
-        pagination: action.payload.pagination,
         error: null
       };
 

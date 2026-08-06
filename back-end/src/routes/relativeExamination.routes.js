@@ -1,4 +1,3 @@
-// routes/relativeExamination.routes.js
 const express = require('express');
 const router = express.Router();
 const {
@@ -7,7 +6,7 @@ const {
   getRelativeExaminationByRelativeId,
   getRelativeExaminationById,
   updateRelativeExamination,
-  deleteRelativeExamination
+  deleteRelativeExamination,relativeExaminationPdf
 } = require('../controllers/relativeExamination.controller');
 const isAuth = require('../middlewares/isAuth.middleware');
 const { 
@@ -24,7 +23,6 @@ router.post(
   validate,
   createRelativeExamination
 );
-
 // Get relative examinations by patient ID
 router.get("/patient/:patientId", isAuth, getRelativeExaminationByPatientId);
 
@@ -42,6 +40,8 @@ router.put(
   validate,
   updateRelativeExamination
 );
+
+router.get('/download/:relativeExaminationId', relativeExaminationPdf);
 
 // Delete relative examination
 router.delete("/delete/:id", isAuth, deleteRelativeExamination);

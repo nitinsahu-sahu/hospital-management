@@ -62,12 +62,10 @@ const patientExaminationSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true,
-        unique: true
     },
-    consultationId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Consultation',
-        required: false
+    patientExaminationDate: {
+        type: Date,
+        default: Date.now
     },
     vitals: {
         type: vitalsSchema,

@@ -4,7 +4,8 @@ import { examinationConstants } from "../actions/constants";
 const initialState = {
   loading: false,
   error: null,
-  examination: null,
+  patientExaminations: [],
+  pagination:{},
   success: false
 };
 
@@ -32,7 +33,8 @@ export const patientExaminationReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        examination: action.payload,
+        patientExaminations: action.payload.patientExaminations,
+        pagination: action.payload.pagination,
         error: null
       };
 

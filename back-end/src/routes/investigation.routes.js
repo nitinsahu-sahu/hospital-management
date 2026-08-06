@@ -16,5 +16,6 @@ router.get('/patient/:patientId', investigationController.getInvestigationByPati
 router.get('/:id', investigationController.getInvestigationById);
 router.put('/:id', updateInvestigationValidation, validate, investigationController.updateInvestigation);
 router.delete('/:id', investigationController.deleteInvestigation);
+router.get('/download/:investigationId', investigationController.investigationPdf);
 
 module.exports = router;

@@ -36,7 +36,6 @@ export interface GeneticOption {
 
 export interface InvestigationData {
   patientId: string;
-  consultationId: string;
   category: string;
   investigations: InvestigationItem[];
   totalAmount: number;

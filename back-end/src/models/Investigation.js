@@ -31,11 +31,6 @@ const investigationSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
-  consultationId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Consultation',
-    required: true
-  },
   category: String,
   subCategory: String,
   investigations: [investigationItemSchema],

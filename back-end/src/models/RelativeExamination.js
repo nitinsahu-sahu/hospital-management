@@ -52,18 +52,15 @@ const husbandExaminationSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true,
-        unique: true
     },
     relativeId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Relative',
         required: true,
-        unique: true
     },
-    consultationId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Consultation',
-        required: false
+     relativeExaminationDate: {
+        type: Date,
+        default: Date.now
     },
     vitals: {
         type: vitalsSchema,
