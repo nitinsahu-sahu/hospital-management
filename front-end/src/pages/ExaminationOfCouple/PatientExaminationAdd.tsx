@@ -1,4 +1,3 @@
-// pages/PatientExaminationAdd.tsx
 import { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PageMeta from '../../components/common/PageMeta';
@@ -12,6 +11,7 @@ import SystemExaminationSection from '../../components/examination-of-couple/Sys
 //@ts-ignore
 import { createPatientExamination } from '../../redux/actions/patientExamination.actions';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
+import { Patient } from '../../types/patient';
 
 const getInitialVitals = () => ({
     pr: '',
@@ -50,7 +50,7 @@ const PatientExaminationAdd = () => {
     const { loading } = useSelector(
         (state: RootState) => state.eoc
     );
-    const [selectedPatient, setSelectedPatient] = useState<null>(null);
+    const [selectedPatient, setSelectedPatient] = useState<Patient|null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
     const [error, setError] = useState('');

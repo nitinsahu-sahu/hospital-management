@@ -141,7 +141,6 @@ const AddDischarge = () => {
                 dischargeAdvice: formData.dischargeAdvice,
                 followUpDate: formData.followUpDate || null
             }) as any);
-console.log("diss",result);
 
             if (result?.status === 200) {
                 setSuccessMessage("Discharge added successfully!");

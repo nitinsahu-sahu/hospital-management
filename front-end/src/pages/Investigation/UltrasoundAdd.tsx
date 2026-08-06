@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch } from 'react-redux';
 import { PatientInfoCard } from "../../components/consultation/PatientInfoCard";
 import Alert from '../../components/ui/alert/Alert';
