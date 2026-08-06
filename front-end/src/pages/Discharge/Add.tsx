@@ -99,7 +99,9 @@ const AddDischarge = () => {
     };
 
     // Handle date change
-    const handleDateChange = (dateString: string) => {
+    const handleDateChange = (dateString: string,dates:any) => {
+        console.log(dates);
+        
         setFormData(prev => ({
             ...prev,
             followUpDate: dateString
@@ -256,7 +258,7 @@ const AddDischarge = () => {
                                     placeholder="Select follow-up date"
                                     value={formData.followUpDate}
                                     onChange={(dates: any, currentDateString: string) => {
-                                        handleDateChange(currentDateString);
+                                        handleDateChange(currentDateString,dates);
                                     }}
                                 />
                             </div>
