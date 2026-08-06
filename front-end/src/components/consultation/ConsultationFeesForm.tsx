@@ -1,8 +1,8 @@
 import React from 'react';
-
+import { ConsultationFees } from '../../types/consultationNew';
 interface ConsultationFeesFormProps {
   fees: any;
-  onChange: (field: keyof any, value: string) => void;
+  onChange: (field: keyof ConsultationFees, value: string) => void;
   isExisting: boolean;
 }
 
