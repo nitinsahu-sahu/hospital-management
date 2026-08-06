@@ -88,11 +88,6 @@ const navItems: NavItem[] = [
   {
     icon: <DischargeIcon />,
     name: "Discharge",
-    path: "/discharge",
-  },
-  {
-    icon: <DischargeIcon />,
-    name: "Discharge",
     subItems: [
       { name: "Add", path: "/discharge/add", pro: false },
       { name: "View", path: "/discharge/view", pro: false },

@@ -31,7 +31,6 @@ import PatientHistoryView from "./pages/PatientHistory/view";
 import ProcedureView from "./pages/Procedure/View";
 import ProcedureAdd from "./pages/Procedure/Add";
 
-import Discharge from "./pages/Discharge/Discharge";
 import DischargeAdd from "./pages/Discharge/Add";
 import DischargeView from "./pages/Discharge/View";
 
@@ -101,7 +100,6 @@ export default function App() {
           <Route path="/procedure/add" element={<ProcedureAdd />} />
           <Route path="/procedure/view" element={<ProcedureView />} />
 
-          <Route path="/discharge" element={<Discharge />} />
           <Route path="/discharge/view" element={<DischargeView />} />
           <Route path="/discharge/add" element={<DischargeAdd />} />
 
