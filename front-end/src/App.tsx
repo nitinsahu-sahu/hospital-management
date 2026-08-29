@@ -46,6 +46,10 @@ import PatientExaminationView from "./pages/ExaminationOfCouple/PatientExaminati
 import RelativeExaminationAdd from "./pages/ExaminationOfCouple/RelativeExaminationAdd";
 import RelativeExaminationView from "./pages/ExaminationOfCouple/RelativeExaminationView";
 
+//Customiztion
+import InvestigationCustomizeAdd from "./pages/Customize/investigation-customize-add";
+import InvestigationCustomizeView from "./pages/Customize/investigation-customize-view";
+
 export default function App() {
   
   const { authenticate } = useSelector(
@@ -109,6 +113,10 @@ export default function App() {
           <Route path="/patient/view" element={<PatientsListing />} />
           <Route path="/prescription/add" element={<PrescriptionAdd />} />
           <Route path="/prescription/view" element={<PrescriptionView />} />
+
+<Route path="/investigation-customizations/add" element={<InvestigationCustomizeAdd />} />
+          <Route path="/investigation-customizations" element={<InvestigationCustomizeView />} />
+
         </Route>
         <Route path="*" element={<NotFound />} />
 

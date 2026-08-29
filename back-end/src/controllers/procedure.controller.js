@@ -40,7 +40,7 @@ const generateProcedurePDF = async (data, res) => {
         doc.fillColor(colors.white)
             .fontSize(12)
             .font('Helvetica-Bold')
-            .text('Women Fetal Care Clinic', 18, 8, { align: 'center' });
+            .text('Women & Fetal Care Clinic', 18, 8, { align: 'center' });
 
         doc.fontSize(10)
             .font('Helvetica')
@@ -90,7 +90,7 @@ const generateProcedurePDF = async (data, res) => {
         doc.fillColor(colors.primary)
             .fontSize(12)
             .font('Helvetica-Bold')
-            .text('Women Fetal Care Clinic', 18, footerY + 5);
+            .text('Women & Fetal Care Clinic', 18, footerY + 5);
 
         doc.fillColor(colors.lightText)
             .fontSize(8)
@@ -513,6 +513,8 @@ exports.procedurePdf = async (req, res) => {
 
 // Create new procedure record
 exports.createProcedure = async (req, res) => {
+    console.log(req.body);
+    
     try {
         const userId = req.user.id;
         const { patientId, procedures, procedureDate } = req.body;
@@ -532,8 +534,7 @@ exports.createProcedure = async (req, res) => {
                 procedureId: proc.procedureId || proc.id,
                 name: proc.name,
                 price: proc.price,
-                category: proc.category || getCategoryFromId(proc.procedureId || proc.id),
-                subType: proc.subType || proc.type || null,
+                category: proc.subType,
                 description: proc.description || ''
             })),
             totalAmount,

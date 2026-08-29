@@ -11,6 +11,7 @@ import { geneticInvestigationReducer } from '../reducers/geneticInvestigation.re
 import procedureReducer from '../reducers/procedure.reducer';
 import prescriptionReducer from '../reducers/prescription.reducer';
 import dischargeReducer from '../reducers/discharge.reducer';
+import {customizationInvestigationReducer} from '../reducers/customization.reducer';
 
 
 const rootReducer = combineReducers({
@@ -26,6 +27,7 @@ const rootReducer = combineReducers({
   procedure: procedureReducer,
   prescriptions: prescriptionReducer,
   discharge: dischargeReducer,
+  customization:customizationInvestigationReducer
 })
 
 export default rootReducer

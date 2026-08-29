@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router"; // Add useLocation
 import { useSidebar } from "../context/SidebarContext";
 import { ThemeToggleButton } from "../components/common/ThemeToggleButton";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,7 +9,6 @@ import UserDropdown from "../components/header/UserDropdown";
 import { RootState } from "../redux/store/store";
 import { CrossIcon, MenuDotIcon } from "../icons";
 
-
 const AppHeader: React.FC = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
   const { searchPatients } = useSelector((state: RootState) => state.patients);
@@ -18,6 +17,10 @@ const AppHeader: React.FC = () => {
   const [search, setSearch] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<any>(null);
+  const location = useLocation(); // Get current location
+
+  // Check if search bar should be hidden
+  const shouldHideSearch = location.pathname === '/' || location.pathname === '/patient/view';
 
   // Load selected patient from sessionStorage on mount
   useEffect(() => {
@@ -106,7 +109,7 @@ const AppHeader: React.FC = () => {
   };
 
   return (
-    <header className="z-9 sticky top-0 flex w-full bg-white border-gray-200 z-99999 dark:border-gray-800 dark:bg-gray-900 lg:border-b">
+    <header className="sticky top-0 flex w-full bg-white border-gray-200 dark:border-gray-800 dark:bg-gray-900 lg:border-b">
       <div className="flex flex-col items-center justify-between grow lg:flex-row lg:px-6">
         <div className="flex items-center justify-between w-full gap-2 px-3 py-3 border-b border-gray-200 dark:border-gray-800 sm:gap-4 lg:justify-normal lg:border-b-0 lg:px-0 lg:py-4">
           <button
@@ -171,89 +174,92 @@ const AppHeader: React.FC = () => {
             <MenuDotIcon />
           </button>
 
-          <div className="lg:block">
-            <form onSubmit={(e) => e.preventDefault()}>
-              <div className="relative">
-                {/* Show selected patient info OR search input */}
-                {selectedPatient ? (
-                  <div className="flex items-center gap-2 bg-blue-50 dark:bg-gray-800 border border-blue-200 dark:border-gray-700 px-3 py-2 rounded-lg h-11">
-                    <img
-                      src={selectedPatient?.pic?.url}
-                      alt={selectedPatient.name}
-                      className="w-6 h-6 rounded-full object-cover"
-                    />
-                    <span className="text-sm font-medium text-gray-800 dark:text-white">
-                      {selectedPatient.name}
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      ({selectedPatient.UH_ID})
-                    </span>
-                    <button
-                      onClick={clearSelectedPatient}
-                      className="ml-2 p-1 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-full transition-colors"
-                      title="Clear selection"
-                    >
-                      <CrossIcon/>
-                    </button>
-                  </div>
-                ) : (
-                  <>
-                    <span className="absolute -translate-y-1/2 pointer-events-none left-4 top-1/2">
-                      <svg
-                        className="fill-gray-500 dark:fill-gray-400"
-                        width="20"
-                        height="20"
-                        viewBox="0 0 20 20"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
+          {/* Conditionally render search bar - hide on '/' and '/patient/view' */}
+          {!shouldHideSearch && (
+            <div className="lg:block">
+              <form onSubmit={(e) => e.preventDefault()}>
+                <div className="relative">
+                  {/* Show selected patient info OR search input */}
+                  {selectedPatient ? (
+                    <div className="flex items-center gap-2 bg-blue-50 dark:bg-gray-800 border border-blue-200 dark:border-gray-700 px-3 py-2 rounded-lg h-11">
+                      <img
+                        src={selectedPatient?.pic?.url}
+                        alt={selectedPatient.name}
+                        className="w-6 h-6 rounded-full object-cover"
+                      />
+                      <span className="text-sm font-medium text-gray-800 dark:text-white">
+                        {selectedPatient.name}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        ({selectedPatient.UH_ID})
+                      </span>
+                      <button
+                        onClick={clearSelectedPatient}
+                        className="ml-2 p-1 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-full transition-colors"
+                        title="Clear selection"
                       >
-                        <path
-                          fillRule="evenodd"
-                          clipRule="evenodd"
-                          d="M3.04175 9.37363C3.04175 5.87693 5.87711 3.04199 9.37508 3.04199C12.8731 3.04199 15.7084 5.87693 15.7084 9.37363C15.7084 12.8703 12.8731 15.7053 9.37508 15.7053C5.87711 15.7053 3.04175 12.8703 3.04175 9.37363ZM9.37508 1.54199C5.04902 1.54199 1.54175 5.04817 1.54175 9.37363C1.54175 13.6991 5.04902 17.2053 9.37508 17.2053C11.2674 17.2053 13.003 16.5344 14.357 15.4176L17.177 18.238C17.4699 18.5309 17.9448 18.5309 18.2377 18.238C18.5306 17.9451 18.5306 17.4703 18.2377 17.1774L15.418 14.3573C16.5365 13.0033 17.2084 11.2669 17.2084 9.37363C17.2084 5.04817 13.7011 1.54199 9.37508 1.54199Z"
-                          fill=""
-                        />
-                      </svg>
-                    </span>
-                    <input
-                      ref={inputRef}
-                      type="text"
-                      placeholder="Search patients... (Ctrl+K)"
-                      value={search}
-                      onChange={(e) => setSearch(e.target.value)}
-                      className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-200 bg-transparent py-2.5 pl-12 pr-14 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-800 dark:bg-gray-900 dark:bg-white/[0.03] dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 xl:w-[430px]"
-                    />
+                        <CrossIcon/>
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <span className="absolute -translate-y-1/2 pointer-events-none left-4 top-1/2">
+                        <svg
+                          className="fill-gray-500 dark:fill-gray-400"
+                          width="20"
+                          height="20"
+                          viewBox="0 0 20 20"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            clipRule="evenodd"
+                            d="M3.04175 9.37363C3.04175 5.87693 5.87711 3.04199 9.37508 3.04199C12.8731 3.04199 15.7084 5.87693 15.7084 9.37363C15.7084 12.8703 12.8731 15.7053 9.37508 15.7053C5.87711 15.7053 3.04175 12.8703 3.04175 9.37363ZM9.37508 1.54199C5.04902 1.54199 1.54175 5.04817 1.54175 9.37363C1.54175 13.6991 5.04902 17.2053 9.37508 17.2053C11.2674 17.2053 13.003 16.5344 14.357 15.4176L17.177 18.238C17.4699 18.5309 17.9448 18.5309 18.2377 18.238C18.5306 17.9451 18.5306 17.4703 18.2377 17.1774L15.418 14.3573C16.5365 13.0033 17.2084 11.2669 17.2084 9.37363C17.2084 5.04817 13.7011 1.54199 9.37508 1.54199Z"
+                            fill=""
+                          />
+                        </svg>
+                      </span>
+                      <input
+                        ref={inputRef}
+                        type="text"
+                        placeholder="Search patients... (Ctrl+K)"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-200 bg-transparent py-2.5 pl-12 pr-14 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-800 dark:bg-gray-900 dark:bg-white/[0.03] dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 xl:w-[430px]"
+                      />
 
-                    {dropdownOpen && searchPatients?.length > 0 && (
-                      <div className="absolute left-0 right-0 mt-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-[9999] max-h-72 overflow-y-auto">
-                        {searchPatients.map((patient: any) => (
-                          <div
-                            key={patient._id}
-                            onClick={() => handleSelectPatient(patient)}
-                            className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
-                          >
-                            <img
-                              src={patient?.pic?.url}
-                              alt={patient.name}
-                              className="w-8 h-8 rounded-full object-cover"
-                            />
-                            <div className="flex flex-col">
-                              <span className="text-sm font-medium text-gray-900 dark:text-white">
-                                {patient.name}
-                              </span>
-                              <span className="text-xs text-gray-500">
-                                UH_ID: {patient.UH_ID} | {patient.mobileNumber}
-                              </span>
+                      {dropdownOpen && searchPatients?.length > 0 && (
+                        <div className="absolute left-0 right-0 mt-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-[9999] max-h-72 overflow-y-auto">
+                          {searchPatients.map((patient: any) => (
+                            <div
+                              key={patient._id}
+                              onClick={() => handleSelectPatient(patient)}
+                              className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                            >
+                              <img
+                                src={patient?.pic?.url}
+                                alt={patient.name}
+                                className="w-8 h-8 rounded-full object-cover"
+                              />
+                              <div className="flex flex-col">
+                                <span className="text-sm font-medium text-gray-900 dark:text-white">
+                                  {patient.name}
+                                </span>
+                                <span className="text-xs text-gray-500">
+                                  UH_ID: {patient.UH_ID} | {patient.mobileNumber}
+                                </span>
+                              </div>
                             </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-            </form>
-          </div>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              </form>
+            </div>
+          )}
         </div>
         <div
           className={`${isApplicationMenuOpen ? "flex" : "hidden"

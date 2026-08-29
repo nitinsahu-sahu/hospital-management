@@ -1,7 +1,6 @@
 const RelativeExamination = require('../models/RelativeExamination');
 const Patient = require('../models/User');
 const Relative = require('../models/Relative');
-const Consultation = require('../models/Consultation');
 
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
@@ -9,6 +8,7 @@ const path = require('path');
 const { formatDateTime } = require('../utils/timeFormate');
 
 const generateRelativeExaminationPDF = async (data, res) => {
+
   const colors = {
     primary: '#1a5276',
     secondary: '#2e86c1',
@@ -40,7 +40,7 @@ const generateRelativeExaminationPDF = async (data, res) => {
     doc.fillColor(colors.white)
       .fontSize(12)
       .font('Helvetica-Bold')
-      .text('Women Fetal Care Clinic', 18, 8, { align: 'center' });
+      .text('Women & Fetal Care Clinic', 18, 8, { align: 'center' });
 
     doc.fontSize(10)
       .font('Helvetica')
@@ -90,7 +90,7 @@ const generateRelativeExaminationPDF = async (data, res) => {
     doc.fillColor(colors.primary)
       .fontSize(12)
       .font('Helvetica-Bold')
-      .text('Women Fetal Care Clinic', 18, footerY + 5);
+      .text('Women & Fetal Care Clinic', 18, footerY + 5);
 
     doc.fillColor(colors.lightText)
       .fontSize(8)
@@ -130,7 +130,7 @@ const generateRelativeExaminationPDF = async (data, res) => {
   doc.fillColor(colors.lightText)
     .fontSize(10)
     .font('Helvetica')
-    .text('Retative Examination Date & Time:', doc.page.width / 2 + 20, titleY, {
+    .text('Retative Examin. Date & Time:', doc.page.width / 2 + 20, titleY, {
       continued: true,
       width: doc.page.width / 2 - 38,
       align: 'left'
@@ -250,7 +250,7 @@ const generateRelativeExaminationPDF = async (data, res) => {
     .text(` ${getPatientField(data.patient?.infertiliyType, data.patient?.infertiliyTypeDetails)}`);
   yPos += 11;
 
-  yPos += 15;
+  yPos += 12;
 
   // ===== 2. HUSBAND/RELATIVE DETAILS =====
   if (data.relative) {
@@ -322,10 +322,11 @@ const generateRelativeExaminationPDF = async (data, res) => {
     yPos += 11;
   }
 
-  yPos += 15;
+  yPos += 12;
 
   // ===== Relative EXAMINATION =====
   if (data.relativeExamination) {
+
     doc.fillColor(colors.primary)
       .fontSize(11)
       .font('Helvetica-Bold')
@@ -353,7 +354,7 @@ const generateRelativeExaminationPDF = async (data, res) => {
 
     if (hasVitalsData) {
       doc.fillColor(colors.primary)
-        .fontSize(11)
+        .fontSize(10)
         .font('Helvetica-Bold')
         .text('Vitals & Physical Examination', 18, yPos)
         .font('Helvetica')
@@ -371,7 +372,7 @@ const generateRelativeExaminationPDF = async (data, res) => {
 
       if (vitalsText) {
         doc.fillColor(colors.text)
-          .fontSize(10)
+          .fontSize(9)
           .text(vitalsText, 18, yPos, { width: doc.page.width - 36 });
         yPos = doc.y + 2;
       }
@@ -387,7 +388,320 @@ const generateRelativeExaminationPDF = async (data, res) => {
 
     yPos += 5;
 
-    // ===== 2. SYSTEM EXAMINATION =====
+    // ===== INVESTIGATIONS =====
+    if (exam.investigations) {
+      const inv = exam.investigations;
+      const hasInvestigationData = inv.hiv || inv.hbsAg || inv.vdrl || inv.hcv || inv.bloodGroup ||
+        inv.tsh || inv.rbs || inv.thalassemiaScreen || inv.karyotype;
+
+      if (hasInvestigationData) {
+        doc.fillColor(colors.primary)
+          .fontSize(10)
+          .font('Helvetica-Bold')
+          .text('Investigations', 18, yPos);
+
+        yPos = doc.y + 5;
+
+        const investigations = [
+          { label: 'HIV', value: inv.hiv },
+          { label: 'HBsAg', value: inv.hbsAg },
+          { label: 'VDRL', value: inv.vdrl },
+          { label: 'HCV', value: inv.hcv },
+          { label: 'Blood Group', value: inv.bloodGroup },
+          { label: 'TSH', value: inv.tsh },
+          { label: 'RBS', value: inv.rbs },
+          { label: 'Thalassemia', value: inv.thalassemiaScreen },
+          { label: 'Karyotype', value: inv.karyotype }
+        ];
+
+        // Filter only items with values
+        const filteredItems = investigations.filter(item => item.value);
+
+        if (filteredItems.length > 0) {
+          const itemsPerRow = 5;
+          const rows = Math.ceil(filteredItems.length / itemsPerRow);
+          const rowHeight = 15;
+          const padding = 4;
+          const boxHeight = rows * rowHeight + padding * 2;
+
+           // Card container with subtle styling
+        doc.rect(18, yPos - 4, doc.page.width - 36, boxHeight)
+          .fill(colors.lightBg)
+          .stroke(colors.border);
+          // doc.rect(18, yPos - 4, doc.page.width - 10, boxHeight)
+          //   .fill(colors.lightBg)
+          //   .stroke(colors.border);
+
+          let currentY = yPos + padding;
+
+          // Loop through rows
+          for (let row = 0; row < rows; row++) {
+            const startIndex = row * itemsPerRow;
+            const endIndex = Math.min(startIndex + itemsPerRow, filteredItems.length);
+            const rowItems = filteredItems.slice(startIndex, endIndex);
+
+            // Calculate equal width for each item
+            const totalWidth = doc.page.width - 50;
+            const itemWidth = totalWidth / itemsPerRow;
+
+            let currentX = 22;
+            rowItems.forEach((item) => {
+              // Draw label in light color
+              doc.fillColor(colors.lightText)
+                .fontSize(9)
+                .font('Helvetica')
+                .text(`${item.label}:`, currentX, currentY, {
+                  width: itemWidth * 0.7,
+                  continued: true
+                });
+
+              // Draw value in bold with primary color
+              const valueX = currentX + (itemWidth * 0.1);
+              doc.fillColor(colors.primary)
+                .fontSize(8.5)
+                .font('Helvetica-Bold')
+                .text(item.value, valueX, currentY, {
+                  width: itemWidth * 0.6
+                });
+
+              currentX += itemWidth;
+            });
+
+            currentY += rowHeight;
+          }
+
+          yPos += boxHeight + 2;
+        }
+      }
+    }
+
+    yPos += 5;
+
+    // ===== SEMEN ANALYSIS =====
+    if (exam.semenAnalysis) {
+      const sa = exam.semenAnalysis;
+      const hasSemenData = sa.count || sa.morphology || sa.motility || sa.hcv || sa.remark ||
+        sa.dfi || sa.srFsh || sa.srTestosterone || sa.e2 || sa.sProlactin ||
+        sa.karyotype || sa.yMicrosomeDeletion || sa.trusScrotalUsg || sa.testicularBiopsy;
+
+      if (hasSemenData) {
+        doc.fillColor(colors.primary)
+          .fontSize(10)
+          .font('Helvetica-Bold')
+          .text('Semen Analysis', 18, yPos);
+
+        yPos = doc.y + 5;
+
+        // Card container with subtle styling
+        doc.rect(18, yPos - 4, doc.page.width - 36, 120)
+          .fill(colors.lightBg)
+          .stroke(colors.border);
+
+        // ===== Group 1: Basic Parameters =====
+        const basicParams = [];
+        if (sa.count) basicParams.push(`Count: ${sa.count}${sa.countUnit ? ` ${sa.countUnit}` : ''}`);
+        if (sa.morphology) basicParams.push(`Morphology: ${sa.morphology}%`);
+        if (sa.motility) basicParams.push(`Motility: ${sa.motility}${sa.motilityUnit ? ` ${sa.motilityUnit}` : ''}`);
+
+        if (basicParams.length > 0) {
+          doc.fillColor(colors.secondary)
+            .fontSize(8.5)
+            .font('Helvetica-Bold')
+            .text('Basic Parameters', 22, yPos + 2);
+
+          yPos += 12;
+
+          let basicText = basicParams.join('  |  ');
+          doc.fillColor(colors.text)
+            .fontSize(9)
+            .font('Helvetica')
+            .text(basicText, 22, yPos, { width: doc.page.width - 50 });
+
+          yPos += 14;
+        }
+
+        // ===== Group 2: Hormonal & Special Tests =====
+        const hormonalParams = [];
+        if (sa.dfi) hormonalParams.push(`DFI: ${sa.dfi}${sa.dfiUnit ? ` ${sa.dfiUnit}` : ''}`);
+        if (sa.hcv) hormonalParams.push(`HCV: ${sa.hcv}`);
+        if (sa.srFsh) hormonalParams.push(`srFSH: ${sa.srFsh}`);
+        if (sa.srTestosterone) hormonalParams.push(`srTestosterone: ${sa.srTestosterone}`);
+        if (sa.e2) hormonalParams.push(`E2: ${sa.e2}`);
+        if (sa.sProlactin) hormonalParams.push(`sProlactin: ${sa.sProlactin}`);
+
+        if (hormonalParams.length > 0) {
+          doc.fillColor(colors.secondary)
+            .fontSize(8.5)
+            .font('Helvetica-Bold')
+            .text('Hormonal & Special Tests', 22, yPos + 2);
+
+          yPos += 14;
+
+          let hormonalText = hormonalParams.join('  |  ');
+          doc.fillColor(colors.text)
+            .fontSize(9)
+            .font('Helvetica')
+            .text(hormonalText, 22, yPos, { width: doc.page.width - 50 });
+
+          yPos += 16;
+        }
+
+        // ===== Group 3: Genetic & Advanced Tests =====
+        const geneticParams = [];
+        if (sa.karyotype) geneticParams.push(`Karyotype: ${sa.karyotype}`);
+        if (sa.yMicrosomeDeletion) geneticParams.push(`Y Microsome Deletion: ${sa.yMicrosomeDeletion}`);
+        if (sa.trusScrotalUsg) geneticParams.push(`TRUS/Scrotal USG: ${sa.trusScrotalUsg}`);
+        if (sa.testicularBiopsy) geneticParams.push(`Testicular Biopsy: ${sa.testicularBiopsy}`);
+
+        if (geneticParams.length > 0) {
+          doc.fillColor(colors.secondary)
+            .fontSize(8.5)
+            .font('Helvetica-Bold')
+            .text('Genetic & Advanced Tests', 22, yPos + 2);
+
+          yPos += 14;
+
+          let geneticText = geneticParams.join('  |  ');
+          doc.fillColor(colors.text)
+            .fontSize(9)
+            .font('Helvetica')
+            .text(geneticText, 22, yPos, { width: doc.page.width - 50 });
+
+          yPos += 16;
+        }
+
+        // ===== Remark =====
+        if (sa.remark) {
+          doc.fillColor(colors.secondary)
+            .fontSize(9)
+            .font('Helvetica-Bold')
+            .text('Remark:', 22, yPos + 2)
+            .fillColor(colors.text)
+            .font('Helvetica')
+            .text(` ${sa.remark}`);
+          yPos += 15;
+        }
+
+        // Calculate total height and update yPos
+        yPos += 8;
+      }
+    }
+
+    yPos +=15;
+
+    // ===== 2. MEDICAL HISTORY =====
+    if (exam.medicalHistory) {
+      const mh = exam.medicalHistory;
+      if (mh.problem || mh.currentMedications) {
+        doc.fillColor(colors.primary)
+          .fontSize(10)
+          .font('Helvetica-Bold')
+          .text('Medical History', 18, yPos);
+
+        yPos = doc.y + 5;
+
+        doc.rect(18, yPos - 4, doc.page.width - 36, 40)
+          .fill(colors.lightBg)
+          .stroke(colors.border);
+
+        if (mh.problem) {
+          doc.fillColor(colors.lightText)
+            .fontSize(9)
+            .font('Helvetica')
+            .text('Problem:', 22, yPos + 4, { continued: true })
+            .fillColor(colors.text)
+            .font('Helvetica-Bold')
+            .text(` ${mh.problem}`);
+          yPos += 15;
+        }
+
+        if (mh.currentMedications) {
+          doc.fillColor(colors.lightText)
+            .fontSize(9)
+            .font('Helvetica')
+            .text('Current Medications:', 22, yPos + 4, { continued: true })
+            .fillColor(colors.text)
+            .font('Helvetica-Bold')
+            .text(` ${mh.currentMedications}`);
+          yPos += 15;
+        }
+
+        yPos += 4;
+      }
+    }
+
+    yPos += 10;
+
+
+    // ===== 3.SURGICAL HISTORY IN TABLE =====
+    if (exam.surgicalHistory && exam.surgicalHistory.length > 0) {
+      doc.fillColor(colors.primary)
+        .fontSize(10)
+        .font('Helvetica-Bold')
+        .text('Surgical History', 18, yPos);
+
+      yPos = doc.y + 5;
+
+      // Table for surgical history
+      const tableY = yPos;
+      const colWidths = [120, 80, doc.page.width - 218];
+      const rowHeight = 18;
+      let rowY = tableY;
+
+      // Table header
+      doc.rect(18, rowY - 2, doc.page.width - 36, rowHeight)
+        .fill(colors.tableHeader);
+
+      doc.fillColor(colors.white)
+        .fontSize(9)
+        .font('Helvetica-Bold')
+        .text('Surgery', 24, rowY + 2)
+        .text('Year', 144, rowY + 2)
+        .text('Details/Findings', 224, rowY + 2);
+
+      rowY += rowHeight;
+
+      // Table data
+      exam.surgicalHistory.forEach((surgery, index) => {
+        const isEven = index % 2 === 0;
+        doc.rect(18, rowY - 2, doc.page.width - 36, rowHeight)
+          .fill(isEven ? colors.white : colors.white)
+          .stroke(colors.tableBorder);
+
+        doc.fillColor(colors.text)
+          .fontSize(8)
+          .font('Helvetica')
+          .text(surgery.surgery || 'N/A', 24, rowY + 2)
+          .text(surgery.year || 'N/A', 144, rowY + 2)
+          .text(surgery.detailsFinding || 'N/A', 224, rowY + 2, { width: doc.page.width - 242 });
+
+        rowY += rowHeight;
+
+        // Check if we need a new page
+        if (rowY > doc.page.height - 100) {
+          doc.addPage();
+          addHeader();
+          // Recalculate positions
+          rowY = doc.y + 20;
+          // Redraw header with adjusted positions
+          doc.rect(18, rowY - 2, doc.page.width - 36, rowHeight)
+            .fill(colors.tableHeader);
+          doc.fillColor(colors.white)
+            .fontSize(9)
+            .font('Helvetica-Bold')
+            .text('Surgery', 24, rowY + 2)
+            .text('Year', 144, rowY + 2)
+            .text('Details/Findings', 224, rowY + 2);
+          rowY += rowHeight;
+        }
+      });
+
+      // yPos = rowY + 8;
+    }
+
+    yPos += 55;
+
+    // ===== 4. SYSTEM EXAMINATION =====
     const systems = [
       { label: 'CNS', value: exam.cns, details: exam.cnsDetails },
       { label: 'CVS', value: exam.cvs, details: exam.cvsDetails },
@@ -421,7 +735,7 @@ const generateRelativeExaminationPDF = async (data, res) => {
             .text(`${system.label}:`, 18, yPos, { continued: true })
             .fillColor(colors.text)
             .text(` ${displayText}`);
-          yPos += 25;
+          yPos += 16;
         }
       });
 
@@ -494,7 +808,6 @@ exports.relativeExaminationPdf = async (req, res) => {
 
 // Create Relative Examination
 exports.createRelativeExamination = async (req, res) => {
-
   try {
     const {
       relativeExaminationDate,
@@ -506,9 +819,14 @@ exports.createRelativeExamination = async (req, res) => {
       respiratorySystem,
       respiratorySystemDetails,
       git,
-      gitDetails
+      gitDetails,
+      investigations,
+      semenAnalysis,
+      medicalHistory,
+      surgicalHistory
     } = req.body;
-    const { patientId, relativeId } = req.params
+    const { patientId, relativeId } = req.params;
+
     // Check if patient exists
     const patient = await Patient.findById(patientId);
     if (!patient) {
@@ -538,7 +856,7 @@ exports.createRelativeExamination = async (req, res) => {
     const examination = new RelativeExamination({
       patientId,
       relativeId,
-      relativeExaminationDate,
+      relativeExaminationDate: relativeExaminationDate || new Date(),
       vitals: {
         pr: vitals?.pr || '',
         prUnit: vitals?.prUnit || 'bpm',
@@ -550,7 +868,11 @@ exports.createRelativeExamination = async (req, res) => {
         weightUnit: vitals?.weightUnit || 'kg',
         bmi: vitals?.bmi || '',
         bmiUnit: vitals?.bmiUnit || 'kg/m²',
-        abdominalExamination: vitals?.abdominalExamination || ''
+        abdominalExamination: vitals?.abdominalExamination || '',
+        localExamination: {
+          perVaginalExamination: vitals?.localExamination?.perVaginalExamination || '',
+          perSpeculumExamination: vitals?.localExamination?.perSpeculumExamination || ''
+        }
       },
       cns: cns || '',
       cnsDetails: cns === 'abnormal' ? cnsDetails || '' : '',
@@ -560,6 +882,41 @@ exports.createRelativeExamination = async (req, res) => {
       respiratorySystemDetails: respiratorySystem === 'abnormal' ? respiratorySystemDetails || '' : '',
       git: git || '',
       gitDetails: git === 'abnormal' ? gitDetails || '' : '',
+      investigations: {
+        hiv: investigations?.hiv || '',
+        hbsAg: investigations?.hbsAg || '',
+        vdrl: investigations?.vdrl || '',
+        hcv: investigations?.hcv || '',
+        bloodGroup: investigations?.bloodGroup || '',
+        tsh: investigations?.tsh || '',
+        rbs: investigations?.rbs || '',
+        thalassemiaScreen: investigations?.thalassemiaScreen || '',
+        karyotype: investigations?.karyotype || ''
+      },
+      semenAnalysis: {
+        count: semenAnalysis?.count || '',
+        countUnit: semenAnalysis?.countUnit || 'mil/ml',
+        morphology: semenAnalysis?.morphology || '',
+        motility: semenAnalysis?.motility || '',
+        motilityUnit: semenAnalysis?.motilityUnit || '%',
+        hcv: semenAnalysis?.hcv || '',
+        remark: semenAnalysis?.remark || '',
+        dfi: semenAnalysis?.dfi || '',
+        dfiUnit: semenAnalysis?.dfiUnit || '%',
+        srFsh: semenAnalysis?.srFsh || '',
+        srTestosterone: semenAnalysis?.srTestosterone || '',
+        e2: semenAnalysis?.e2 || '',
+        sProlactin: semenAnalysis?.sProlactin || '',
+        karyotype: semenAnalysis?.karyotype || '',
+        yMicrosomeDeletion: semenAnalysis?.yMicrosomeDeletion || '',
+        trusScrotalUsg: semenAnalysis?.trusScrotalUsg || '',
+        testicularBiopsy: semenAnalysis?.testicularBiopsy || ''
+      },
+      medicalHistory: {
+        problem: medicalHistory?.problem || '',
+        currentMedications: medicalHistory?.currentMedications || ''
+      },
+      surgicalHistory: surgicalHistory || [],
       createdBy: req.user.id,
       updatedBy: req.user.id
     });

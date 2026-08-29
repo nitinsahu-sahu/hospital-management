@@ -23,6 +23,8 @@ const PatientExaminationView = () => {
     const [selectedPatient, setSelectedPatient] = useState<SelectedPatient | null>(null);
     const currentPatientIdRef = useRef<string | null>(null);
     const { patientExaminations, loading } = useSelector((state: RootState) => state.eoc);
+    console.log("==>", patientExaminations);
+
     const [expandedPatientExaminationId, setExpandedPatientExaminationId] = useState<string | null>(null);
     const [downloadingId, setDownloadingId] = useState<string | null>(null);
     const dispatch = useDispatch();
@@ -125,7 +127,6 @@ const PatientExaminationView = () => {
         return (
             <div className="flex items-center gap-2">
                 {getStatusBadge(system)}
-
             </div>
         );
     };
@@ -142,6 +143,37 @@ const PatientExaminationView = () => {
                     </p>
                 </div>
             </div>
+        );
+    };
+
+    // Render investigation field
+    const renderInvestigationField = (label: string, value: string) => {
+        if (!value) return null;
+        return (
+            <div className="flex justify-between py-1 border-b border-gray-100 dark:border-gray-700 last:border-0">
+                <span className="text-sm text-gray-600 dark:text-gray-400">{label}</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-white">{value}</span>
+            </div>
+        );
+    };
+
+    // Render blood group badge
+    const renderBloodGroupBadge = (bloodGroup: string) => {
+        if (!bloodGroup) return null;
+        const colors: { [key: string]: string } = {
+            'A+': 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+            'A-': 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400',
+            'B+': 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
+            'B-': 'bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400',
+            'AB+': 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
+            'AB-': 'bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400',
+            'O+': 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
+            'O-': 'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400',
+        };
+        return (
+            <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${colors[bloodGroup] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'}`}>
+                {bloodGroup}
+            </span>
         );
     };
 
@@ -179,6 +211,9 @@ const PatientExaminationView = () => {
                                         Date & Time
                                     </th>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        Blood Group
+                                    </th>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                         CNS
                                     </th>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -209,6 +244,9 @@ const PatientExaminationView = () => {
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
+                                                {renderBloodGroupBadge(patientExamination.investigations?.bloodGroup)}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
                                                 {renderSystemStatus(patientExamination.cns)}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
@@ -237,7 +275,6 @@ const PatientExaminationView = () => {
                                                             <PdfIcon className="fill-green-500 dark:fill-gray-400 size-5" />
                                                         )}
                                                     </button>
-
                                                 </div>
                                             </td>
                                         </tr>
@@ -253,6 +290,144 @@ const PatientExaminationView = () => {
                                                 >
                                                     <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
                                                         <div className="p-6 space-y-6">
+                                                            {/* Investigations Section */}
+                                                            {patientExamination.investigations && (
+                                                                <div className="space-y-4">
+                                                                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                                                        </svg>
+                                                                        Investigations
+                                                                    </h4>
+
+                                                                    {/* Blood Group */}
+                                                                    <div className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                                        <div className="flex items-center gap-4">
+                                                                            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Blood Group:</span>
+                                                                            {renderBloodGroupBadge(patientExamination.investigations.bloodGroup)}
+                                                                        </div>
+                                                                    </div>
+
+                                                                    {/* Blood Tests Grid */}
+                                                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                                                        {renderInvestigationField('HIV', patientExamination.investigations.hiv)}
+                                                                        {renderInvestigationField('TSH', patientExamination.investigations.tsh)}
+                                                                        {renderInvestigationField('HBsAg', patientExamination.investigations.hbsAg)}
+                                                                        {renderInvestigationField('RBS', patientExamination.investigations.rbs)}
+                                                                        {renderInvestigationField('HCV', patientExamination.investigations.hcv)}
+                                                                        {renderInvestigationField('PRL', patientExamination.investigations.prl)}
+                                                                        {renderInvestigationField('VDRL', patientExamination.investigations.vdrl)}
+                                                                        {renderInvestigationField('SGOT', patientExamination.investigations.sgot)}
+                                                                        {renderInvestigationField('DTAH', patientExamination.investigations.dtah)}
+                                                                        {renderInvestigationField('SGPT', patientExamination.investigations.sgpt)}
+                                                                        {renderInvestigationField('BUN', patientExamination.investigations.bun)}
+                                                                        {renderInvestigationField('Sr. Creatinine', patientExamination.investigations.srCreatinine)}
+                                                                    </div>
+
+                                                                    {/* Rubella Tests */}
+                                                                    {patientExamination.investigations.rubella && (
+                                                                        <div className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                                            <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Rubella</h5>
+                                                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                                                                {renderInvestigationField('IgG', patientExamination.investigations.rubella.igg)}
+                                                                                {renderInvestigationField('IgM', patientExamination.investigations.rubella.igm)}
+                                                                                {renderInvestigationField('AMH', patientExamination.investigations.rubella.amh)}
+                                                                                {renderInvestigationField('Avidity Test', patientExamination.investigations.rubella.avidityTest)}
+                                                                            </div>
+                                                                        </div>
+                                                                    )}
+
+                                                                    {/* Other Investigations */}
+                                                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                                                        {renderInvestigationField('Thalassemia Screen', patientExamination.investigations.thalassemiaScreen)}
+                                                                        {renderInvestigationField('Pap Test', patientExamination.investigations.papTest)}
+                                                                        {renderInvestigationField('Karyotype', patientExamination.investigations.karyotype)}
+                                                                        {patientExamination.investigations.hsg && (
+                                                                            <>
+                                                                                {renderInvestigationField('HSG Year', patientExamination.investigations.hsg.year)}
+                                                                                {renderInvestigationField('HSG Finding', patientExamination.investigations.hsg.finding)}
+                                                                            </>
+                                                                        )}
+                                                                        {renderInvestigationField('Echocardiography', patientExamination.investigations.echocardiography)}
+                                                                    </div>
+                                                                </div>
+                                                            )}
+
+                                                            {/* Medical History Section */}
+                                                            {(patientExamination.medicalHistory?.problem || patientExamination.medicalHistory?.currentMedications) && (
+                                                                <div className="space-y-4">
+                                                                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                                                        </svg>
+                                                                        Medical History
+                                                                    </h4>
+
+                                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                                        {patientExamination.medicalHistory.problem && (
+                                                                            <div className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                                                <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Problem</span>
+                                                                                <p className="text-sm text-gray-900 dark:text-white mt-1">
+                                                                                    {patientExamination.medicalHistory.problem}
+                                                                                </p>
+                                                                            </div>
+                                                                        )}
+                                                                        {patientExamination.medicalHistory.currentMedications && (
+                                                                            <div className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                                                <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Current Medications</span>
+                                                                                <p className="text-sm text-gray-900 dark:text-white mt-1">
+                                                                                    {patientExamination.medicalHistory.currentMedications}
+                                                                                </p>
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            )}
+
+                                                            {/* Surgical History Section */}
+                                                            {patientExamination.surgicalHistory && patientExamination.surgicalHistory.length > 0 && (
+                                                                <div className="space-y-4">
+                                                                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                        </svg>
+                                                                        Surgical History
+                                                                    </h4>
+
+                                                                    <div className="space-y-3">
+                                                                        {patientExamination.surgicalHistory.map((surgery: any, index: number) => (
+                                                                            <div key={index} className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                                                <div className="flex items-center justify-between mb-2">
+                                                                                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                                                        Surgery #{index + 1}
+                                                                                    </span>
+                                                                                </div>
+                                                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                                                    <div>
+                                                                                        <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Surgery</span>
+                                                                                        <p className="text-sm text-gray-900 dark:text-white mt-1">
+                                                                                            {surgery.surgery || 'N/A'}
+                                                                                        </p>
+                                                                                    </div>
+                                                                                    <div>
+                                                                                        <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Year</span>
+                                                                                        <p className="text-sm text-gray-900 dark:text-white mt-1">
+                                                                                            {surgery.year || 'N/A'}
+                                                                                        </p>
+                                                                                    </div>
+                                                                                    <div>
+                                                                                        <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Details / Finding</span>
+                                                                                        <p className="text-sm text-gray-900 dark:text-white mt-1">
+                                                                                            {surgery.detailsFinding || 'N/A'}
+                                                                                        </p>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        ))}
+                                                                    </div>
+                                                                </div>
+                                                            )}
+
                                                             {/* Vitals Section */}
                                                             {patientExamination.vitals && (
                                                                 <div className="space-y-4">
@@ -272,7 +447,7 @@ const PatientExaminationView = () => {
                                                                     </div>
 
                                                                     {patientExamination.vitals.abdominalExamination && (
-                                                                        <div className="mt-3 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                                        <div className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
                                                                             <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Abdominal Examination</span>
                                                                             <p className="text-sm text-gray-900 dark:text-white mt-1">
                                                                                 {patientExamination.vitals.abdominalExamination}
@@ -366,11 +541,9 @@ const PatientExaminationView = () => {
                                                                                 {patientExamination.createdBy?.name || 'N/A'}
                                                                             </span>
                                                                         </div>
-
                                                                     </div>
 
                                                                     <div className="space-y-2">
-
                                                                         <div className="flex items-center gap-2">
                                                                             <span className="text-gray-500 dark:text-gray-400">Examination Date:</span>
                                                                             <span className="font-medium text-gray-900 dark:text-white">

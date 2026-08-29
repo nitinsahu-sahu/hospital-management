@@ -135,7 +135,7 @@ export default function PatientView() {
             All Patients {pagination?.totalRecords > 0 && `(${pagination.totalRecords})`}
           </h3>
           <Link
-            to="/patient/add"
+            to="/"
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
           >
             + Create Patient

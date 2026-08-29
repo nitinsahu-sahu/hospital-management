@@ -1,17 +1,20 @@
 import { useEffect, useRef, useState } from "react";
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { PatientInfoCard } from "../../components/consultation/PatientInfoCard";
 import Alert from '../../components/ui/alert/Alert';
 import PageMeta from "../../components/common/PageMeta";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 //@ts-ignore
 import { createInvestigation } from '../../redux/actions/investigation.actions';
+//@ts-ignore
+import { getCustomizationInv } from '../../redux/actions/customization.action';
 import CategorySelector from '../../components/Investigation/Ultrasound/CategorySelector';
 import PNDTInvestigations from '../../components/Investigation/Ultrasound/PNDTInvestigations';
 import GynaeInvestigations from '../../components/Investigation/Ultrasound/GynaeInvestigations';
 import SelectedInvestigationsList from '../../components/Investigation/Ultrasound/SelectedInvestigationsList';
 import { InvestigationItem, PNDTOption, GynaeOption, PelvicSubOption } from '../../types/investigation.types';
-import { pndtOptions, gynaeOptions, pelvicSubOptions } from '../../utils/investigationOptions';
+import { gynaeOptions } from '../../utils/investigationOptions';
+import { RootState } from "../../redux/store/store";
 
 export interface SelectedPatient {
     _id: string;
@@ -28,12 +31,12 @@ export interface SelectedPatient {
 
 const UltrasoundAdd = () => {
     const dispatch = useDispatch();
-
     const [successMessage, setSuccessMessage] = useState<string>('');
     const [error, setError] = useState<string>('');
     const [selectedPatient, setSelectedPatient] = useState<SelectedPatient | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const currentPatientIdRef = useRef<string | null>(null);
+    const { investigationsCustom } = useSelector((state: RootState) => state.customization);
 
     // State for investigations
     const [selectedMainCategory, setSelectedMainCategory] = useState<'pndt' | 'gynae' | ''>('');
@@ -41,6 +44,52 @@ const UltrasoundAdd = () => {
     const [selectedInvestigations, setSelectedInvestigations] = useState<InvestigationItem[]>([]);
     const [totalAmount, setTotalAmount] = useState(0);
 
+    useEffect(() => {
+        if (selectedMainCategory === 'pndt') {
+            loadCustomizationPndt();
+        }
+    }, [selectedMainCategory]);
+
+    // Load FM data when fm sub-category is selected
+    useEffect(() => {
+        if (selectedSubCategory === 'fm') {
+            loadCustomizationFM();
+        }
+    }, [selectedSubCategory]);
+
+    // Load Pelvic data when pelvic sub-category is selected
+    useEffect(() => {
+        if (selectedSubCategory === 'pelvic') {
+            loadCustomizationPelvic();
+        }
+    }, [selectedSubCategory]);
+
+    // Load discounts with pagination
+    const loadCustomizationPndt = async () => {
+        try {
+            await dispatch(getCustomizationInv({ category: "pndt", search: "", isActive: true }) as any);
+        } catch (error) {
+            console.error("Error loading pndt:", error);
+        }
+    };
+
+    // Load discounts with pagination
+    const loadCustomizationFM = async () => {
+        try {
+            await dispatch(getCustomizationInv({ category: "fm", search: "", isActive: true }) as any);
+        } catch (error) {
+            console.error("Error loading pndt:", error);
+        }
+    };
+
+    // Load discounts with pagination
+    const loadCustomizationPelvic = async () => {
+        try {
+            await dispatch(getCustomizationInv({ category: "pelvic", search: "", isActive: true }) as any);
+        } catch (error) {
+            console.error("Error loading pndt:", error);
+        }
+    };
     // Calculate total whenever selectedInvestigations changes
     useEffect(() => {
         const total = selectedInvestigations.reduce((sum, item) => sum + item.price, 0);
@@ -64,7 +113,7 @@ const UltrasoundAdd = () => {
                         setSelectedInvestigations([]);
                         setSelectedMainCategory('');
                         setSelectedSubCategory('');
-                        
+
                         // Update ref immediately
                         currentPatientIdRef.current = patient._id;
                         setSelectedPatient(patient);
@@ -110,14 +159,13 @@ const UltrasoundAdd = () => {
     const handleMainCategoryChange = (category: 'pndt' | 'gynae') => {
         setSelectedMainCategory(category);
         setSelectedSubCategory('');
-        // Clear previous selections when changing category
         setSelectedInvestigations([]);
     };
 
     // Handle PNDT selection
     const handlePNDTSelection = (option: PNDTOption) => {
         const existingIndex = selectedInvestigations.findIndex(
-            item => item.id === option.id && item.category === 'pndt'
+            item => item._id === option._id && item.category === 'pndt'
         );
 
         if (existingIndex !== -1) {
@@ -126,7 +174,7 @@ const UltrasoundAdd = () => {
             setSelectedInvestigations(prev => [
                 ...prev,
                 {
-                    id: option.id,
+                    _id: option._id,
                     name: option.name,
                     category: 'pndt',
                     price: option.price,
@@ -141,56 +189,116 @@ const UltrasoundAdd = () => {
         setSelectedSubCategory(option.id);
 
         if (option.id === 'fm') {
-            const existingIndex = selectedInvestigations.findIndex(
-                item => item.id === 'fm' && item.category === 'gynae'
+            // Remove any existing FM selection
+            const filteredWithoutFM = selectedInvestigations.filter(
+                item => !(item._id === 'fm' && item.category === 'gynae')
             );
 
-            if (existingIndex !== -1) {
-                setSelectedInvestigations(prev => prev.filter((_, index) => index !== existingIndex));
-            } else {
-                const filteredInvestigations = selectedInvestigations.filter(
-                    item => item.category !== 'pelvic'
-                );
+            // Remove any pelvic selections when FM is selected
+            const filteredWithoutPelvic = filteredWithoutFM.filter(
+                item => item.category !== 'pelvic'
+            );
 
+            // Add FM if not already selected
+            const fmExists = selectedInvestigations.some(
+                item => item._id === 'fm' && item.category === 'gynae'
+            );
+
+            if (!fmExists) {
                 setSelectedInvestigations([
-                    ...filteredInvestigations,
+                    ...filteredWithoutPelvic,
                     {
-                        id: 'fm',
+                        _id: 'fm',
                         name: 'FM (FOLLICULAR MONITORING)',
                         category: 'gynae',
                         price: 0,
                         selected: true
                     }
                 ]);
+            } else {
+                // If FM already exists, just remove pelvic items
+                setSelectedInvestigations(filteredWithoutPelvic);
             }
         } else if (option.id === 'pelvic') {
-            const filteredInvestigations = selectedInvestigations.filter(
-                item => item.id !== 'fm'
+            // Remove FM and keep only non-FM items
+            const filteredWithoutFM = selectedInvestigations.filter(
+                item => item._id !== 'fm'
             );
-            setSelectedInvestigations(filteredInvestigations);
+
+            // Also remove any existing pelvic selections when switching to pelvic
+            const filteredWithoutPelvic = filteredWithoutFM.filter(
+                item => item.category !== 'pelvic'
+            );
+
+            setSelectedInvestigations(filteredWithoutPelvic);
+        }
+    };
+
+    // Handle FM selection
+    const handleFMSelection = (option: PelvicSubOption) => {
+        // Remove any existing FM selection
+        const filteredWithoutFM = selectedInvestigations.filter(
+            item => !(item._id === 'fm' && item.category === 'gynae')
+        );
+
+        // Remove any pelvic selections when FM is selected
+        const filteredWithoutPelvic = filteredWithoutFM.filter(
+            item => item.category !== 'pelvic'
+        );
+
+        // Check if this FM option is already selected
+        const isAlreadySelected = selectedInvestigations.some(
+            item => item._id === option._id && item.category === 'fm'
+        );
+
+        if (!isAlreadySelected) {
+            setSelectedInvestigations([
+                ...filteredWithoutPelvic,
+                {
+                    _id: option._id,
+                    name: option.name,
+                    category: 'fm',
+                    price: option.price,
+                    selected: true
+                }
+            ]);
+            setSelectedSubCategory('fm');
+        } else {
+            // If already selected, deselect it
+            setSelectedInvestigations(filteredWithoutPelvic);
+            setSelectedSubCategory('');
         }
     };
 
     // Handle Pelvic sub-option selection
     const handlePelvicSubSelection = (option: PelvicSubOption) => {
         const existingIndex = selectedInvestigations.findIndex(
-            item => item.id === option.id && item.category === 'pelvic'
+            item => item._id === option._id && item.category === 'pelvic'
         );
 
         if (existingIndex !== -1) {
+            // Remove the pelvic option
             setSelectedInvestigations(prev => prev.filter((_, index) => index !== existingIndex));
-            if (selectedInvestigations.filter(item => item.category === 'pelvic').length === 1) {
+            // If no pelvic items left, clear the sub category
+            const remainingPelvic = selectedInvestigations.filter(item => item.category === 'pelvic');
+            if (remainingPelvic.length === 1) { // Only the one being removed
                 setSelectedSubCategory('');
             }
         } else {
-            const filteredInvestigations = selectedInvestigations.filter(
+            // Remove any FM selection when pelvic is selected
+            const filteredWithoutFM = selectedInvestigations.filter(
+                item => item._id !== 'fm'
+            );
+
+            // Remove any existing pelvic selections
+            const filteredWithoutPelvic = filteredWithoutFM.filter(
                 item => item.category !== 'pelvic'
             );
 
             setSelectedInvestigations([
-                ...filteredInvestigations,
+                ...filteredWithoutPelvic,
                 {
-                    id: option.id,
+                    _id: option._id,
                     name: option.name,
                     category: 'pelvic',
                     price: option.price,
@@ -204,7 +312,7 @@ const UltrasoundAdd = () => {
 
     // Check if a PNDT option is selected
     const isPNDTSelected = (optionId: string) => {
-        return selectedInvestigations.some(item => item.id === optionId && item.category === 'pndt');
+        return selectedInvestigations.some(item => item._id === optionId && item.category === 'pndt');
     };
 
     // Check if any pelvic option is selected
@@ -212,20 +320,27 @@ const UltrasoundAdd = () => {
         return selectedInvestigations.some(item => item.category === 'pelvic');
     };
 
-    // Get selected pelvic option name
+    // Check if FM is selected
+    const isFMSelected = () => {
+        return selectedInvestigations.some(item => item.category === 'fm');
+    };
+
+    // Get selected pelvic or FM option name
     const getSelectedPelvicName = () => {
-        const pelvic = selectedInvestigations.find(item => item.category === 'pelvic');
-        return pelvic ? pelvic.name : '';
+        const selected = selectedInvestigations.find(item =>
+            item.category === 'pelvic' || item.category === 'fm'
+        );
+        return selected ? selected.name : '';
     };
 
     // Handle remove investigation
     const removeInvestigation = (id: string) => {
-        setSelectedInvestigations(prev => prev.filter(item => item.id !== id));
+        setSelectedInvestigations(prev => prev.filter(item => item._id !== id));
 
-        const removedItem = selectedInvestigations.find(item => item.id === id);
+        const removedItem = selectedInvestigations.find(item => item._id === id);
         if (removedItem?.category === 'pelvic') {
             setSelectedSubCategory('');
-        } else if (removedItem?.id === 'fm') {
+        } else if (removedItem?.category === 'fm') {
             setSelectedSubCategory('');
         }
     };
@@ -248,7 +363,7 @@ const UltrasoundAdd = () => {
         let subCategory = '';
 
         const hasPelvic = selectedInvestigations.some(item => item.category === 'pelvic');
-        const hasFM = selectedInvestigations.some(item => item.id === 'fm');
+        const hasFM = selectedInvestigations.some(item => item.category === 'fm');
 
         if (hasPelvic) {
             mainCategory = 'gynae';
@@ -266,7 +381,7 @@ const UltrasoundAdd = () => {
             category: mainCategory,
             subCategory: subCategory,
             investigations: selectedInvestigations.map(item => ({
-                id: item.id,
+                id: item._id,
                 name: item.name,
                 category: item.category,
                 price: item.price,
@@ -303,9 +418,9 @@ const UltrasoundAdd = () => {
 
     return (
         <>
-            <PageMeta 
-                title="Add Ultrasound Investigation | Dr. Yogita Verma" 
-                description="Add new ultrasound investigations" 
+            <PageMeta
+                title="Add Ultrasound Investigation | Dr. Yogita Verma"
+                description="Add new ultrasound investigations"
             />
             <PageBreadcrumb pageTitle="Add Ultrasound Investigation" />
 
@@ -340,7 +455,7 @@ const UltrasoundAdd = () => {
                 />
 
                 {/* Investigation Form */}
-                {selectedPatient  && (
+                {selectedPatient && (
                     <div className="mt-6 space-y-6">
                         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                             <CategorySelector
@@ -351,7 +466,7 @@ const UltrasoundAdd = () => {
                             {/* PNDT Options */}
                             {selectedMainCategory === 'pndt' && (
                                 <PNDTInvestigations
-                                    options={pndtOptions}
+                                    options={investigationsCustom}
                                     selectedInvestigations={selectedInvestigations}
                                     onSelectionChange={handlePNDTSelection}
                                     isSelected={isPNDTSelected}
@@ -362,13 +477,15 @@ const UltrasoundAdd = () => {
                             {selectedMainCategory === 'gynae' && (
                                 <GynaeInvestigations
                                     gynaeOptions={gynaeOptions}
-                                    pelvicSubOptions={pelvicSubOptions}
+                                    pelvicSubOptions={investigationsCustom}
                                     selectedSubCategory={selectedSubCategory}
                                     selectedInvestigations={selectedInvestigations}
                                     onGynaeSubCategoryChange={handleGynaeSubCategory}
                                     onPelvicSubSelection={handlePelvicSubSelection}
+                                    onFMSelection={handleFMSelection}
                                     isPelvicSelected={isPelvicSelected}
                                     getSelectedPelvicName={getSelectedPelvicName}
+                                    isFMSelected={isFMSelected}
                                 />
                             )}
                         </div>

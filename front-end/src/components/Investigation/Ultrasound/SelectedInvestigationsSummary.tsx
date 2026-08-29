@@ -27,7 +27,7 @@ const SelectedInvestigationsSummary: React.FC<SelectedInvestigationsSummaryProps
           <div className="space-y-3 max-h-96 overflow-y-auto">
             {investigations.map((item) => (
               <div
-                key={item.id}
+                key={item._id}
                 className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
               >
                 <div className="flex-1">
@@ -48,7 +48,7 @@ const SelectedInvestigationsSummary: React.FC<SelectedInvestigationsSummaryProps
                     ₹{item.price}/-
                   </span>
                   <button
-                    onClick={() => onRemove(item.id)}
+                    onClick={() => onRemove(item._id)}
                     className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
                     aria-label="Remove investigation"
                   >

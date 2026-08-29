@@ -8,25 +8,49 @@ import { createProcedure } from '../../redux/actions/procedure.actions';
 import { PatientInfoCard } from '../../components/consultation/PatientInfoCard';
 import Alert from '../../components/ui/alert/Alert';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
+//@ts-ignore
+import { getCustomizationInv } from '../../redux/actions/customization.action';
 
 interface SelectedProcedureDetails {
     id: string;
     name: string;
     price: number;
     type?: string;
+    code?: string;
+    description?: string;
 }
 
 export default function ProcedureAdd() {
     const dispatch = useDispatch();
     const { creating } = useSelector((state: RootState) => state.procedure);
-
     const [selectedPatient, setSelectedPatient] = useState<any | null>(null);
     const [selectedProcedures, setSelectedProcedures] = useState<string[]>([]);
     const [expandedCategory, setExpandedCategory] = useState<string | null>('iui');
     const [selectedIuiType, setSelectedIuiType] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [successMessage, setSuccessMessage] = useState<string>('');
+    const [iuiProcedures, setIuiProcedures] = useState<any[]>([]);
+    const [otherProcedures, setOtherProcedures] = useState<any[]>([]);
     const [error, setError] = useState<string>('');
+
+    // Load customizations sequentially
+    useEffect(() => {
+        loadCustomizationsSequentially();
+    }, []);
+
+    const loadCustomizationsSequentially = async () => {
+        try {
+            // Load IUI first
+            const iuiResult = await dispatch(getCustomizationInv({ category: "iui", search: "", isActive: true }) as any);
+            setIuiProcedures(iuiResult.payload || []);
+
+            // Load procedures
+            const procedureResult = await dispatch(getCustomizationInv({ category: "procedure", search: "", isActive: true }) as any);
+            setOtherProcedures(procedureResult.payload || []);
+        } catch (error) {
+            console.error("Error loading customizations:", error);
+        }
+    };
 
     // Reset all states
     const resetAllStates = () => {
@@ -48,7 +72,6 @@ export default function ProcedureAdd() {
                     const patient = JSON.parse(patientData);
                     if (!selectedPatient || selectedPatient._id !== patient._id) {
                         setSelectedPatient(patient);
-                        // Reset form states for new patient
                         resetAllStates();
                     }
                 } catch (error) {
@@ -79,82 +102,30 @@ export default function ProcedureAdd() {
         );
     };
 
-    const handleIuiTypeSelect = (type: string) => {
-        setSelectedIuiType(type);
-        setSelectedProcedures(prev => prev.filter(id => !id.startsWith('iui')));
-        setSelectedProcedures(prev => [...prev, type]);
+    const handleIuiTypeSelect = (procedureId: string) => {
+        setSelectedIuiType(procedureId);
+        // Remove any previously selected IUI procedures
+        setSelectedProcedures(prev => prev.filter(id => !id.startsWith('iui_')));
+        setSelectedProcedures(prev => [...prev, procedureId]);
     };
 
     const getSelectedProceduresDetails = (): SelectedProcedureDetails[] => {
         const details: SelectedProcedureDetails[] = [];
+        const allProcedures = [...iuiProcedures, ...otherProcedures];
 
         selectedProcedures.forEach(procId => {
-            switch (procId) {
-                case 'iui-self':
-                    details.push({
-                        id: procId,
-                        name: 'IUI (Self - Husband)',
-                        price: 3500,
-                        type: 'self'
-                    });
-                    break;
-                case 'iui-donor':
-                    details.push({
-                        id: procId,
-                        name: 'IUI (Donor Sperm)',
-                        price: 5500,
-                        type: 'donor'
-                    });
-                    break;
-                case 'cvs':
-                    details.push({
-                        id: procId,
-                        name: 'CVS (Chorionic Villus Sampling)',
-                        price: 12000
-                    });
-                    break;
-                case 'prp':
-                    details.push({
-                        id: procId,
-                        name: 'PRP (Platelet-Rich Plasma)',
-                        price: 8000
-                    });
-                    break;
-                case 'lbc':
-                    details.push({
-                        id: procId,
-                        name: 'LBC (Liquid Based Cytology)',
-                        price: 2500
-                    });
-                    break;
-                case 'lbc-hpv':
-                    details.push({
-                        id: procId,
-                        name: 'LBC + HPV DNA',
-                        price: 4500
-                    });
-                    break;
-                case 'amniocentesis':
-                    details.push({
-                        id: procId,
-                        name: 'Amniocentesis',
-                        price: 15000
-                    });
-                    break;
-                case 'iui-h':
-                    details.push({
-                        id: procId,
-                        name: 'IUI-H (IUI with Husband)',
-                        price: 3500
-                    });
-                    break;
-                case 'iui-d':
-                    details.push({
-                        id: procId,
-                        name: 'IUI-D (IUI with Donor)',
-                        price: 5500
-                    });
-                    break;
+            const procedure = allProcedures.find(p => p._id === procId);
+            if (procedure) {
+                // Check if it's an IUI procedure
+                const isIUI = iuiProcedures.some(p => p._id === procId);
+                details.push({
+                    id: procedure._id,
+                    name: procedure.name,
+                    price: procedure.price,
+                    type: isIUI ? 'iui' : 'procedure',
+                    code: procedure.code,
+                    description: procedure.description
+                });
             }
         });
 
@@ -163,28 +134,19 @@ export default function ProcedureAdd() {
 
     const getTotalPrice = () => {
         let total = 0;
+        const allProcedures = [...iuiProcedures, ...otherProcedures];
+        
         selectedProcedures.forEach(procId => {
-            if (procId === 'iui-self') {
-                total += 3500;
-            } else if (procId === 'iui-donor') {
-                total += 5500;
-            } else if (procId === 'cvs') {
-                total += 12000;
-            } else if (procId === 'prp') {
-                total += 8000;
-            } else if (procId === 'lbc') {
-                total += 2500;
-            } else if (procId === 'lbc-hpv') {
-                total += 4500;
-            } else if (procId === 'amniocentesis') {
-                total += 15000;
-            } else if (procId === 'iui-h') {
-                total += 3500;
-            } else if (procId === 'iui-d') {
-                total += 5500;
+            const procedure = allProcedures.find(p => p._id === procId);
+            if (procedure) {
+                total += procedure.price;
             }
         });
         return total;
+    };
+
+    const getProcedureDisplayName = (procedure: any) => {
+        return procedure.name;
     };
 
     const handleSubmit = async () => {
@@ -202,7 +164,6 @@ export default function ProcedureAdd() {
         setSuccessMessage('');
         setError('');
 
-        // Prepare data for API - only create new procedure
         const procedureData = {
             procedureDate: new Date().toISOString().split('T')[0],
             patientId: selectedPatient._id,
@@ -212,22 +173,17 @@ export default function ProcedureAdd() {
                 name: proc.name,
                 price: proc.price,
                 subType: proc.type || null,
-                description: ''
+                description: proc.description || ''
             })),
         };
 
         try {
-            // Always create new procedure (no update functionality)
             const result = await dispatch(createProcedure(procedureData) as any);
-console.log("pro cret",result);
 
             if (result?.status === 201 || result?.status === 200) {
                 setSuccessMessage('Procedures saved successfully!');
-                // Reset form after successful submission
                 setSelectedProcedures([]);
                 setSelectedIuiType(null);
-
-                // Hide success message after 5 seconds
                 setTimeout(() => setSuccessMessage(''), 5000);
             } else {
                 setError(result?.error || 'Error saving procedures. Please try again.');
@@ -238,6 +194,102 @@ console.log("pro cret",result);
         } finally {
             setIsSubmitting(false);
         }
+    };
+
+    // Helper function to render procedure item
+    const renderProcedureItem = (procedure: any) => {
+        const isSelected = selectedProcedures.includes(procedure._id);
+        const isIUI = procedure.category === 'iui';
+
+        // For IUI procedures, use radio buttons (only one can be selected)
+        if (isIUI) {
+            return (
+                <div className="p-2 sm:p-3" key={procedure._id}>
+                    <label className={`flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${
+                        selectedIuiType === procedure._id
+                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                            : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
+                    }`}>
+                        <div className="flex items-start gap-3">
+                            <input
+                                type="radio"
+                                name="iui-type"
+                                checked={selectedIuiType === procedure._id}
+                                onChange={() => handleIuiTypeSelect(procedure._id)}
+                                className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 mt-1"
+                            />
+                            <div className="flex-1">
+                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                                    <span className="font-medium text-gray-900 dark:text-white">
+                                        {procedure.name}
+                                    </span>
+                                    <span className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
+                                        ₹{procedure.price}/-
+                                    </span>
+                                </div>
+                                {procedure.description && (
+                                    <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                        {procedure.description}
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            );
+        }
+
+        // For other procedures, use checkboxes
+        return (
+            <div className="p-4 sm:p-6" key={procedure._id}>
+                <label className={`flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${
+                    isSelected
+                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                        : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
+                }`}>
+                    <div className="flex items-start gap-3">
+                        <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => handleProcedureToggle(procedure._id)}
+                            className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 mt-1"
+                        />
+                        <div>
+                            <div className="flex items-center gap-2">
+                                <span className="text-xl sm:text-2xl">
+                                    {getEmojiForProcedure(procedure.name)}
+                                </span>
+                                <span className="font-medium text-gray-900 dark:text-white">
+                                    {procedure.name}
+                                </span>
+                            </div>
+                            {procedure.description && (
+                                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                    {procedure.description}
+                                </p>
+                            )}
+                        </div>
+                    </div>
+                    <span className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mt-2 sm:mt-0 sm:ml-4">
+                        ₹{procedure.price}/-
+                    </span>
+                </label>
+            </div>
+        );
+    };
+
+    // Helper function to get emoji for procedure
+    const getEmojiForProcedure = (name: string) => {
+        const emojiMap: { [key: string]: string } = {
+            'CVS (Chorionic Villus Sampling)': '🧬',
+            'PRP (Platelet-Rich Plasma)': '💉',
+            'LBC (Liquid Based Cytology)': '🔍',
+            'LBC + HPV DNA': '🧪',
+            'Amniocentesis': '💊',
+            'IUI-H (IUI with Husband)': '👨‍👩‍👧',
+            'IUI-D (IUI with Donor)': '🤝'
+        };
+        return emojiMap[name] || '📋';
     };
 
     return (
@@ -296,303 +348,35 @@ console.log("pro cret",result);
                             {/* Procedures List */}
                             <div className="divide-y divide-gray-200 dark:divide-gray-700">
                                 {/* IUI Section */}
-                                <div className="p-4 sm:p-6">
-                                    <button
-                                        onClick={() => setExpandedCategory(expandedCategory === 'iui' ? null : 'iui')}
-                                        className="w-full flex items-center justify-between group"
-                                    >
-                                        <div className="flex items-center gap-2 sm:gap-3">
-                                            <span className="text-xl sm:text-2xl">🔬</span>
-                                            <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
-                                                IUI (Intrauterine Insemination)
-                                            </h3>
-                                        </div>
-                                        <span className="text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300">
-                                            {expandedCategory === 'iui' ? '▼' : '▶'}
-                                        </span>
-                                    </button>
-
-                                    {expandedCategory === 'iui' && (
-                                        <div className="mt-4 sm:mt-6 space-y-3 sm:space-y-4">
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                                                {/* Self (Husband) */}
-                                                <label className={`flex flex-col p-3 sm:p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${selectedIuiType === 'iui-self'
-                                                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                                                        : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
-                                                    }`}>
-                                                    <div className="flex items-start gap-3">
-                                                        <input
-                                                            type="radio"
-                                                            name="iui-type"
-                                                            checked={selectedIuiType === 'iui-self'}
-                                                            onChange={() => handleIuiTypeSelect('iui-self')}
-                                                            className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 mt-1"
-                                                        />
-                                                        <div className="flex-1">
-                                                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                                                                <span className="font-medium text-gray-900 dark:text-white">
-                                                                    Self (Husband)
-                                                                </span>
-                                                                <span className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
-                                                                    ₹3,500/-
-                                                                </span>
-                                                            </div>
-                                                            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                                                Using husband's sperm sample
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                </label>
-
-                                                {/* Donor Sperm */}
-                                                <label className={`flex flex-col p-3 sm:p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${selectedIuiType === 'iui-donor'
-                                                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                                                        : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
-                                                    }`}>
-                                                    <div className="flex items-start gap-3">
-                                                        <input
-                                                            type="radio"
-                                                            name="iui-type"
-                                                            checked={selectedIuiType === 'iui-donor'}
-                                                            onChange={() => handleIuiTypeSelect('iui-donor')}
-                                                            className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 mt-1"
-                                                        />
-                                                        <div className="flex-1">
-                                                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                                                                <span className="font-medium text-gray-900 dark:text-white">
-                                                                    Donor Sperm
-                                                                </span>
-                                                                <span className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
-                                                                    ₹5,500/-
-                                                                </span>
-                                                            </div>
-                                                            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                                                Using donor sperm sample
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                </label>
+                                {iuiProcedures.length > 0 && (
+                                    <div className="p-4 sm:p-6">
+                                        <button
+                                            onClick={() => setExpandedCategory(expandedCategory === 'iui' ? null : 'iui')}
+                                            className="w-full flex items-center justify-between group"
+                                        >
+                                            <div className="flex items-center gap-2 sm:gap-3">
+                                                <span className="text-xl sm:text-2xl">🔬</span>
+                                                <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
+                                                    IUI (Intrauterine Insemination)
+                                                </h3>
                                             </div>
-                                        </div>
-                                    )}
-                                </div>
+                                            <span className="text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300">
+                                                {expandedCategory === 'iui' ? '▼' : '▶'}
+                                            </span>
+                                        </button>
 
-                                {/* CVS */}
-                                <div className="p-4 sm:p-6">
-                                    <label className={`flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${selectedProcedures.includes('cvs')
-                                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                                            : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
-                                        }`}>
-                                        <div className="flex items-start gap-3">
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedProcedures.includes('cvs')}
-                                                onChange={() => handleProcedureToggle('cvs')}
-                                                className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 mt-1"
-                                            />
-                                            <div>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-xl sm:text-2xl">🧬</span>
-                                                    <span className="font-medium text-gray-900 dark:text-white">
-                                                        CVS (Chorionic Villus Sampling)
-                                                    </span>
+                                        {expandedCategory === 'iui' && (
+                                            <div className="mt-1 sm:mt-6 space-y-3 sm:space-y-4">
+                                                <div className="grid grid-cols-1 gap-1 sm:gap-4">
+                                                    {iuiProcedures.map(procedure => renderProcedureItem(procedure))}
                                                 </div>
-                                                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                                    Prenatal test for genetic disorders
-                                                </p>
                                             </div>
-                                        </div>
-                                        <span className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mt-2 sm:mt-0 sm:ml-4">
-                                            ₹12,000/-
-                                        </span>
-                                    </label>
-                                </div>
+                                        )}
+                                    </div>
+                                )}
 
-                                {/* PRP */}
-                                <div className="p-4 sm:p-6">
-                                    <label className={`flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${selectedProcedures.includes('prp')
-                                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                                            : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
-                                        }`}>
-                                        <div className="flex items-start gap-3">
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedProcedures.includes('prp')}
-                                                onChange={() => handleProcedureToggle('prp')}
-                                                className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 mt-1"
-                                            />
-                                            <div>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-xl sm:text-2xl">💉</span>
-                                                    <span className="font-medium text-gray-900 dark:text-white">
-                                                        PRP (Platelet-Rich Plasma)
-                                                    </span>
-                                                </div>
-                                                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                                    Therapy for ovarian rejuvenation
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <span className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mt-2 sm:mt-0 sm:ml-4">
-                                            ₹8,000/-
-                                        </span>
-                                    </label>
-                                </div>
-
-                                {/* LBC */}
-                                <div className="p-4 sm:p-6">
-                                    <label className={`flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${selectedProcedures.includes('lbc')
-                                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                                            : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
-                                        }`}>
-                                        <div className="flex items-start gap-3">
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedProcedures.includes('lbc')}
-                                                onChange={() => handleProcedureToggle('lbc')}
-                                                className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 mt-1"
-                                            />
-                                            <div>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-xl sm:text-2xl">🔍</span>
-                                                    <span className="font-medium text-gray-900 dark:text-white">
-                                                        LBC (Liquid Based Cytology)
-                                                    </span>
-                                                </div>
-                                                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                                    Advanced pap smear test
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <span className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mt-2 sm:mt-0 sm:ml-4">
-                                            ₹2,500/-
-                                        </span>
-                                    </label>
-                                </div>
-
-                                {/* LBC + HPV DNA */}
-                                <div className="p-4 sm:p-6">
-                                    <label className={`flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${selectedProcedures.includes('lbc-hpv')
-                                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                                            : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
-                                        }`}>
-                                        <div className="flex items-start gap-3">
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedProcedures.includes('lbc-hpv')}
-                                                onChange={() => handleProcedureToggle('lbc-hpv')}
-                                                className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 mt-1"
-                                            />
-                                            <div>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-xl sm:text-2xl">🧪</span>
-                                                    <span className="font-medium text-gray-900 dark:text-white">
-                                                        LBC + HPV DNA
-                                                    </span>
-                                                </div>
-                                                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                                    Combined cervical cancer screening
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <span className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mt-2 sm:mt-0 sm:ml-4">
-                                            ₹4,500/-
-                                        </span>
-                                    </label>
-                                </div>
-
-                                {/* Amniocentesis */}
-                                <div className="p-4 sm:p-6">
-                                    <label className={`flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${selectedProcedures.includes('amniocentesis')
-                                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                                            : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
-                                        }`}>
-                                        <div className="flex items-start gap-3">
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedProcedures.includes('amniocentesis')}
-                                                onChange={() => handleProcedureToggle('amniocentesis')}
-                                                className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 mt-1"
-                                            />
-                                            <div>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-xl sm:text-2xl">💊</span>
-                                                    <span className="font-medium text-gray-900 dark:text-white">
-                                                        Amniocentesis
-                                                    </span>
-                                                </div>
-                                                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                                    Prenatal diagnostic test
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <span className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mt-2 sm:mt-0 sm:ml-4">
-                                            ₹15,000/-
-                                        </span>
-                                    </label>
-                                </div>
-
-                                {/* IUI-H */}
-                                <div className="p-4 sm:p-6">
-                                    <label className={`flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${selectedProcedures.includes('iui-h')
-                                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                                            : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
-                                        }`}>
-                                        <div className="flex items-start gap-3">
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedProcedures.includes('iui-h')}
-                                                onChange={() => handleProcedureToggle('iui-h')}
-                                                className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 mt-1"
-                                            />
-                                            <div>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-xl sm:text-2xl">👨‍👩‍👧</span>
-                                                    <span className="font-medium text-gray-900 dark:text-white">
-                                                        IUI-H (IUI with Husband)
-                                                    </span>
-                                                </div>
-                                                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                                    IUI procedure using husband's sperm
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <span className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mt-2 sm:mt-0 sm:ml-4">
-                                            ₹3,500/-
-                                        </span>
-                                    </label>
-                                </div>
-
-                                {/* IUI-D */}
-                                <div className="p-4 sm:p-6">
-                                    <label className={`flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${selectedProcedures.includes('iui-d')
-                                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                                            : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
-                                        }`}>
-                                        <div className="flex items-start gap-3">
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedProcedures.includes('iui-d')}
-                                                onChange={() => handleProcedureToggle('iui-d')}
-                                                className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 mt-1"
-                                            />
-                                            <div>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-xl sm:text-2xl">🤝</span>
-                                                    <span className="font-medium text-gray-900 dark:text-white">
-                                                        IUI-D (IUI with Donor)
-                                                    </span>
-                                                </div>
-                                                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                                    IUI procedure using donor sperm
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <span className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mt-2 sm:mt-0 sm:ml-4">
-                                            ₹5,500/-
-                                        </span>
-                                    </label>
-                                </div>
+                                {/* Other Procedures */}
+                                {otherProcedures.map(procedure => renderProcedureItem(procedure))}
                             </div>
 
                             {/* Summary Section */}
@@ -604,19 +388,15 @@ console.log("pro cret",result);
                                         </h3>
                                         <div className="flex flex-wrap gap-2 mt-2">
                                             {selectedProcedures.length > 0 ? (
-                                                selectedProcedures.map(proc => (
-                                                    <span key={proc} className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                                                        {proc === 'iui-self' && 'IUI (Self)'}
-                                                        {proc === 'iui-donor' && 'IUI (Donor)'}
-                                                        {proc === 'cvs' && 'CVS'}
-                                                        {proc === 'prp' && 'PRP'}
-                                                        {proc === 'lbc' && 'LBC'}
-                                                        {proc === 'lbc-hpv' && 'LBC + HPV DNA'}
-                                                        {proc === 'amniocentesis' && 'Amniocentesis'}
-                                                        {proc === 'iui-h' && 'IUI-H'}
-                                                        {proc === 'iui-d' && 'IUI-D'}
-                                                    </span>
-                                                ))
+                                                selectedProcedures.map(procId => {
+                                                    const allProcedures = [...iuiProcedures, ...otherProcedures];
+                                                    const procedure = allProcedures.find(p => p._id === procId);
+                                                    return procedure ? (
+                                                        <span key={procId} className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                                                            {procedure.name}
+                                                        </span>
+                                                    ) : null;
+                                                })
                                             ) : (
                                                 <span className="text-sm text-gray-500 dark:text-gray-400">
                                                     No procedures selected
@@ -635,10 +415,11 @@ console.log("pro cret",result);
                                 <button
                                     onClick={handleSubmit}
                                     disabled={isSubmitting || creating || selectedProcedures.length === 0}
-                                    className={`w-full mt-4 px-4 py-2.5 sm:py-3 bg-blue-600 text-white font-medium rounded-lg transition-colors duration-200 ${isSubmitting || creating || selectedProcedures.length === 0
+                                    className={`w-full mt-4 px-4 py-2.5 sm:py-3 bg-blue-600 text-white font-medium rounded-lg transition-colors duration-200 ${
+                                        isSubmitting || creating || selectedProcedures.length === 0
                                             ? 'opacity-50 cursor-not-allowed'
                                             : 'hover:bg-blue-700'
-                                        }`}
+                                    }`}
                                 >
                                     {isSubmitting || creating ? 'Saving...' : 'Save Procedures'}
                                 </button>

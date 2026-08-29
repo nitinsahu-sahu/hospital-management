@@ -7,6 +7,39 @@ const fs = require('fs');
 const path = require('path');
 const { formatDateTime } = require('../utils/timeFormate');
 
+// Create new investigation
+exports.createInvestigation = async (req, res) => {
+
+  try {
+    const { patientId, category, subCategory, investigations, totalAmount } = req.body;
+    const userId = req.user?.id;
+
+    const investigation = new Investigation({
+      patientId,
+      category, subCategory,
+      investigations,
+      totalAmount,
+      createdBy: userId,
+      updatedBy: userId
+    });
+
+    await investigation.save();
+
+    res.status(201).json({
+      success: true,
+      message: 'Investigation created successfully',
+      data: investigation
+    });
+  } catch (error) {
+    console.error('Error creating investigation:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error creating investigation',
+      error: error.message
+    });
+  }
+};
+
 const generateUltrasoundPDF = async (data, res) => {
 
   const colors = {
@@ -40,7 +73,7 @@ const generateUltrasoundPDF = async (data, res) => {
     doc.fillColor(colors.white)
       .fontSize(12)
       .font('Helvetica-Bold')
-      .text('Women Fetal Care Clinic', 18, 8, { align: 'center' });
+      .text('Women & Fetal Care Clinic', 18, 8, { align: 'center' });
 
     doc.fontSize(10)
       .font('Helvetica')
@@ -90,7 +123,7 @@ const generateUltrasoundPDF = async (data, res) => {
     doc.fillColor(colors.primary)
       .fontSize(12)
       .font('Helvetica-Bold')
-      .text('Women Fetal Care Clinic', 18, footerY + 5);
+      .text('Women & Fetal Care Clinic', 18, footerY + 5);
 
     doc.fillColor(colors.lightText)
       .fontSize(8)
@@ -503,39 +536,7 @@ exports.investigationPdf = async (req, res) => {
   }
 };
 
-// Create new investigation
-exports.createInvestigation = async (req, res) => {
 
-  try {
-    const { patientId, category, subCategory, investigations, totalAmount, status } = req.body;
-    const userId = req.user?.id;
-
-    const investigation = new Investigation({
-      patientId,
-      category, subCategory,
-      investigations,
-      totalAmount,
-      status: status || 'pending',
-      createdBy: userId,
-      updatedBy: userId
-    });
-
-    await investigation.save();
-
-    res.status(201).json({
-      success: true,
-      message: 'Investigation created successfully',
-      data: investigation
-    });
-  } catch (error) {
-    console.error('Error creating investigation:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error creating investigation',
-      error: error.message
-    });
-  }
-};
 
 // Get investigation by patient ID
 exports.getInvestigationByPatientId = async (req, res) => {

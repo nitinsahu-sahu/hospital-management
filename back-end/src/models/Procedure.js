@@ -25,13 +25,8 @@ const procedureSchema = new mongoose.Schema({
     },
     category: {
       type: String,
-      enum: ['iui', 'cvs', 'prp', 'lbc', 'amniocentesis'],
+      enum: ['iui','procedure'],
       required: true
-    },
-    subType: {
-      type: String,
-      enum: ['self', 'donor', 'husband', null],
-      default: null
     },
     description: {
       type: String,

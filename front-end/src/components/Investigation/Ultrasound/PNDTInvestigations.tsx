@@ -18,7 +18,7 @@ const PNDTInvestigations: React.FC<PNDTInvestigationsProps> = ({
   return (
     <div className="space-y-4 sm:space-y-5">
       <BloodInvestigationsList
-        title="PNDT/ANTINUTOL Investigations"
+        title="PNDT/ANTENATAL Investigations"
         options={options}
         selectedInvestigations={selectedInvestigations}
         category="pndt"

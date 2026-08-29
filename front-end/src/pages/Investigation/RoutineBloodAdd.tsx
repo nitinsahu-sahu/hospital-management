@@ -8,9 +8,11 @@ import { RootState } from '../../redux/store/store';
 //@ts-ignore
 import { createBloodInvestigation, clearBloodInvestigationError } from '../../redux/actions/bloodInvestigation.actions';
 import { InvestigationItem, InvestigationData } from '../../types/investigation.types';
-import { routineOptions } from '../../utils/investigationOptions';
+// import { routineOptions } from '../../utils/investigationOptions';
 import SelectedInvestigationsSummary from '../../components/Investigation/Ultrasound/SelectedInvestigationsSummary';
 import BloodInvestigationsList from '../../components/Investigation/Ultrasound/BloodInvestigationsList';
+//@ts-ignore
+import { getCustomizationInv } from '../../redux/actions/customization.action';
 
 export interface SelectedPatient {
     _id: string;
@@ -30,6 +32,8 @@ const RoutineBloodAdd = () => {
     const { success, error: bloodInvestigationError } = useSelector(
         (state: RootState) => state.bloodInvestigation
     );
+    const { investigationsCustom } = useSelector((state: RootState) => state.customization);
+
     const [successMessage, setSuccessMessage] = useState<string>('');
     const [error, setError] = useState<string>('');
     const [selectedPatient, setSelectedPatient] = useState<SelectedPatient | null>(null);
@@ -39,6 +43,20 @@ const RoutineBloodAdd = () => {
     // Investigation state
     const [selectedInvestigations, setSelectedInvestigations] = useState<InvestigationItem[]>([]);
     const [totalAmount, setTotalAmount] = useState(0);
+
+    // Load routine data when pelvic sub-category is selected
+    useEffect(() => {
+            loadCustomizationRoutine();
+    }, []);
+
+    // Load discounts with pagination
+    const loadCustomizationRoutine = async () => {
+        try {
+            await dispatch(getCustomizationInv({ category: "rbt", search: "", isActive: true }) as any);
+        } catch (error) {
+            console.error("Error loading pndt:", error);
+        }
+    };
 
     // Calculate total whenever selectedInvestigations changes
     useEffect(() => {
@@ -122,7 +140,7 @@ const RoutineBloodAdd = () => {
     // Handle selection change
     const handleSelectionChange = (option: any, category: string) => {
         const existingIndex = selectedInvestigations.findIndex(
-            item => item.id === option.id
+            item => item._id === option._id
         );
 
         if (existingIndex !== -1) {
@@ -131,7 +149,7 @@ const RoutineBloodAdd = () => {
             setSelectedInvestigations(prev => [
                 ...prev,
                 {
-                    id: option.id,
+                    _id: option._id,
                     code: option.code,
                     name: option.name,
                     category: category,
@@ -144,12 +162,12 @@ const RoutineBloodAdd = () => {
 
     // Check if an option is selected
     const isSelected = (optionId: string) => {
-        return selectedInvestigations.some(item => item.id === optionId);
+        return selectedInvestigations.some(item => item._id === optionId);
     };
 
     // Handle remove investigation
     const removeInvestigation = (id: string) => {
-        setSelectedInvestigations(prev => prev.filter(item => item.id !== id));
+        setSelectedInvestigations(prev => prev.filter(item => item._id !== id));
     };
 
     // Handle submit - Only create new
@@ -170,7 +188,7 @@ const RoutineBloodAdd = () => {
             patientId: selectedPatient._id,
             category: 'routine',
             investigations: selectedInvestigations.map(item => ({
-                id: item.id,
+                _id: item._id,
                 code: item.code,
                 name: item.name,
                 category: item.category,
@@ -180,7 +198,6 @@ const RoutineBloodAdd = () => {
             totalAmount: totalAmount,
         };
 
-        console.log('Routine Blood Investigation Data:', investigationData);
 
         setIsSubmitting(true);
         setError('');
@@ -251,7 +268,7 @@ const RoutineBloodAdd = () => {
                         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                             <BloodInvestigationsList
                                 title="Routine Blood Tests"
-                                options={routineOptions}
+                                options={investigationsCustom}
                                 selectedInvestigations={selectedInvestigations}
                                 category="routine"
                                 onSelectionChange={handleSelectionChange}
