@@ -217,7 +217,7 @@ if (relativeFormData.sex === "other" && !relativeFormData.sexDetails?.trim()) {
         sessionStorage.removeItem("registrationStep");
 
         setTimeout(() => {
-          navigate("/patient/view");
+          navigate("/patients");
         }, 3000);
       } else {
         setError(response?.message || "Failed to register relative");
