@@ -20,7 +20,7 @@ const AppHeader: React.FC = () => {
   const location = useLocation(); // Get current location
 
   // Check if search bar should be hidden
-  const shouldHideSearch = location.pathname === '/' || location.pathname === '/patient/view';
+  const shouldHideSearch = location.pathname === '/' || location.pathname === '/patients';
 
   // Load selected patient from sessionStorage on mount
   useEffect(() => {
