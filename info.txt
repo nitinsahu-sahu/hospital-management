@@ -5,6 +5,11 @@ demo credential
 demo23@gmail.com
 demo@!123
 
+
+//LIve DB
+user=prdmagency_db_user
+pwd=nEhHxIKSzrtnrrRT    
+conn_url= mongodb+srv://prdmagency_db_user:nEhHxIKSzrtnrrRT@cluster0.kvzwnks.mongodb.net/?appName=Cluster0
 //view
 import { useEffect, useRef, useState } from "react";
 import { PatientInfoCard } from "../../components/consultation/PatientInfoCard"
