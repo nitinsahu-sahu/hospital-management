@@ -145,10 +145,6 @@ export default function ProcedureAdd() {
         return total;
     };
 
-    const getProcedureDisplayName = (procedure: any) => {
-        return procedure.name;
-    };
-
     const handleSubmit = async () => {
         if (!selectedPatient) {
             setError('Please select a patient first');
