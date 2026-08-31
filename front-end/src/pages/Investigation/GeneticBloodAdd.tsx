@@ -8,9 +8,11 @@ import { RootState } from '../../redux/store/store';
 //@ts-ignore
 import { createGeneticInvestigation, clearGeneticInvestigationError } from '../../redux/actions/geneticInvestigation.actions';
 import { InvestigationItem, InvestigationData } from '../../types/investigation.types';
-import { geneticOptions } from '../../utils/investigationOptions';
+// import { geneticOptions } from '../../utils/investigationOptions';
 import SelectedInvestigationsSummary from '../../components/Investigation/Ultrasound/SelectedInvestigationsSummary';
 import BloodInvestigationsList from '../../components/Investigation/Ultrasound/BloodInvestigationsList';
+//@ts-ignore
+import { getCustomizationInv } from '../../redux/actions/customization.action';
 
 export interface SelectedPatient {
     _id: string;
@@ -28,17 +30,30 @@ export interface SelectedPatient {
 const GeneticBloodAdd = () => {
     const dispatch = useDispatch();
     const { success, error: geneticInvestigationError } = useSelector((state: RootState) => state.geneticInvestigation);
-
-    
+    const { investigationsCustom } = useSelector((state: RootState) => state.customization);
     const [successMessage, setSuccessMessage] = useState<string>('');
     const [error, setError] = useState<string>('');
     const [selectedPatient, setSelectedPatient] = useState<SelectedPatient | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const currentPatientIdRef = useRef<string | null>(null);
+// console.log("investigationsCustom",investigationsCustom);
 
     // Investigation state
     const [selectedInvestigations, setSelectedInvestigations] = useState<InvestigationItem[]>([]);
     const [totalAmount, setTotalAmount] = useState(0);
+
+    useEffect(() => {
+            loadCustomizationGenetic();
+    }, []);
+
+    // Load discounts with pagination
+    const loadCustomizationGenetic = async () => {
+        try {
+            await dispatch(getCustomizationInv({ category: "gbt", search: "", isActive: true }) as any);
+        } catch (error) {
+            console.error("Error loading pndt:", error);
+        }
+    };
 
     // Calculate total whenever selectedInvestigations changes
     useEffect(() => {
@@ -122,8 +137,11 @@ const GeneticBloodAdd = () => {
 
     // Handle selection change
     const handleSelectionChange = (option: any, category: string) => {
+        console.log("option",option);
+        console.log("category",category);
+        
         const existingIndex = selectedInvestigations.findIndex(
-            item => item.id === option.id
+            item => item._id === option._id
         );
 
         if (existingIndex !== -1) {
@@ -132,7 +150,7 @@ const GeneticBloodAdd = () => {
             setSelectedInvestigations(prev => [
                 ...prev,
                 {
-                    id: option.id,
+                    _id: option._id,
                     code: option.code,
                     name: option.name,
                     category: category,
@@ -145,12 +163,12 @@ const GeneticBloodAdd = () => {
 
     // Check if an option is selected
     const isSelected = (optionId: string) => {
-        return selectedInvestigations.some(item => item.id === optionId);
+        return selectedInvestigations.some(item => item._id === optionId);
     };
 
     // Handle remove investigation
     const removeInvestigation = (id: string) => {
-        setSelectedInvestigations(prev => prev.filter(item => item.id !== id));
+        setSelectedInvestigations(prev => prev.filter(item => item._id !== id));
     };
 
     // Handle submit - Only create new
@@ -171,7 +189,7 @@ const GeneticBloodAdd = () => {
             patientId: selectedPatient._id,
             category: 'genetic',
             investigations: selectedInvestigations.map(item => ({
-                id: item.id,
+                _id: item._id,
                 code: item.code,
                 name: item.name,
                 category: item.category,
@@ -250,7 +268,7 @@ const GeneticBloodAdd = () => {
                         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                             <BloodInvestigationsList
                                 title="Genetic Blood Tests"
-                                options={geneticOptions}
+                                options={investigationsCustom}
                                 selectedInvestigations={selectedInvestigations}
                                 category="genetic"
                                 onSelectionChange={handleSelectionChange}

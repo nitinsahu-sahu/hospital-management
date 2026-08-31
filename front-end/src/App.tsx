@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route,  redirect } from "react-router";
+import { BrowserRouter as Router, Routes, Route, redirect } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 
@@ -46,11 +46,15 @@ import PatientExaminationView from "./pages/ExaminationOfCouple/PatientExaminati
 import RelativeExaminationAdd from "./pages/ExaminationOfCouple/RelativeExaminationAdd";
 import RelativeExaminationView from "./pages/ExaminationOfCouple/RelativeExaminationView";
 
+//Customiztion
+import InvestigationCustomizeAdd from "./pages/Customize/investigation-customize-add";
+import InvestigationCustomizeView from "./pages/Customize/investigation-customize-view";
+
 export default function App() {
-  
+
   const { authenticate } = useSelector(
-      (state: RootState) => state.auth
-    );
+    (state: RootState) => state.auth
+  );
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -106,9 +110,13 @@ export default function App() {
           <Route path="/consultation/view" element={<ConsultationView />} />
           <Route path="/consultation/add" element={<ConsultationAdd />} />
           <Route path="/" element={<Patients />} />
-          <Route path="/patient/view" element={<PatientsListing />} />
+          <Route path="/patients" element={<PatientsListing />} />
           <Route path="/prescription/add" element={<PrescriptionAdd />} />
           <Route path="/prescription/view" element={<PrescriptionView />} />
+
+          <Route path="/investigation-customizations/add" element={<InvestigationCustomizeAdd />} />
+          <Route path="/investigation-customizations" element={<InvestigationCustomizeView />} />
+
         </Route>
         <Route path="*" element={<NotFound />} />
 

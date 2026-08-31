@@ -1,6 +1,73 @@
 import APIs from "../helper/api";
 import { patientConstants } from "./constants";
 
+export const updateRelativeImg = (relativeId, data) => async (dispatch) => {
+    dispatch({ type: patientConstants.UPDATE_RELATIVE_IMG_REQUEST });
+
+    try {
+        const config = {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        };
+        const response = await APIs.put(`/patient/relative/${relativeId}/image`, data, config);
+
+        dispatch({
+            type: patientConstants.UPDATE_RELATIVE_IMG_SUCCESS,
+            payload: {
+                message: response?.data?.message,
+                data: response?.data?.data
+            },
+        });
+        dispatch(patientsFetch())
+        return response?.data;
+
+    } catch (error) {
+        dispatch({
+            type: patientConstants.UPDATE_RELATIVE_IMG_FAILURE,
+            payload: {
+                message: error?.response?.data?.message || "Server error",
+                error: error?.response?.status
+            },
+        });
+        throw error; // Re-throw for component handling
+    }
+};
+
+
+export const updatePatientImg = (patientId, data) => async (dispatch) => {
+    dispatch({ type: patientConstants.UPDATE_PATIENT_IMG_REQUEST });
+
+    try {
+        const config = {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        };
+        const response = await APIs.put(`/patient/${patientId}/image`, data, config);
+
+        dispatch({
+            type: patientConstants.UPDATE_PATIENT_IMG_SUCCESS,
+            payload: {
+                message: response?.data?.message,
+                data: response?.data?.data
+            },
+        });
+        dispatch(patientsFetch())
+        return response?.data;
+
+    } catch (error) {
+        dispatch({
+            type: patientConstants.UPDATE_PATIENT_IMG_FAILURE,
+            payload: {
+                message: error?.response?.data?.message || "Server error",
+                error: error?.response?.status
+            },
+        });
+        throw error; // Re-throw for component handling
+    }
+};
+
 export const createPatient = (data) => async (dispatch) => {
 
     dispatch({ type: patientConstants.CREATE_PATIENT_REQUEST });
@@ -133,9 +200,9 @@ export const updatePatient = (id, data) => async (dispatch) => {
 
         dispatch({
             type: patientConstants.UPDATE_PATIENT_SUCCESS,
-            payload: { 
-                message: response?.data?.message, 
-                data: response?.data?.data 
+            payload: {
+                message: response?.data?.message,
+                data: response?.data?.data
             },
         });
 
@@ -149,9 +216,9 @@ export const updatePatient = (id, data) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: patientConstants.UPDATE_PATIENT_FAILURE,
-            payload: { 
-                message: error?.response?.data?.message || "Server error", 
-                error: error.status 
+            payload: {
+                message: error?.response?.data?.message || "Server error",
+                error: error.status
             },
         });
 
@@ -175,7 +242,7 @@ export const deletePatient = (id) => async (dispatch) => {
 
         dispatch({
             type: patientConstants.DELETE_PATIENT_SUCCESS,
-            payload: { 
+            payload: {
                 message: response?.data?.message,
                 patientId: id,
             },
@@ -190,9 +257,9 @@ export const deletePatient = (id) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: patientConstants.DELETE_PATIENT_FAILURE,
-            payload: { 
-                message: error?.response?.data?.message || "Server error", 
-                error: error.status 
+            payload: {
+                message: error?.response?.data?.message || "Server error",
+                error: error.status
             },
         });
 

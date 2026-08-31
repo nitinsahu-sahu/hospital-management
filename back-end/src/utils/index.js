@@ -69,6 +69,7 @@ app.use('/api/genetic-investigations', require('../routes/geneticInvestigation.r
 app.use('/api/procedure', require('../routes/procedure.routes'));
 app.use('/api/prescription', require('../routes/prescription.routes'));
 app.use('/api/discharge', require('../routes/discharge.routes'));
+app.use('/api/investigation-category', require('../routes/investigation-category.routes'));
 
 // Health check endpoint
 app.get('/health', (req, res) => {

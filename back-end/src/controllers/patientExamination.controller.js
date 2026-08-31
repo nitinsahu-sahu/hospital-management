@@ -17,7 +17,9 @@ const generatePatientExaminationPDF = async (data, res) => {
     text: '#2c3e50',
     lightText: '#5d6d7e',
     highlight: '#d4efdf',
-    white: '#ffffff'
+    white: '#ffffff',
+    tableHeader: '#2c3e50',
+    tableBorder: '#dee2e6'
   };
 
   const doc = new PDFDocument({
@@ -27,7 +29,7 @@ const generatePatientExaminationPDF = async (data, res) => {
   });
 
   res.setHeader('Content-Type', 'application/pdf');
-  res.setHeader('Content-Disposition', `attachment; filename=discharge_summary_${data.patient?.UH_ID || 'patient'}.pdf`);
+  res.setHeader('Content-Disposition', `attachment; filename=patient_examination_${data.patient?.UH_ID || 'patient'}.pdf`);
 
   doc.pipe(res);
 
@@ -39,7 +41,7 @@ const generatePatientExaminationPDF = async (data, res) => {
     doc.fillColor(colors.white)
       .fontSize(12)
       .font('Helvetica-Bold')
-      .text('Women Fetal Care Clinic', 18, 8, { align: 'center' });
+      .text('Women & Fetal Care Clinic', 18, 8, { align: 'center' });
 
     doc.fontSize(10)
       .font('Helvetica')
@@ -89,7 +91,7 @@ const generatePatientExaminationPDF = async (data, res) => {
     doc.fillColor(colors.primary)
       .fontSize(12)
       .font('Helvetica-Bold')
-      .text('Women Fetal Care Clinic', 18, footerY + 5);
+      .text('Women & Fetal Care Clinic', 18, footerY + 5);
 
     doc.fillColor(colors.lightText)
       .fontSize(8)
@@ -114,52 +116,64 @@ const generatePatientExaminationPDF = async (data, res) => {
       })}`, sigX, footerY + 29);
   };
 
-  // ===== PAGE 1 (Single Page) =====
-  addHeader();
-
-  let yPos = doc.y;
-
-  // ===== 1. PATIENT DEMOGRAPHICS =====
-    const titleY = yPos;
-  
-    // Left side - Patient Demographics
-    doc.fillColor(colors.primary)
-      .fontSize(12)
-      .font('Helvetica-Bold')
-      .text('Patient Demographics', 18, titleY);
-  
-    doc.fillColor(colors.lightText)
-      .fontSize(10)
-      .font('Helvetica')
-      .text('Patient Examination Date & Time:', doc.page.width / 2 + 20, titleY, {
-        continued: true,
-        width: doc.page.width / 2 - 38,
-        align: 'left'
-      })
-      .fillColor(colors.text)
-      .font('Helvetica-Bold')
-      .text(` ${formatDateTime(data.patientExamination?.createdAt)}`, {
-        continued: false
-      });
-  
-    doc.strokeColor(colors.border)
-      .lineWidth(0.4)
-      .moveTo(18, doc.y + 1.5)
-      .lineTo(doc.page.width - 18, doc.y + 1.5)
-      .stroke();
-  
-    doc.fillColor(colors.text)
-      .fontSize(10)
-      .font('Helvetica');
-  
-    yPos = doc.y + 8;
-
+  // ===== HELPER FUNCTIONS =====
   const getPatientField = (field, detailsField) => {
     if (field === 'other' && detailsField) {
       return `Other (${detailsField})`;
     }
     return field || 'N/A';
   };
+
+  const formatDateTime = (date) => {
+    if (!date) return 'N/A';
+    const d = new Date(date);
+    return d.toLocaleString('en-IN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
+  };
+
+  // ===== PAGE 1 =====
+  addHeader();
+
+  let yPos = doc.y;
+
+  // ===== 1. PATIENT DEMOGRAPHICS =====
+  const titleY = yPos;
+  doc.fillColor(colors.primary)
+    .fontSize(12)
+    .font('Helvetica-Bold')
+    .text('Patient Demographics', 18, titleY);
+
+  doc.fillColor(colors.lightText)
+    .fontSize(10)
+    .font('Helvetica')
+    .text('Patient Examination Date & Time:', doc.page.width / 2 + 20, titleY, {
+      continued: true,
+      width: doc.page.width / 2 - 38,
+      align: 'left'
+    })
+    .fillColor(colors.text)
+    .font('Helvetica-Bold')
+    .text(` ${formatDateTime(data.patientExamination?.createdAt)}`, {
+      continued: false
+    });
+
+  doc.strokeColor(colors.border)
+    .lineWidth(0.4)
+    .moveTo(18, doc.y + 1.5)
+    .lineTo(doc.page.width - 18, doc.y + 1.5)
+    .stroke();
+
+  doc.fillColor(colors.text)
+    .fontSize(10)
+    .font('Helvetica');
+
+  yPos = doc.y + 8;
 
   const col1 = 22;
   const col2 = doc.page.width / 3 + 10;
@@ -353,7 +367,7 @@ const generatePatientExaminationPDF = async (data, res) => {
 
     if (hasVitalsData) {
       doc.fillColor(colors.primary)
-        .fontSize(11)
+        .fontSize(10)
         .font('Helvetica-Bold')
         .text('Vitals & Physical Examination', 18, yPos)
         .font('Helvetica')
@@ -371,7 +385,7 @@ const generatePatientExaminationPDF = async (data, res) => {
 
       if (vitalsText) {
         doc.fillColor(colors.text)
-          .fontSize(10)
+          .fontSize(9)
           .text(vitalsText, 18, yPos, { width: doc.page.width - 36 });
         yPos = doc.y + 2;
       }
@@ -384,22 +398,25 @@ const generatePatientExaminationPDF = async (data, res) => {
         yPos += 15;
       }
     }
-    yPos += 15;
+
+    yPos += 5;
+
     // ===== 2. LOCAL EXAMINATION =====
     const hasLocalExam = vitals.localExamination &&
       (vitals.localExamination.perVaginalExamination || vitals.localExamination.perSpeculumExamination);
 
     if (hasLocalExam) {
       doc.fillColor(colors.primary)
-        .fontSize(11)
+        .fontSize(10)
         .font('Helvetica-Bold')
         .text('Local Examination', 18, yPos)
         .font('Helvetica')
-        .fontSize(10);
+        .fontSize(9);
 
       doc.fillColor(colors.text);
       yPos = doc.y + 5;
 
+      
       if (vitals.localExamination.perVaginalExamination) {
         doc.fillColor(colors.lightText)
           .text('Per Vaginal:', 18, yPos, { continued: true })
@@ -407,19 +424,19 @@ const generatePatientExaminationPDF = async (data, res) => {
           .text(` ${vitals.localExamination.perVaginalExamination}`);
         yPos += 11;
       }
-        yPos += 11;
 
       if (vitals.localExamination.perSpeculumExamination) {
         doc.fillColor(colors.lightText)
           .text('Per Speculum:', 18, yPos, { continued: true })
           .fillColor(colors.text)
           .text(` ${vitals.localExamination.perSpeculumExamination}`);
+        yPos += 11;
       }
 
-      yPos += 15;
+      yPos += 5;
     }
 
-    yPos += 15;
+    yPos += 5;
 
     // ===== 3. SYSTEM EXAMINATION =====
     const systems = [
@@ -433,14 +450,19 @@ const generatePatientExaminationPDF = async (data, res) => {
 
     if (hasSystemData) {
       doc.fillColor(colors.primary)
-        .fontSize(11)
+        .fontSize(10)
         .font('Helvetica-Bold')
         .text('System Examination', 18, yPos)
         .font('Helvetica')
-        .fontSize(10);
+        .fontSize(9);
 
       doc.fillColor(colors.text);
       yPos = doc.y + 5;
+
+      doc.rect(18, yPos - 4, doc.page.width - 36, 70)
+        .fill(colors.lightBg)
+        .stroke(colors.border);
+
 
       systems.forEach((system) => {
         if (system.value) {
@@ -452,21 +474,334 @@ const generatePatientExaminationPDF = async (data, res) => {
           }
 
           doc.fillColor(colors.lightText)
-            .text(`${system.label}:`, 18, yPos, { continued: true })
+            .text(`${system.label}:`, 22, yPos, { continued: true })
             .fillColor(colors.text)
             .text(` ${displayText}`);
-          yPos += 25;
+          yPos += 16;
         }
       });
 
       yPos += 5;
     }
+
+    yPos += 5;
+
+    // ===== 4. INVESTIGATIONS =====
+    if (exam.investigations) {
+      const inv = exam.investigations;
+      const hasInvestigationData = inv.hiv || inv.hbsAg || inv.vdrl || inv.hcv || inv.bloodGroup ||
+        inv.tsh || inv.rbs || inv.thalassemiaScreen || inv.karyotype || inv.prl ||
+        inv.sgot || inv.dtah || inv.sgpt || inv.bun || inv.srCreatinine || inv.papTest ||
+        inv.echocardiography;
+
+      if (hasInvestigationData) {
+        doc.fillColor(colors.primary)
+          .fontSize(10)
+          .font('Helvetica-Bold')
+          .text('Investigations', 18, yPos);
+
+        yPos = doc.y + 5;
+
+        const investigations = [
+          { label: 'HIV', value: inv.hiv },
+          { label: 'HBsAg', value: inv.hbsAg },
+          { label: 'VDRL', value: inv.vdrl },
+          { label: 'HCV', value: inv.hcv },
+          { label: 'Blood Group', value: inv.bloodGroup },
+          { label: 'TSH', value: inv.tsh },
+          { label: 'RBS', value: inv.rbs },
+          { label: 'PRL', value: inv.prl },
+          { label: 'SGOT', value: inv.sgot },
+          { label: 'DTAH', value: inv.dtah },
+          { label: 'SGPT', value: inv.sgpt },
+          { label: 'BUN', value: inv.bun },
+          { label: 'Sr Creatinine', value: inv.srCreatinine },
+          { label: 'Thalassemia', value: inv.thalassemiaScreen },
+          { label: 'Pap Test', value: inv.papTest },
+          { label: 'Karyotype', value: inv.karyotype },
+          { label: 'Echocardiography', value: inv.echocardiography }
+        ];
+
+        // Filter only items with values
+        const filteredItems = investigations.filter(item => item.value);
+
+        if (filteredItems.length > 0) {
+          const itemsPerRow = 5;
+          const rows = Math.ceil(filteredItems.length / itemsPerRow);
+          const rowHeight = 15;
+          const padding = 4;
+          const boxHeight = rows * rowHeight + padding * 2;
+
+          // Check if there's enough space for investigations, if not add new page
+          if (yPos + boxHeight + 50 > doc.page.height - 60) {
+            // Add footer to current page before new page
+            addFooter();
+            doc.addPage();
+            addHeader();
+            yPos = doc.y + 10;
+          }
+
+          doc.rect(18, yPos - 4, doc.page.width - 36, boxHeight)
+            .fill(colors.lightBg)
+            .stroke(colors.border);
+
+          let currentY = yPos + padding;
+
+          // Loop through rows
+          for (let row = 0; row < rows; row++) {
+            const startIndex = row * itemsPerRow;
+            const endIndex = Math.min(startIndex + itemsPerRow, filteredItems.length);
+            const rowItems = filteredItems.slice(startIndex, endIndex);
+
+            // Calculate equal width for each item
+            const totalWidth = doc.page.width - 50;
+            const itemWidth = totalWidth / itemsPerRow;
+
+            let currentX = 22;
+            rowItems.forEach((item) => {
+              // Draw label in light color
+              doc.fillColor(colors.lightText)
+                .fontSize(8.5)
+                .font('Helvetica')
+                .text(`${item.label}:`, currentX, currentY, {
+                  width: itemWidth * 0.8,
+                  continued: true
+                });
+
+              // Draw value in bold with primary color
+              const valueX = currentX + (itemWidth * 0.1);
+              doc.fillColor(colors.primary)
+                .fontSize(8.5)
+                .font('Helvetica-Bold')
+                .text(item.value, valueX, currentY, {
+                  width: itemWidth * 0.2
+                });
+
+              currentX += itemWidth;
+            });
+
+            currentY += rowHeight;
+          }
+
+          yPos += boxHeight + 2;
+        }
+      }
+    }
+
+    yPos += 5;
+
+    // ===== 5. RUBELLA (Nested Object) =====
+    if (exam.investigations?.rubella) {
+      const rubella = exam.investigations.rubella;
+      const hasRubellaData = rubella.igg || rubella.igm || rubella.amh || rubella.avidityTest;
+
+      if (hasRubellaData) {
+        // Check if there's enough space
+        if (yPos + 40 > doc.page.height - 60) {
+          addFooter();
+          doc.addPage();
+          addHeader();
+          yPos = doc.y + 10;
+        }
+
+        doc.fillColor(colors.primary)
+          .fontSize(10)
+          .font('Helvetica-Bold')
+          .text('Rubella Panel', 18, yPos);
+
+        yPos = doc.y + 5;
+
+        const rubellaParams = [];
+        if (rubella.igg) rubellaParams.push(`IgG: ${rubella.igg}`);
+        if (rubella.igm) rubellaParams.push(`IgM: ${rubella.igm}`);
+        if (rubella.amh) rubellaParams.push(`AMH: ${rubella.amh}`);
+        if (rubella.avidityTest) rubellaParams.push(`Avidity Test: ${rubella.avidityTest}`);
+
+        if (rubellaParams.length > 0) {
+          doc.rect(18, yPos - 4, doc.page.width - 36, 22)
+            .fill(colors.lightBg)
+            .stroke(colors.border);
+
+          let rubellaText = rubellaParams.join('  |  ');
+          doc.fillColor(colors.text)
+            .fontSize(9)
+            .font('Helvetica')
+            .text(rubellaText, 22, yPos + 4, { width: doc.page.width - 50 });
+
+          yPos += 24;
+        }
+      }
+    }
+
+    yPos += 5;
+
+    // ===== 6. HSG (Nested Object) =====
+    if (exam.investigations?.hsg) {
+      const hsg = exam.investigations.hsg;
+      if (hsg.year || hsg.finding) {
+        // Check if there's enough space
+        if (yPos + 40 > doc.page.height - 60) {
+          addFooter();
+          doc.addPage();
+          addHeader();
+          yPos = doc.y + 10;
+        }
+
+        doc.fillColor(colors.primary)
+          .fontSize(10)
+          .font('Helvetica-Bold')
+          .text('HSG (Hysterosalpingography)', 18, yPos);
+
+        yPos = doc.y + 5;
+
+        doc.rect(18, yPos - 4, doc.page.width - 36, 22)
+          .fill(colors.lightBg)
+          .stroke(colors.border);
+
+        let hsgText = '';
+        if (hsg.year) hsgText += `Year: ${hsg.year}`;
+        if (hsg.finding) hsgText += `${hsgText ? ' | ' : ''}Finding: ${hsg.finding}`;
+
+        doc.fillColor(colors.text)
+          .fontSize(9)
+          .font('Helvetica')
+          .text(hsgText, 22, yPos + 4, { width: doc.page.width - 50 });
+
+        yPos += 24;
+      }
+    }
+
+    yPos += 5;
+
+    // ===== 7. MEDICAL HISTORY =====
+    if (exam.medicalHistory) {
+      const mh = exam.medicalHistory;
+      if (mh.problem || mh.currentMedications) {
+        // Check if there's enough space
+        if (yPos + 60 > doc.page.height - 60) {
+          addFooter();
+          doc.addPage();
+          addHeader();
+          yPos = doc.y + 10;
+        }
+
+        doc.fillColor(colors.primary)
+          .fontSize(10)
+          .font('Helvetica-Bold')
+          .text('Medical History', 18, yPos);
+
+        yPos = doc.y + 5;
+
+        doc.rect(18, yPos - 4, doc.page.width - 36, 40)
+          .fill(colors.lightBg)
+          .stroke(colors.border);
+
+        if (mh.problem) {
+          doc.fillColor(colors.lightText)
+            .fontSize(9)
+            .font('Helvetica')
+            .text('Problem:', 22, yPos + 4, { continued: true })
+            .fillColor(colors.text)
+            .font('Helvetica-Bold')
+            .text(` ${mh.problem}`);
+          yPos += 15;
+        }
+
+        if (mh.currentMedications) {
+          doc.fillColor(colors.lightText)
+            .fontSize(9)
+            .font('Helvetica')
+            .text('Current Medications:', 22, yPos + 4, { continued: true })
+            .fillColor(colors.text)
+            .font('Helvetica-Bold')
+            .text(` ${mh.currentMedications}`);
+          yPos += 15;
+        }
+
+        yPos += 4;
+      }
+    }
+
+    yPos += 15;
   }
 
-  yPos += 15;
-
-  // ===== FOOTER =====
+  // Add footer to page 1 before adding surgical history page
   addFooter();
+
+  // ===== 8. SURGICAL HISTORY ON NEW PAGE =====
+  if (data.patientExamination?.surgicalHistory && data.patientExamination.surgicalHistory.length > 0) {
+    // Add new page for surgical history
+    doc.addPage();
+    addHeader();
+    
+    let yPosSurgical = doc.y + 10;
+    
+    doc.fillColor(colors.primary)
+      .fontSize(12)
+      .font('Helvetica-Bold')
+      .text('Surgical History', 18, yPosSurgical);
+
+    yPosSurgical = doc.y + 10;
+
+    // Table for surgical history
+    const tableY = yPosSurgical;
+    const rowHeight = 18;
+    let rowY = tableY;
+
+    // Table header
+    doc.rect(18, rowY - 2, doc.page.width - 36, rowHeight)
+      .fill(colors.tableHeader);
+
+    doc.fillColor(colors.white)
+      .fontSize(9)
+      .font('Helvetica-Bold')
+      .text('Surgery', 24, rowY + 2)
+      .text('Year', 144, rowY + 2)
+      .text('Details/Findings', 224, rowY + 2);
+
+    rowY += rowHeight;
+
+    // Table data
+    data.patientExamination.surgicalHistory.forEach((surgery, index) => {
+      const isEven = index % 2 === 0;
+      doc.rect(18, rowY - 2, doc.page.width - 36, rowHeight)
+        .fill(isEven ? colors.white : colors.lightBg)
+        .stroke(colors.tableBorder);
+
+      doc.fillColor(colors.text)
+        .fontSize(8)
+        .font('Helvetica')
+        .text(surgery.surgery || 'N/A', 24, rowY + 2)
+        .text(surgery.year || 'N/A', 144, rowY + 2)
+        .text(surgery.detailsFinding || 'N/A', 224, rowY + 2, { width: doc.page.width - 242 });
+
+      rowY += rowHeight;
+
+      // Check if we need a new page for surgical history continuation
+      if (rowY > doc.page.height - 100) {
+        // Add footer to current surgical page
+        addFooter();
+        doc.addPage();
+        addHeader();
+        rowY = doc.y + 20;
+        doc.rect(18, rowY - 2, doc.page.width - 36, rowHeight)
+          .fill(colors.tableHeader);
+        doc.fillColor(colors.white)
+          .fontSize(9)
+          .font('Helvetica-Bold')
+          .text('Surgery', 24, rowY + 2)
+          .text('Year', 144, rowY + 2)
+          .text('Details/Findings', 224, rowY + 2);
+        rowY += rowHeight;
+      }
+    });
+
+    // Add footer to surgical history page
+    addFooter();
+  }
+
+  // If no surgical history, the footer is already added above
+  // If surgical history exists, we've already added the footer
 
   doc.end();
 };
@@ -539,10 +874,12 @@ exports.createPatientExamination = async (req, res) => {
       respiratorySystem,
       respiratorySystemDetails,
       git,
-      gitDetails
+      gitDetails,
+      investigations,
+      medicalHistory,
+      surgicalHistory
     } = req.body;
 
-    // Check if patient exists
     const patient = await Patient.findById(patientId);
     if (!patient) {
       return res.status(404).json({
@@ -553,7 +890,7 @@ exports.createPatientExamination = async (req, res) => {
 
     const examination = new PatientExamination({
       patientId,
-      patientExaminationDate,
+      patientExaminationDate: patientExaminationDate || new Date(),
       vitals: {
         pr: vitals?.pr || '',
         prUnit: vitals?.prUnit || 'bpm',
@@ -579,6 +916,40 @@ exports.createPatientExamination = async (req, res) => {
       respiratorySystemDetails: respiratorySystem === 'abnormal' ? respiratorySystemDetails || '' : '',
       git: git || '',
       gitDetails: git === 'abnormal' ? gitDetails || '' : '',
+      investigations: {
+        bloodGroup: investigations?.bloodGroup || '',
+        hiv: investigations?.hiv || '',
+        tsh: investigations?.tsh || '',
+        hbsAg: investigations?.hbsAg || '',
+        rbs: investigations?.rbs || '',
+        hcv: investigations?.hcv || '',
+        prl: investigations?.prl || '',
+        vdrl: investigations?.vdrl || '',
+        sgot: investigations?.sgot || '',
+        dtah: investigations?.dtah || '',
+        sgpt: investigations?.sgpt || '',
+        bun: investigations?.bun || '',
+        srCreatinine: investigations?.srCreatinine || '',
+        rubella: {
+          igg: investigations?.rubella?.igg || '',
+          igm: investigations?.rubella?.igm || '',
+          amh: investigations?.rubella?.amh || '',
+          avidityTest: investigations?.rubella?.avidityTest || ''
+        },
+        thalassemiaScreen: investigations?.thalassemiaScreen || '',
+        papTest: investigations?.papTest || '',
+        karyotype: investigations?.karyotype || '',
+        hsg: {
+          year: investigations?.hsg?.year || '',
+          finding: investigations?.hsg?.finding || ''
+        },
+        echocardiography: investigations?.echocardiography || ''
+      },
+      medicalHistory: {
+        problem: medicalHistory?.problem || '',
+        currentMedications: medicalHistory?.currentMedications || ''
+      },
+      surgicalHistory: surgicalHistory || [],
       createdBy: req.user.id,
       updatedBy: req.user.id
     });

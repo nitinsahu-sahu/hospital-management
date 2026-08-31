@@ -57,6 +57,147 @@ const vitalsSchema = new mongoose.Schema({
     }
 }, { _id: false });
 
+// Rubella Schema
+const rubellaSchema = new mongoose.Schema({
+    igg: {
+        type: String,
+        default: ''
+    },
+    igm: {
+        type: String,
+        default: ''
+    },
+    amh: {
+        type: String,
+        default: ''
+    },
+    avidityTest: {
+        type: String,
+        default: ''
+    }
+}, { _id: false });
+
+// HSG Schema
+const hsgSchema = new mongoose.Schema({
+    year: {
+        type: String,
+        default: ''
+    },
+    finding: {
+        type: String,
+        default: ''
+    }
+}, { _id: false });
+
+// Investigations Schema
+const investigationsSchema = new mongoose.Schema({
+    bloodGroup: {
+        type: String,
+        enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', ''],
+        default: ''
+    },
+    hiv: {
+        type: String,
+        default: ''
+    },
+    tsh: {
+        type: String,
+        default: ''
+    },
+    hbsAg: {
+        type: String,
+        default: ''
+    },
+    rbs: {
+        type: String,
+        default: ''
+    },
+    hcv: {
+        type: String,
+        default: ''
+    },
+    prl: {
+        type: String,
+        default: ''
+    },
+    vdrl: {
+        type: String,
+        default: ''
+    },
+    sgot: {
+        type: String,
+        default: ''
+    },
+    dtah: {
+        type: String,
+        default: ''
+    },
+    sgpt: {
+        type: String,
+        default: ''
+    },
+    bun: {
+        type: String,
+        default: ''
+    },
+    srCreatinine: {
+        type: String,
+        default: ''
+    },
+    rubella: {
+        type: rubellaSchema,
+        default: () => ({})
+    },
+    thalassemiaScreen: {
+        type: String,
+        default: ''
+    },
+    papTest: {
+        type: String,
+        default: ''
+    },
+    karyotype: {
+        type: String,
+        default: ''
+    },
+    hsg: {
+        type: hsgSchema,
+        default: () => ({})
+    },
+    echocardiography: {
+        type: String,
+        default: ''
+    }
+}, { _id: false });
+
+// Medical History Schema
+const medicalHistorySchema = new mongoose.Schema({
+    problem: {
+        type: String,
+        default: ''
+    },
+    currentMedications: {
+        type: String,
+        default: ''
+    }
+}, { _id: false });
+
+// Surgical History Item Schema
+const surgicalHistoryItemSchema = new mongoose.Schema({
+    surgery: {
+        type: String,
+        default: ''
+    },
+    year: {
+        type: String,
+        default: ''
+    },
+    detailsFinding: {
+        type: String,
+        default: ''
+    }
+}, { _id: false });
+
 const patientExaminationSchema = new mongoose.Schema({
     patientId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -78,7 +219,7 @@ const patientExaminationSchema = new mongoose.Schema({
     },
     cnsDetails: {
         type: String,
-        required: false
+        default: ''
     },
     cvs: {
         type: String,
@@ -87,7 +228,7 @@ const patientExaminationSchema = new mongoose.Schema({
     },
     cvsDetails: {
         type: String,
-        required: false
+        default: ''
     },
     respiratorySystem: {
         type: String,
@@ -96,7 +237,7 @@ const patientExaminationSchema = new mongoose.Schema({
     },
     respiratorySystemDetails: {
         type: String,
-        required: false
+        default: ''
     },
     git: {
         type: String,
@@ -105,7 +246,19 @@ const patientExaminationSchema = new mongoose.Schema({
     },
     gitDetails: {
         type: String,
-        required: false
+        default: ''
+    },
+    investigations: {
+        type: investigationsSchema,
+        default: () => ({})
+    },
+    medicalHistory: {
+        type: medicalHistorySchema,
+        default: () => ({})
+    },
+    surgicalHistory: {
+        type: [surgicalHistoryItemSchema],
+        default: []
     },
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,

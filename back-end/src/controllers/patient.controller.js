@@ -14,6 +14,136 @@ const generateUHID = require("../utils/generateUHID.js");
 const { sendResponse } = require("../utils/response.js");
 const cloudinaryService = require("../services/cloudinary.service.js");
 
+// ================= UPDATE RELATIVE IMAGE ONLY =================
+exports.updateRelativeImage = async (req, res) => {
+  try {
+    const { relativeId } = req.params;
+
+    const relative = await Relative.findOne({ 
+      _id: relativeId, 
+    });
+
+    if (!relative) {
+      return sendResponse(res, false, "Relative not found", null, 404);
+    }
+
+    // Check if file was uploaded
+    if (!req.files || req.files.length === 0) {
+      return sendResponse(res, false, "Please upload an image", null, 400);
+    }
+
+    const file = req.files[0];
+
+    // Delete old image from Cloudinary if exists
+    if (relative.pic && relative.pic.public_id) {
+      try {
+        await cloudinaryService.deleteImage(relative.pic.public_id);
+      } catch (error) {
+        console.error("Error deleting old image:", error);
+        // Continue with upload even if deletion fails
+      }
+    }
+
+    // Upload new image to Cloudinary
+    const result = await cloudinaryService.uploadImage(file.buffer, {
+      folder: "pic",
+      public_id: `pic_${relativeId}_${Date.now()}`,
+      publicIdPrefix: `${Date.now()}`
+    });
+
+    // Update patient's pic
+    relative.pic = {
+      url: result.secure_url,
+      public_id: result.public_id,
+      alt: `${relative.name} - ${Date.now()}`,
+    };
+
+    await relative.save();
+
+    return sendResponse(
+      res, 
+      true, 
+      "relative image updated successfully", 
+      { 
+        _id: relative._id,
+        name: relative.name,
+        pic: relative.pic 
+      }, 
+      200
+    );
+
+  } catch (error) {
+    console.error("Error updating patient image:", error);
+    return sendResponse(res, false, error.message, null, 500);
+  }
+};
+
+// ================= UPDATE PATIENT IMAGE ONLY =================
+exports.updatePatientImage = async (req, res) => {
+  try {
+    const { patientId } = req.params;
+
+    // Find patient
+    const patient = await User.findOne({ 
+      _id: patientId, 
+      role: "patient" 
+    });
+
+    if (!patient) {
+      return sendResponse(res, false, "Patient not found", null, 404);
+    }
+
+    // Check if file was uploaded
+    if (!req.files || req.files.length === 0) {
+      return sendResponse(res, false, "Please upload an image", null, 400);
+    }
+
+    const file = req.files[0];
+
+    // Delete old image from Cloudinary if exists
+    if (patient.pic && patient.pic.public_id) {
+      try {
+        await cloudinaryService.deleteImage(patient.pic.public_id);
+      } catch (error) {
+        console.error("Error deleting old image:", error);
+        // Continue with upload even if deletion fails
+      }
+    }
+
+    // Upload new image to Cloudinary
+    const result = await cloudinaryService.uploadImage(file.buffer, {
+      folder: "pic",
+      public_id: `pic_${patientId}_${Date.now()}`,
+      publicIdPrefix: `${Date.now()}`
+    });
+
+    // Update patient's pic
+    patient.pic = {
+      url: result.secure_url,
+      public_id: result.public_id,
+      alt: `${patient.name} - ${Date.now()}`,
+    };
+
+    await patient.save();
+
+    return sendResponse(
+      res, 
+      true, 
+      "Patient image updated successfully", 
+      { 
+        _id: patient._id,
+        name: patient.name,
+        pic: patient.pic 
+      }, 
+      200
+    );
+
+  } catch (error) {
+    console.error("Error updating patient image:", error);
+    return sendResponse(res, false, error.message, null, 500);
+  }
+};
+
 
 // ================= CREATE PATIENT =================
 exports.createPatient = async (req, res) => {
@@ -708,7 +838,6 @@ exports.deletePatient = async (req, res) => {
     session.endSession();
   }
 };
-
 
 // ================= GET ALL PATIENTS (Existing) =================
 exports.getPatients = async (req, res) => {

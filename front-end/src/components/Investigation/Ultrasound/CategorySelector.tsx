@@ -34,7 +34,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
           `}
         >
           <span className="relative z-10">
-            PNDT / ANTINUTOL
+            PNDT / ANTENATAL
             {selectedMainCategory === 'pndt' && (
               <span className="absolute -right-1 -top-1 flex h-2 w-2 sm:h-3 sm:w-3">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>

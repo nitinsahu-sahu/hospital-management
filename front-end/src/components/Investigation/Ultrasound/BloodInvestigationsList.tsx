@@ -17,6 +17,8 @@ const BloodInvestigationsList: React.FC<BloodInvestigationsListProps> = ({
   isSelected,
   category
 }) => {
+  console.log("op", options);
+
   const [searchTerm, setSearchTerm] = useState('');
 
   // Filter options based on search term (matches name or code)
@@ -42,7 +44,7 @@ const BloodInvestigationsList: React.FC<BloodInvestigationsListProps> = ({
       <div className="sticky top-0 bg-white dark:bg-gray-800 z-10 py-2 sm:py-3">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <h3 className="text-base sm:text-lg md:text-xl font-semibold text-gray-900 dark:text-white">
-                    {title}
+            {title}
           </h3>
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
@@ -118,23 +120,22 @@ const BloodInvestigationsList: React.FC<BloodInvestigationsListProps> = ({
           {filteredOptions.length > 0 ? (
             filteredOptions.map((option) => (
               <label
-                key={option.id}
+                key={option._id}  // Changed from option.id
                 className={`
-              relative overflow-hidden
-              flex flex-col
-              p-3 sm:p-4
-              border-2 rounded-xl
-              cursor-pointer
-              transition-all duration-200
-              hover:shadow-lg
-              ${isSelected(option.id)
+    relative overflow-hidden
+    flex flex-col
+    p-3 sm:p-4
+    border-2 rounded-xl
+    cursor-pointer
+    transition-all duration-200
+    hover:shadow-lg
+    ${isSelected(option._id)  // Changed from option.id
                     ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                     : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600'
                   }
-            `}
-
+  `}
               >
-                {isSelected(option.id) && (
+                {isSelected(option._id) && (  // Changed from option.id
                   <div className="absolute top-2 right-2 sm:top-3 sm:right-3">
                     <div className="w-4 h-4 sm:w-5 sm:h-5 bg-blue-500 rounded-full flex items-center justify-center">
                       <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -146,7 +147,7 @@ const BloodInvestigationsList: React.FC<BloodInvestigationsListProps> = ({
                 <div className="flex items-center gap-3 flex-1">
                   <input
                     type="checkbox"
-                    checked={isSelected(option.id)}
+                    checked={isSelected(option._id)}  // Changed from option.id
                     onChange={() => onSelectionChange(option, category)}
                     className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
                   />
@@ -166,7 +167,6 @@ const BloodInvestigationsList: React.FC<BloodInvestigationsListProps> = ({
                     </div>
                   </div>
                 </div>
-
               </label>
             ))
           ) : (

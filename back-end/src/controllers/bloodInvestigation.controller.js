@@ -40,7 +40,7 @@ const generateRoutinePDF = async (data, res) => {
     doc.fillColor(colors.white)
       .fontSize(12)
       .font('Helvetica-Bold')
-      .text('Women Fetal Care Clinic', 18, 8, { align: 'center' });
+      .text('Women & Fetal Care Clinic', 18, 8, { align: 'center' });
 
     doc.fontSize(10)
       .font('Helvetica')
@@ -90,7 +90,7 @@ const generateRoutinePDF = async (data, res) => {
     doc.fillColor(colors.primary)
       .fontSize(12)
       .font('Helvetica-Bold')
-      .text('Women Fetal Care Clinic', 18, footerY + 5);
+      .text('Women & Fetal Care Clinic', 18, footerY + 5);
 
     doc.fillColor(colors.lightText)
       .fontSize(8)

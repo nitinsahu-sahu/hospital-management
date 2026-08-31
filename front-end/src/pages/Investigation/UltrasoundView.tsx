@@ -28,8 +28,6 @@ const UltrasoundView = () => {
     const [expandedUltrasoundId, setExpandedUltrasoundId] = useState<string | null>(null);
     const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
-    console.log("ultrasounds", ultrasounds);
-
     const formatDateTime = (dateString: string) => {
         if (!dateString) return 'N/A';
         return new Date(dateString).toLocaleString('en-IN', {
@@ -196,7 +194,7 @@ const UltrasoundView = () => {
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="flex flex-col gap-1">
+                                                <div className="flex gap-1">
                                                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getCategoryColor(ultrasound.category)}`}>
                                                         {ultrasound.category}
                                                     </span>

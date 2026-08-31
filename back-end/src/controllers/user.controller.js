@@ -92,7 +92,7 @@ exports.loginUser = async (req, res) => {
             }
         );
 
-        const cookieExpiry = 2 * 60 * 60 * 1000; //2 hours
+        const cookieExpiry = 2 * 60 * 60 * 1000;
         res.cookie('token', token, {
             sameSite: process.env.PRODUCTION ? "none" : 'Lax',
             maxAge: cookieExpiry,

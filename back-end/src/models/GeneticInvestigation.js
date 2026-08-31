@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const geneticInvestigationItemSchema = new mongoose.Schema({
-  id: {
+  _id: {
     type: String,
     required: true
   },

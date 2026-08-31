@@ -6,7 +6,7 @@ const {
     getPatientById,
     updatePatient,
     deletePatient,
-    createRelative
+    createRelative,updatePatientImage,updateRelativeImage
 } = require('../controllers/patient.controller');
 const isAuth = require('../middlewares/isAuth.middleware');
 const { uploadImages } = require('../middlewares/upload.middleware');
@@ -19,5 +19,17 @@ router.get("/", getPatients);
 router.get("/:id", getPatientById);
 router.put("/:id", isAuth, updatePatientValidation, validate, updatePatient);
 router.delete("/:id", isAuth, deletePatient);
-
+// Update patient image only
+router.put(
+  "/:patientId/image", 
+  isAuth, 
+  uploadImages, 
+  updatePatientImage
+);
+router.put(
+  "/relative/:relativeId/image", 
+  isAuth, 
+  uploadImages, 
+  updateRelativeImage
+);
 module.exports = router;

@@ -1,5 +1,5 @@
 export interface InvestigationItem {
-  id: string;
+  _id: string;
   name: string;
   category: string;
   price: number;
@@ -7,8 +7,15 @@ export interface InvestigationItem {
   code?: string
 }
 
+export interface GeneticOption {
+  _id: string;
+  name: string;
+  price: number;
+  code: string
+}
+
 export interface PNDTOption {
-  id: string;
+  _id: string;
   name: string;
   price: number;
   code: string;
@@ -21,18 +28,14 @@ export interface GynaeOption {
 }
 
 export interface PelvicSubOption {
-  id: string;
+  category:string;
+  _id: string;
   name: string;
   price: number;
   code: string;
 }
 
-export interface GeneticOption {
-  id: string;
-  name: string;
-  price: number;
-  code: string
-}
+
 
 export interface InvestigationData {
   patientId: string;

@@ -11,7 +11,7 @@ import {
   Couple,
   DischargeIcon,
   ProcedureIcon,
-  InvestigationIcon
+  InvestigationIcon,CustomizeIcon
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 
@@ -28,7 +28,7 @@ const navItems: NavItem[] = [
     name: "Patients",
     subItems: [
       { name: "Add", path: "/", pro: false },
-      { name: "View", path: "/patient/view", pro: false },
+      { name: "View", path: "/patients", pro: false },
     ],
   },
   {
@@ -93,7 +93,14 @@ const navItems: NavItem[] = [
       { name: "View", path: "/discharge/view", pro: false },
     ],
   },
-  
+  {
+    icon: <CustomizeIcon />,
+    name: "Customization",
+    subItems: [
+      { name: "Investigation Costomization", path: "/investigation-customizations/add", pro: false },
+      { name: "Investigation Costomization View", path: "/investigation-customizations", pro: false },
+    ],
+  },
   
 ];
 
