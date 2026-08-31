@@ -1,5 +1,13 @@
 import { PNDTOption, GynaeOption, PelvicSubOption, GeneticOption } from '../types/investigation.types';
 
+//Ultrasound
+
+export const gynaeOptions: GynaeOption[] = [
+  { id: 'pelvic', name: 'PELVIC ULTRASOUND', price: 0 },
+  { id: 'fm', name: 'FM (FOLLICULAR MONITORING)', price: 0 }
+];
+
+
 export const pndtOptions: PNDTOption[] = [
   { id: 'first_trimester', code: 'first_trimester', name: 'First Trimester TVS (6-10 weeks)', price: 1000 },
   { id: 'nt_nb_scan_single', code: 'nt_nb_scan_single', name: 'NT/NB Scan (Single) (11-13 weeks)', price: 1500 },
@@ -11,11 +19,6 @@ export const pndtOptions: PNDTOption[] = [
   { id: 'anomaly_scan_single_only', code: 'anomaly_scan_single_only', name: 'Anomaly Scan (19-22 weeks) (Single Only)', price: 4000 }
 ];
 
-export const gynaeOptions: GynaeOption[] = [
-  { id: 'pelvic', name: 'PELVIC ULTRASOUND', price: 0 },
-  { id: 'fm', name: 'FM (FOLLICULAR MONITORING)', price: 0 }
-];
-
 export const pelvicSubOptions: PelvicSubOption[] = [
   { id: 'trans_abdominal', code: "trans_abdominal", name: 'PELVIC ULTRASOUND (TRANS ABDOMINAL)', price: 800 },
   { id: 'tvs_viginal', code: "tvs_viginal", name: 'TRANS VAGINAL SCAN (TVS) BASIC', price: 1000 },
@@ -23,6 +26,7 @@ export const pelvicSubOptions: PelvicSubOption[] = [
   { id: 'infertility_d2_d3', code: "infertility_d2_d3", name: 'Infertility D2 D3 (TVS Scan)', price: 1500 },
   { id: 'follicular_monitoring', code: "follicular_monitoring", name: 'Follicular Monitoring (Ovulation Study)', price: 1500 }
 ];
+
 
 export const geneticOptions: GeneticOption[] = [
   { id: 'T3295', code: "T3295", name: 'Comprehensive Non Invasive Prenatal Testing (NIPT-COMP)', price: 12000 },

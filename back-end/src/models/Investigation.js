@@ -11,7 +11,7 @@ const investigationItemSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ['pndt', 'gynae', 'pelvic'],
+    enum: ['pndt', 'gynae', 'pelvic','fm'],
     required: true
   },
   price: {
@@ -31,11 +31,6 @@ const investigationSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
-  consultationId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Consultation',
-    required: true
-  },
   category: String,
   subCategory: String,
   investigations: [investigationItemSchema],
@@ -43,11 +38,6 @@ const investigationSchema = new mongoose.Schema({
     type: Number,
     required: true,
     default: 0
-  },
-  status: {
-    type: String,
-    enum: ['pending', 'completed', 'cancelled'],
-    default: 'pending'
   },
   date: {
     type: Date,

@@ -6,10 +6,9 @@ const procedureSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
-  consultationId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Consultation',
-    default: null
+  procedureDate: {
+    type: Date,
+    default: Date.now
   },
   procedures: [{
     procedureId: {
@@ -26,13 +25,8 @@ const procedureSchema = new mongoose.Schema({
     },
     category: {
       type: String,
-      enum: ['iui', 'cvs', 'prp', 'lbc', 'amniocentesis'],
+      enum: ['iui','procedure'],
       required: true
-    },
-    subType: {
-      type: String,
-      enum: ['self', 'donor', 'husband', null],
-      default: null
     },
     description: {
       type: String,
@@ -47,10 +41,6 @@ const procedureSchema = new mongoose.Schema({
   procedureDate: {
     type: Date,
     default: Date.now
-  },
-  notes: {
-    type: String,
-    default: ''
   },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,

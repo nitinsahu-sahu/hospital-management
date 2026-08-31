@@ -16,7 +16,7 @@ router.put('/:id', dischargeController.updateDischarge);
 // Download discharge PDF
 router.get('/download/:patientId', dischargeController.downloadDischargePDF);
 
-router.get('/patient/:id', dischargeController.getDischargeByPatientId);
+router.get('/patient/:patientId', dischargeController.getDischargeByPatientId);
 
 
 module.exports = router;

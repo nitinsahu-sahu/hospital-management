@@ -11,7 +11,7 @@ import {
   Couple,
   DischargeIcon,
   ProcedureIcon,
-  InvestigationIcon
+  InvestigationIcon,CustomizeIcon
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 
@@ -28,51 +28,80 @@ const navItems: NavItem[] = [
     name: "Patients",
     subItems: [
       { name: "Add", path: "/", pro: false },
-      { name: "View", path: "/patient/view", pro: false },
+      { name: "View", path: "/patients", pro: false },
     ],
   },
   {
     icon: <Consultation />,
     name: "Doctor Consultation",
-    path: "/consultation",
+    subItems: [
+      { name: "Add", path: "/consultation/add", pro: false },
+      { name: "View", path: "/consultation/view", pro: false },
+    ],
   },
   {
     icon: <PatientHistory />,
     name: "Patient History",
-    path: "/patient-history",
+    subItems: [
+      { name: "Add", path: "/patient-history/add", pro: false },
+      { name: "View", path: "/patient-history/view", pro: false },
+    ],
   },
   {
     icon: <Couple />,
     name: "Examination of Couple",
     subItems: [
-      { name: "Wife / Patient", path: "/examination-of-couple/patient", pro: false },
-      { name: "Husband / Relative", path: "/examination-of-couple/relative", pro: false },
+      { name: "Wife / Patient Add", path: "/examination-of-couple/patient/add", pro: false },
+      { name: "Wife / Patient View", path: "/examination-of-couple/patient/view", pro: false },
+      { name: "Husband / Relative Add", path: "/examination-of-couple/relative/add", pro: false },
+      { name: "Husband / Relative View", path: "/examination-of-couple/relative/view", pro: false },
     ],
   },
   {
     icon: <InvestigationIcon />,
     name: "Investigation",
     subItems: [
-      { name: "Ultrasound", path: "/investigation/ultrasound", pro: false },
-      { name: "Routine Blood Test", path: "/investigation/routine-blood-test", pro: false },
-      { name: "Genetic Blood Test", path: "/investigation/genetic-blood-test", pro: false },
+      { name: "Ultrasound Add", path: "/investigation/ultrasound-add", pro: false },
+      { name: "Ultrasound View", path: "/investigation/ultrasound-view", pro: false },
+      { name: "Routine Blood Add", path: "/investigation/routine-blood-add", pro: false },
+      { name: "Routine Blood View", path: "/investigation/routine-blood-view", pro: false },
+      { name: "Genetic Blood Add", path: "/investigation/genetic-blood-add", pro: false },
+      { name: "Genetic Blood View", path: "/investigation/genetic-blood-view", pro: false },
     ],
   },
   {
     icon: <ProcedureIcon />,
     name: "Procedure",
-    path: "/procedure",
+    subItems: [
+      { name: "Add", path: "/procedure/add", pro: false },
+      { name: "View", path: "/procedure/view", pro: false },
+    ],
   },
   {
     icon: <Prescription />,
     name: "Prescription",
-    path: "/prescription"
+    subItems: [
+      { name: "Add", path: "/prescription/add", pro: false },
+      { name: "View", path: "/prescription/view", pro: false },
+    ],
   },
   {
     icon: <DischargeIcon />,
     name: "Discharge",
-    path: "/discharge",
+    subItems: [
+      { name: "Add", path: "/discharge/add", pro: false },
+      { name: "View", path: "/discharge/view", pro: false },
+    ],
   },
+  {
+    icon: <CustomizeIcon />,
+    name: "Customization",
+    subItems: [
+      { name: "Investigation Costomization", path: "/investigation-customizations/add", pro: false },
+      { name: "Investigation Costomization View", path: "/investigation-customizations", pro: false },
+    ],
+  },
+  
 ];
 
 // REMOVED: othersItems array - Delete this entire section

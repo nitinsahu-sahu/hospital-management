@@ -2,6 +2,29 @@ import APIs from "../helper/api";
 import { investigationConstants } from "./constants";
 
 
+// Download Patient History PDF
+export const downloadUltrasoundPDF = (ultrasoundId) => async (dispatch) => {
+    try {
+        const config = {
+            responseType: 'blob'
+        };
+        const response = await APIs.get(`/investigations/download/${ultrasoundId}`, config);
+        // Create download link
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `ultrasound_summary_${ultrasoundId}.pdf`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        return true;
+    } catch (error) {
+        console.error('Error downloading PDF:', error);
+        throw error;
+    }
+};
+
 // Create Investigation
 export const createInvestigation = (investigationData) => async (dispatch) => {
     try {
@@ -33,7 +56,10 @@ export const getInvestigationByPatientId = (patientId) => async (dispatch) => {
 
         dispatch({
             type: investigationConstants.GET_INVESTIGATION_SUCCESS,
-            payload: data.data
+            payload: {
+                ultrasounds:data.data,
+                pagination:data.pagination
+            },
         });
 
         return { type: investigationConstants.GET_INVESTIGATION_SUCCESS, payload: data.data };

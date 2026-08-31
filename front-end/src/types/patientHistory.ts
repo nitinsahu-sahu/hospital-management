@@ -42,6 +42,7 @@ export interface HusbandHistory {
 }
 
 export interface PatientHistoryForm {
+  patientHistoryDate:any,
   chiefComplaints: string;
   chiefComplaintsDetails?: string;
   lmp?: string;

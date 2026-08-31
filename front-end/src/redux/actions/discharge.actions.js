@@ -6,16 +6,16 @@ export const createDischarge = (dischargeData) => async (dispatch) => {
     try {
         dispatch({ type: dischargeConstants.DISCHARGE_CREATE_REQUEST });
 
-        const response = await APIs.post("/discharge/create", dischargeData);
-        const { data } = response.data;
-
-
+        const {data} = await APIs.post("/discharge/create", dischargeData);
         dispatch({
             type: dischargeConstants.DISCHARGE_CREATE_SUCCESS,
             payload: data
         });
 
-        return data;
+        return {
+            type: dischargeConstants.DISCHARGE_CREATE_SUCCESS,
+            status: 200
+        };
     } catch (error) {
         dispatch({
             type: dischargeConstants.DISCHARGE_CREATE_FAILURE,
@@ -30,12 +30,14 @@ export const getDischargeData = (patientId) => async (dispatch) => {
     try {
         dispatch({ type: dischargeConstants.DISCHARGE_DATA_REQUEST });
 
-        const response = await APIs.get(`/discharge/patient/${patientId}`);
-        const { data } = response.data;
+        const {data} = await APIs.get(`/discharge/patient/${patientId}`);
 
         dispatch({
             type: dischargeConstants.DISCHARGE_DATA_SUCCESS,
-            payload: data
+            payload: {
+                discharesRecord:data.data,
+                pagination:data.pagination
+            },
         });
         return ({
             type: dischargeConstants.DISCHARGE_DATA_SUCCESS,

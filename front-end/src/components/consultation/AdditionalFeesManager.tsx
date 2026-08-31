@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { PlusIcon, TrashBinIcon } from '../../icons';
-import { NewFee } from '../../types/consultation';
 
 
 const formatDate = (dateString: string) => {
@@ -17,7 +16,7 @@ const formatDate = (dateString: string) => {
 };
 
 export const AdditionalFeesManager = ({ fees, onAddFee, onRemoveFee }: any) => {
-  const [newFee, setNewFee] = useState<NewFee>({ name: '', amount: '' });
+  const [newFee, setNewFee] = useState<any>({ name: '', amount: '' });
 
   const handleAddFee = () => {
     if (newFee.name && newFee.amount) {

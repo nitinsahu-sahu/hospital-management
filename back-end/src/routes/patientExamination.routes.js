@@ -5,7 +5,7 @@ const {
   getPatientExaminationByPatientId,
   getPatientExaminationById,
   updatePatientExamination,
-  deletePatientExamination
+  deletePatientExamination,patientExaminationPdf
 } = require('../controllers/patientExamination.controller');
 const isAuth = require('../middlewares/isAuth.middleware');
 const { 
@@ -40,5 +40,7 @@ router.put(
 
 // Delete patient examination
 router.delete("/delete/:id", isAuth, deletePatientExamination);
+
+router.get('/download/:patientExaminationId', patientExaminationPdf);
 
 module.exports = router;

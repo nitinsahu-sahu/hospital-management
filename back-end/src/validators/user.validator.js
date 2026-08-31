@@ -60,13 +60,15 @@ const validateIdProof = (type, value) => {
     switch (type) {
         case 'aadhaar':
             const aadhaarResult = aadhaarSchema.validate(value);
+            console.log("aadhaarResult",aadhaarResult);
+            
             if (aadhaarResult.error) {
                 throw new Error(aadhaarResult.error.message);
             }
             // Additional Aadhaar validation (Verhoeff algorithm - optional)
-            if (!validateAadhaarChecksum(value)) {
-                throw new Error('Invalid Aadhaar number (checksum failed)');
-            }
+            // if (!validateAadhaarChecksum(value)) {
+            //     throw new Error('Invalid Aadhaar number (checksum failed)');
+            // }
             break;
 
         case 'pancard':

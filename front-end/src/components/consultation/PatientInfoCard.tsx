@@ -1,9 +1,8 @@
 import React from 'react';
-import { SelectedPatient } from '../../types/consultation';
 import { InfoIcon } from '../../icons';
 
 interface PatientInfoCardProps {
-  selectedPatient: SelectedPatient | null;
+  selectedPatient: any | null;
   isExistingConsultation: boolean;
   isLoading: boolean;
 }

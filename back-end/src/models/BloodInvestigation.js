@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const bloodInvestigationItemSchema = new mongoose.Schema({
-  id: {
+  _id: {
     type: String,
     required: true
   },
@@ -32,11 +32,6 @@ const bloodInvestigationSchema = new mongoose.Schema({
   patientId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
-  },
-  consultationId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Consultation',
     required: true
   },
   category: {

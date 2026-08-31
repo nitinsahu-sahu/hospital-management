@@ -24,4 +24,6 @@ router.put('/:id', procedureController.updateProcedure);
 // Delete procedure
 router.delete('/:id', procedureController.deleteProcedure);
 
+router.get('/download/:procedureId', procedureController.procedurePdf);
+
 module.exports = router;

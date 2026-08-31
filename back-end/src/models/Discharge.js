@@ -7,11 +7,6 @@ const dischargeSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
-  consultationId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Consultation',
-    required: true
-  },
   dischargeDate: {
     type: Date,
     default: Date.now

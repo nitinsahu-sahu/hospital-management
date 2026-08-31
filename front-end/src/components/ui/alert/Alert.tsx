@@ -11,7 +11,6 @@ interface AlertProps {
 
 const Alert: React.FC<AlertProps> = ({
   variant,
-  title,
   message,
   showLink = false,
   linkHref = "#",
@@ -121,9 +120,6 @@ const Alert: React.FC<AlertProps> = ({
         </div>
 
         <div>
-          {/* <h4 className="mb-1 text-sm font-semibold text-gray-800 dark:text-white/90">
-            {title}
-          </h4> */}
 
           <p className="text-sm text-gray-500 dark:text-gray-400">{message}</p>
 

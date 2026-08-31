@@ -40,13 +40,13 @@ export const PROCEDURES = {
   iuiH: {
     name: 'IUI-H (IUI with Husband)',
     icon: '👨‍👩‍👧',
-    price: 3500,
+    price: 10000,
     description: 'IUI procedure using husband\'s sperm'
   },
   iuiD: {
     name: 'IUI-D (IUI with Donor)',
     icon: '🤝',
-    price: 5500,
+    price: 35500,
     description: 'IUI procedure using donor sperm'
   }
 };

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const geneticInvestigationItemSchema = new mongoose.Schema({
-  id: {
+  _id: {
     type: String,
     required: true
   },
@@ -28,11 +28,6 @@ const geneticInvestigationSchema = new mongoose.Schema({
   patientId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
-  },
-  consultationId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Consultation',
     required: true
   },
   category: {
@@ -65,7 +60,6 @@ const geneticInvestigationSchema = new mongoose.Schema({
 
 // Compound index for efficient queries
 geneticInvestigationSchema.index({ patientId: 1, category: 1 });
-geneticInvestigationSchema.index({ consultationId: 1 });
 geneticInvestigationSchema.index({ date: -1 });
 
 module.exports = mongoose.model('GeneticInvestigation', geneticInvestigationSchema);

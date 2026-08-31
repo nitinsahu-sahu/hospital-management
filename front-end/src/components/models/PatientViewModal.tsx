@@ -1,8 +1,11 @@
-// components/patient/PatientViewModal.tsx
 import { Patient } from "../../types/patient";
-import PatientImage from "../patients/PatientImage";
 import PatientInfoSection from "../patients/PatientInfoSection";
 import RelativeCard from "../patients/RelativeCard";
+//@ts-ignore
+import { updatePatientImg } from "../../redux/actions/patient.actions"
+import { EditIcon } from "../../icons";
+import { useDispatch } from "react-redux";
+import { useRef, useState } from "react";
 
 interface PatientViewModalProps {
   patient: Patient;
@@ -10,7 +13,51 @@ interface PatientViewModalProps {
 }
 
 export default function PatientViewModal({ patient, onClose }: PatientViewModalProps) {
-  
+
+  const dispatch = useDispatch();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [currentImageUrl, setCurrentImageUrl] = useState(patient.pic?.url);
+
+   const handleImageClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Show preview immediately
+    const previewUrl = URL.createObjectURL(file);
+    setCurrentImageUrl(previewUrl);
+
+    // Prepare form data
+    const formData = new FormData();
+    formData.append('pic', file);
+
+    setIsUploading(true);
+
+    try {
+      const response = await dispatch(updatePatientImg(patient._id, formData));
+      
+      if (response?.data?.url) {
+        setCurrentImageUrl(response.data.url);
+      }
+    } catch (error: any) {
+      setCurrentImageUrl(patient.pic?.url);
+    } finally {
+      setIsUploading(false);
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      // Clean up preview URL
+      if (previewUrl && previewUrl !== currentImageUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    }
+  };
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
@@ -23,12 +70,39 @@ export default function PatientViewModal({ patient, onClose }: PatientViewModalP
         {/* Modal Header */}
         <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center z-10">
           <div className="flex items-center gap-4">
-            <PatientImage
-              src={patient.pic?.url}
-              alt={patient.pic?.alt || patient.name}
-              name={patient.name}
-              size="lg"
-            />
+            <div className="relative group">
+              <img
+                src={currentImageUrl || patient.pic?.url}
+                alt={patient.pic?.alt || patient.name}
+                className={`w-20 h-20 text-2xl rounded-full object-cover transition-all duration-300 ${
+                  isUploading ? 'opacity-50' : 'opacity-100'
+                }`}
+              />
+              
+              {/* Edit Icon Overlay */}
+              <button
+                onClick={handleImageClick}
+                disabled={isUploading}
+                className="absolute bottom-0 right-0 bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full shadow-lg transition-all duration-200 transform hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Update profile picture"
+              >
+                {isUploading ? (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <EditIcon className="w-4 h-4" />
+                )}
+              </button>
+
+              {/* Hidden file input */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/jpg,image/webp"
+                onChange={handleImageChange}
+                className="hidden"
+                disabled={isUploading}
+              />
+            </div>
             <div>
               <h3 className="text-xl font-semibold text-gray-800 dark:text-white">
                 {patient.name}
@@ -59,7 +133,7 @@ export default function PatientViewModal({ patient, onClose }: PatientViewModalP
                 label="Duration of Marriage"
                 value={patient.durationOfMarriage ? `${patient.durationOfMarriage} years` : "N/A"}
               />
-              <InfoItem label="Infertility Type" value={patient.infertiliyType=== "other"?patient.infertiliyTypeDetails:patient.infertiliyType} capitalize />
+              <InfoItem label="Infertility Type" value={patient.infertiliyType === "other" ? patient.infertiliyTypeDetails : patient.infertiliyType} capitalize />
             </div>
           </PatientInfoSection>
 
@@ -75,7 +149,7 @@ export default function PatientViewModal({ patient, onClose }: PatientViewModalP
           {/* ID Proof Details */}
           <PatientInfoSection title="ID Proof Details">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <InfoItem label="ID Proof Type" value={patient.idProofType==="other"?patient.idProofTypeDetails:patient.idProofType} capitalize />
+              <InfoItem label="ID Proof Type" value={patient.idProofType === "other" ? patient.idProofTypeDetails : patient.idProofType} capitalize />
               <InfoItem label="ID Proof Number" value={patient.idProofNumber} />
             </div>
           </PatientInfoSection>
@@ -83,7 +157,7 @@ export default function PatientViewModal({ patient, onClose }: PatientViewModalP
           {/* Referral Information */}
           <PatientInfoSection title="Referral Information">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <InfoItem label="How Found Clinic" value={patient.howToFindClinic==="other"?patient.howToFindClinicDetails:patient.howToFindClinic} capitalize />
+              <InfoItem label="How Found Clinic" value={patient.howToFindClinic === "other" ? patient.howToFindClinicDetails : patient.howToFindClinic} capitalize />
               <InfoItem label="Referred By Doctor" value={patient.referredByDoctorName || "N/A"} />
             </div>
           </PatientInfoSection>
@@ -92,7 +166,7 @@ export default function PatientViewModal({ patient, onClose }: PatientViewModalP
           <PatientInfoSection title="Relatives">
             {patient.relative ? (
               <div className="space-y-4">
-                  <RelativeCard relativedata={patient?.relative} />
+                <RelativeCard relativedata={patient?.relative} />
               </div>
             ) : (
               <div className="text-center py-8 text-gray-500 dark:text-gray-400">
@@ -123,16 +197,16 @@ export default function PatientViewModal({ patient, onClose }: PatientViewModalP
                 badge={patient.isActive ? "success" : "error"}
               />
               <InfoItem
-                label="Created At"
+                label="Registration At"
                 value={
                   patient.createdAt
                     ? new Date(patient.createdAt).toLocaleString("en-IN", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })
                     : "N/A"
                 }
               />
@@ -174,19 +248,17 @@ const InfoItem = ({
     </label>
     {badge ? (
       <span
-        className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${
-          badge === "success"
-            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-            : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-        }`}
+        className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${badge === "success"
+          ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+          : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+          }`}
       >
         {value || "N/A"}
       </span>
     ) : (
       <p
-        className={`text-sm font-medium text-gray-800 dark:text-white ${
-          capitalize ? "capitalize" : ""
-        }`}
+        className={`text-sm font-medium text-gray-800 dark:text-white ${capitalize ? "capitalize" : ""
+          }`}
       >
         {value || "N/A"}
       </p>

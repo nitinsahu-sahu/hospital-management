@@ -4,8 +4,8 @@ import { examinationConstants } from "../actions/constants";
 const initialState = {
   loading: false,
   error: null,
-  examination: null,
-  examinations: [],
+  pagination: {},
+  relativeExaminations: [],
   success: false
 };
 
@@ -24,8 +24,6 @@ export const relativeExaminationReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        examination: action.payload,
-        examinations: [...state.examinations, action.payload],
         success: true,
         error: null
       };
@@ -34,8 +32,8 @@ export const relativeExaminationReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        examination: Array.isArray(action.payload) ? null : action.payload,
-        examinations: Array.isArray(action.payload) ? action.payload : [action.payload],
+        relativeExaminations: action.payload.relativeExaminations,
+        pagination: action.payload.pagination,
         error: null
       };
 

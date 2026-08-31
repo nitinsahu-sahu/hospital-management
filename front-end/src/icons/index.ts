@@ -30,10 +30,16 @@ import { ReactComponent as SearchIcon } from "./search.svg?react";
 import { ReactComponent as DischargeIcon } from "./discharge.svg?react";
 import { ReactComponent as ProcedureIcon } from "./procedure.svg?react";
 import { ReactComponent as InvestigationIcon } from "./investigation.svg?react";
+import { ReactComponent as PdfIcon } from "./pdf.svg?react";
+import { ReactComponent as ChevronUpIcon } from "./chevron-up.svg?react";
+import { ReactComponent as CustomizeIcon } from "./customize.svg?react";
 
 
 
 export {
+  CustomizeIcon,
+  ChevronUpIcon,
+  PdfIcon,
   InvestigationIcon,
   ProcedureIcon,
   DischargeIcon,
